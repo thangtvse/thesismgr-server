@@ -1,6 +1,6 @@
 # thesismgr-server
 
-## Setup
+## Installation
   - npm install
   - npm start
   
