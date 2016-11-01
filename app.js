@@ -1,19 +1,26 @@
+/*
+ * Project: ThesisMgr-Server
+ * File: app.js
+ */
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var routes = require('./controllers');
-
-var dbURI = require('./config/db').dbURI;
+var routes = require('./routes');
+var dbConfig = require('./config/db');
+var dbURI = dbConfig.dbURI;
+var rootUsername = dbConfig.root_username;
+var rootPassword = dbConfig.root_password;
 var db = require('./helpers/db');
 
 var app = express();
 
 // connect database
 db.connectDatabase(dbURI);
+db.createRootUserIfNeeded(rootUsername, rootPassword);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

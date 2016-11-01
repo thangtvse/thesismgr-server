@@ -1,12 +1,20 @@
-/**
- * Created by Tran Viet Thang on 10/22/2016.
- * User model
+/*
+ * Project: ThesisMgr-Server
+ * File: models\User.js
  */
 
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
+var Office = require('./Office');
 
 var UserSchema = new mongoose.Schema({
+
+    officerNumber: {
+        type: String,
+        unique: true,
+        required: true
+    },
+
     username: {
         type: String,
         unique: true,
@@ -16,8 +24,23 @@ var UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+
+    fullName: {
+        type: String
+    },
+
+    office: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Office'
+    },
+
+    field: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Field'
+    }]
 });
+
 
 /**
  * Execute  before each user.save() call
@@ -26,7 +49,7 @@ UserSchema.pre('save', function (next) {
     var user = this;
 
     // Break out if the password hasn't changed
-    if (!user.isModified('password')){
+    if (!user.isModified('password')) {
         return next();
     }
 
@@ -35,6 +58,8 @@ UserSchema.pre('save', function (next) {
         if (err) {
             return next(err);
         }
+
+        console.log("hashing: " + user.password);
 
         bcrypt.hash(user.password, salt, null, function (err, hash) {
             if (err) {
@@ -46,6 +71,32 @@ UserSchema.pre('save', function (next) {
         })
     })
 });
+
+// methods
+UserSchema.statics.login = function (email, password, next) {
+
+    User.findOne({ username: email }, function (err, user) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!user) {
+            return next({
+                message: "User not found."
+            });
+        }
+
+        bcrypt.compare(password, user.password, function (err, result) {
+
+            if (err) {
+                return next({ message: err }, null);
+            }
+
+            return next(null, result, user);
+
+        })
+    });
+}
 
 var User = mongoose.model('user', UserSchema);
 

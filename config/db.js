@@ -3,5 +3,7 @@
  */
 
 module.exports = {
-    dbURI: "mongodb://localhost:27017/thesis_mgr"
+    dbURI: "mongodb://localhost:27017/thesis_mgr",
+    root_username: "admin@gmail.com",
+    root_password: "nopassword"
 };
