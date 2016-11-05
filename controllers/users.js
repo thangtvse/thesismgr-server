@@ -4,13 +4,15 @@
  */
 
 var User = require('../models/User');
+var Office = require('../models/Office');
 var jwt = require('jsonwebtoken');
 var createResponse = require('../helpers/response').createRes;
 var authConfig = require('../config/auth');
 var bcrypt = require('bcrypt-nodejs');
 var _ = require('underscore');
 var randomstring = require("randomstring");
-
+var Excel = require('exceljs');
+var stringSimilarity = require('string-similarity');
 
 /**
  * Login controller
@@ -139,4 +141,72 @@ exports.createUser = function (req, res) {
             console.log(errors);
             return res.status(400).send(createResponse(false, null, errors[0].msg));
         });
+}
+
+
+// Create a list of lecturers using xlsx file
+exports.createLecturersUsingXLSX = function (req, res) {
+
+    // check received file
+    var fileInfo = req.file;
+    if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+        return res.status(400).send(createResponse(false, null, "Invalid xlsx file"));
+    }
+
+    // find all offices
+    Office.find(function (err, offices) {
+
+        if (err) {
+            return res.status(500).createResponse(false, null, err.message);
+        }
+
+        // get all office names
+        var officeNames = _map(offices, function (office) {
+            return office.name;
+        })
+
+        // read xlsx file
+        var workbook = new Excel.Workbook();
+        workbook.xlsx.readFile(fileInfo.path)
+            .then(function () {
+                var worksheet = workbook.getWorksheet("Sheet1");
+                worksheet.eachRow({ includeEmpty: true }, function (row, rowNumber) {
+
+                    // File format: No., Officer Number, Full Name, Office, Username
+                    var values = row.values;
+
+                    // find best match office
+                    var bestMatchOfficeName = stringSimilarity.findBestMatch(row.values[4]).bestMatch.target;
+                    var indexOfBestMatchOffice = officeNames.indexOf(bestMatchOfficeName);
+
+                    // find index of best match office name in the offices array
+                    if (indexOfBestMatchOffice = -1) {
+                        return res.status(500).createResponse(false, null, "Internal error.");
+                    }
+
+                    // save new lecturer
+                    var newUser = new User({
+                        officerNumber: values[2],
+                        username: values[5],
+                        password: randomstring.generate(10),
+                        officeID: offices[indexOfBestMatchOffice]._id,
+                        fullName: values[2],
+                        role: 'lecturer'
+                    });
+
+                    newUser.save(function (err) {
+                        if (err) {
+                            return res.status(500).createResponse(false, null, err.message);
+                        }
+                    })
+                })
+            })
+            .catch(function (err) {
+                if (err) {
+                    return res.status(500).createResponse(false, null, err.message);
+                }
+            });
+    })
+
+    res.send(req.file);
 }

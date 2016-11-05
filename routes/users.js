@@ -8,6 +8,8 @@ var User = require('../models/User');
 var createResponse = require('../helpers/response').createRes;
 var usersCtrl = require('../controllers/users');
 var hasAccess = require('../middlewares/roles').hasAccess;
+var multer = require('multer');
+var upload = multer({ dest: 'temp/' });
 
 /**
  * @api {get} /users/:id Get user by users id
@@ -59,5 +61,13 @@ router.post('/create', [
     hasAccess('moderator'),
     usersCtrl.createUser
 ]);
+
+
+
+router.post('/create_lecturers_xlsx', [
+    hasAccess('moderator'),
+    upload.single('xlsx'),
+    usersCtrl.createLecturersUsingXLSX
+])
 
 module.exports = router;

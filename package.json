@@ -17,15 +17,18 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
     "ejs": "~2.4.1",
+    "exceljs": "^0.2.35",
     "express": "~4.13.4",
     "express-validator": "^2.21.0",
     "jsonwebtoken": "^7.1.9",
     "mongoose": "^4.6.4",
     "mongoose-role": "^2.0.0",
     "morgan": "~1.7.0",
+    "multer": "^1.2.0",
     "node-sass-middleware": "0.8.0",
     "randomstring": "^1.1.5",
     "serve-favicon": "~2.3.0",
+    "string-similarity": "^1.1.0",
     "underscore": "^1.8.3",
     "validator": "^6.1.0"
   }
