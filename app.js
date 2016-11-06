@@ -42,11 +42,14 @@ app.use(require('node-sass-middleware')({
     sourceMap: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'apidoc')));
 
 // required for passport
 require('./config/passport')(passport)
-app.use(session({secret: 'ilovescotchscotchyscotchscotch'})); // session secret
+app.use(session({
+    secret: 'thesismgr-system-uet-vnu', // session secret
+    resave: true,
+    saveUninitialized: true
+}));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session

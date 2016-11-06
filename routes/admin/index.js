@@ -7,9 +7,11 @@ var unless = require('../../helpers/auth').unless;
 
 router.use(unless(['/login'], authMiddleware.moderatorAuth));
 
+
 router.get('/', function(req, res) {
     res.render('admin/index');
 });
+
 
 router.get('/login', adminAuthCtrl.getLogin);
 
