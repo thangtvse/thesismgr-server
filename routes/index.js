@@ -16,27 +16,26 @@ var customValidators = require('../helpers/customValidators');
 var unless = function (paths, middleware) {
     return function (req, res, next) {
 
+
         var shouldRunMiddleware = true;
 
         paths.forEach(function (path) { 
             if (req.path === path) {
                 shouldRunMiddleware = false;
             }
-        })
+        });
 
         if (shouldRunMiddleware) {
             return middleware(req, res, next);
         } else {
             return next();
         }
-
-
     };
 };
 
 // middlewares ===============================================
 // authentication
-router.use(unless(['/users/login'], authMiddleware));
+// router.use(unless(['/users/login'], authMiddleware));
 
 // param validations
 router.use(expressValidator({
@@ -44,9 +43,10 @@ router.use(expressValidator({
 }));
 
 // routes ============================================================
-router.use('/users', require('./users'));
+router.use('/users', require('./admin/users'));
 router.use('/fields', require('./fields'));
 router.use('/offices', require('./offices'));
+router.use('/admin', require('./admin'));
 
 /* GET home page. */
 router.get('/', function (req, res, next) {

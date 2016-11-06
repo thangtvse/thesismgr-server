@@ -15,6 +15,9 @@ var dbURI = dbConfig.dbURI;
 var rootUsername = dbConfig.root_username;
 var rootPassword = dbConfig.root_password;
 var db = require('./helpers/db');
+var flash = require('connect-flash');
+var passport = require('passport');
+var session = require('express-session');
 
 var app = express();
 
@@ -40,6 +43,14 @@ app.use(require('node-sass-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'apidoc')));
+
+// required for passport
+require('./config/passport')(passport)
+app.use(session({secret: 'ilovescotchscotchyscotchscotch'})); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
 app.use(routes);
 
 // catch 404 and forward to error handler

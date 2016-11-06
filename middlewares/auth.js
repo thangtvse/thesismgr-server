@@ -2,39 +2,34 @@
  * Created by Tran Viet Thang on 10/22/2016.
  */
 
-var authConfig = require('../config/auth');
-var jwt = require('jsonwebtoken');
-var util = require('util')
+exports.adminAuth = function (req, res, next) {
 
-module.exports = function (req, res, next) {
-    //middleware for authorization
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated() && req.user.role == 'admin')
+        return next();
 
-    //get token from body or header
-    var token = req.query.token || req.headers['token'] || req.body.token;
-    if (token) {
+    // if they aren't redirect them to the home page
+    res.redirect('/admin/login');
+};
 
-        //verifies secret and check exp
-        jwt.verify(token, authConfig.secret_key, function (err, decoded) {
-            if (err) {
-                console.log(err);
-                return res.status(401).send({
-                    success: false,
-                    message: err.message
-                });
-            } else {
-                // if everything is good, save to request for use in other routes
-            
-                req.user = decoded._doc;
-                console.log('JWT decoded:\n' + util.inspect(decoded, {showHidden: false, depth: null}))
-                return next();
-            }
-        })
-    } else {
+exports.moderatorAuth = function (req, res, next) {
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated() && (req.user.role == 'moderator' || req.user.role == 'admin'))
+        return next();
 
-        //there is no token
-        return res.status(401).send({
-            success: false,
-            message: "No token provided"
-        })
-    }
+    // if they aren't redirect them to the home page
+    res.redirect('/admin/login');
+};
+
+exports.moderatorLevelAuth = function (req, res, next) {
+
+};
+
+
+exports.lecturerAuth = function (req, res, next) {
+
+};
+
+exports.studentAuth = function (req, res, next) {
+
 };

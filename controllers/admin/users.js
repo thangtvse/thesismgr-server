@@ -3,56 +3,20 @@
  * File: controllers\users.js
  */
 
-var User = require('../models/User');
-var Office = require('../models/Office');
+var User = require('../../models/User');
+var Office = require('../../models/Office');
 var jwt = require('jsonwebtoken');
-var createResponse = require('../helpers/response').createRes;
-var authConfig = require('../config/auth');
+var createResponse = require('../../helpers/response').createRes;
 var bcrypt = require('bcrypt-nodejs');
 var _ = require('underscore');
 var randomstring = require("randomstring");
 var Excel = require('exceljs');
 var stringSimilarity = require('string-similarity');
+var nodemailer = require('nodemailer');
+var mailTransportConfig = require('../../config/mail').transportConfig;
+var async = require('async');
+var util = require('util');
 
-/**
- * Login controller
- */
-exports.login = function (req, res) {
-
-    req.checkBody('username', 'Invalid username').notEmpty().isEmail();
-    req.checkBody('password', 'Invalid password').notEmpty();
-
-    var errors = req.validationErrors();
-    if (errors) {
-        console.log(errors);
-        return res.status(400).send(createResponse(false, null, errors[0].msg));
-    }
-
-    User.login(req.body.username, req.body.password, function (err, result, user) {
-
-        if (err) {
-            return res.status(401).send(createResponse(false, null, err.message));
-        }
-
-        if (result == true) {
-            // if user is found and password is right
-            // create a token
-            var token = jwt.sign(user, authConfig.secret_key, {
-                expiresIn: authConfig.exp_time
-            });
-
-            // return the information including token as JSON
-            return res.send({
-                success: true,
-                message: "Enjoy your token!",
-                token: token,
-                user: _.omit(user.toObject(), 'password')
-            });
-        } else {
-            return res.status(401).send(createResponse(false, null, "Wrong password."));
-        }
-    })
-}
 
 // get a lecturer or student user by id
 exports.getUserByID = function (req, res) {
@@ -72,7 +36,7 @@ exports.getUserByID = function (req, res) {
 
             return res.send(createResponse(true, nil, _.omit(user.toObject(), 'password')));
         });
-}
+};
 
 // get a moderator by id
 exports.getModeratorByID = function (req, res) {
@@ -89,7 +53,7 @@ exports.getModeratorByID = function (req, res) {
 
             return res.send(createResponse(true, nil, _.omit(user.toObject(), 'password')));
         });
-}
+};
 
 
 // Create a new user with random password
@@ -141,11 +105,14 @@ exports.createUser = function (req, res) {
             console.log(errors);
             return res.status(400).send(createResponse(false, null, errors[0].msg));
         });
-}
+};
 
 
 // Create a list of lecturers using xlsx file
 exports.createLecturersUsingXLSX = function (req, res) {
+
+
+    var mailTransporter = nodemailer.createTransport(mailTransportConfig);
 
     // check received file
     var fileInfo = req.file;
@@ -161,9 +128,97 @@ exports.createLecturersUsingXLSX = function (req, res) {
         }
 
         // get all office names
-        var officeNames = _map(offices, function (office) {
+        var officeNames = _.map(offices, function (office) {
             return office.name;
         })
+
+
+        // create a queue object with concurrency 2
+        var q = async.queue(function (task, callback) {
+
+            var row = task.row;
+
+            if (row._number == 1) {
+                return callback();
+            }
+
+            // File format: No., Officer Number, Full Name, Office, Username
+            var values = row.values;
+            
+            // get username
+            var username = values[5];
+            if (username.text) {
+                username = username.text;
+            }
+
+            // random password
+            var password = randomstring.generate(10)
+            
+            // find best match office
+            var bestMatchOfficeName = stringSimilarity.findBestMatch(row.values[4], officeNames).bestMatch.target;
+            var indexOfBestMatchOffice = officeNames.indexOf(bestMatchOfficeName);
+          
+            // find index of best match office name in the offices array
+            if (indexOfBestMatchOffice == -1) {
+                var error = new Error("Internal error.");
+                return callback(error, username);
+            }
+
+          
+            // save new lecturer
+            var newUser = new User({
+                officerNumber: values[2],
+                username: username,
+                password: password,
+                officeID: offices[indexOfBestMatchOffice]._id,
+                fullName: values[2],
+                role: 'lecturer'
+            });
+
+            newUser.save(function (err) {
+                if (err) {
+                    return callback(err, username);
+                }
+
+                // setup e-mail data with unicode symbols
+                var mailOptions = {
+                    from: '"ThesisMgr System 👥" <uendno@gmail.com>', // sender address
+                    to: username, // list of receivers
+                    subject: 'Invitation Mail', // Subject line
+                    text: 'username: ' + username + "\n" + "password: " + password // plaintext body
+                   //  html: '<b>Hello world 🐴</b>' // html body
+                };
+
+                console.log("sending mail to " + username);
+                // send mail with defined transport object
+                mailTransporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        return callback(error, username);
+                    }
+
+                    console.log( util.inspect(info, showHidden=false, depth=2, colorize=true));
+                    return callback();
+                });
+            })
+
+        }, 2);
+
+
+        var responseErrors = [];
+
+        q.drain = function() {
+            if (responseErrors.length > 0) {
+                return res.status(400).send(createResponse(false, {
+                    errors: responseErrors
+                },
+                "There are some errors."
+                ));
+
+            } else {
+                return res.send(createResponse(true, null, "Successfully!"));
+            }
+           
+        };
 
         // read xlsx file
         var workbook = new Excel.Workbook();
@@ -172,41 +227,18 @@ exports.createLecturersUsingXLSX = function (req, res) {
                 var worksheet = workbook.getWorksheet("Sheet1");
                 worksheet.eachRow({ includeEmpty: true }, function (row, rowNumber) {
 
-                    // File format: No., Officer Number, Full Name, Office, Username
-                    var values = row.values;
-
-                    // find best match office
-                    var bestMatchOfficeName = stringSimilarity.findBestMatch(row.values[4]).bestMatch.target;
-                    var indexOfBestMatchOffice = officeNames.indexOf(bestMatchOfficeName);
-
-                    // find index of best match office name in the offices array
-                    if (indexOfBestMatchOffice = -1) {
-                        return res.status(500).createResponse(false, null, "Internal error.");
-                    }
-
-                    // save new lecturer
-                    var newUser = new User({
-                        officerNumber: values[2],
-                        username: values[5],
-                        password: randomstring.generate(10),
-                        officeID: offices[indexOfBestMatchOffice]._id,
-                        fullName: values[2],
-                        role: 'lecturer'
-                    });
-
-                    newUser.save(function (err) {
-                        if (err) {
-                            return res.status(500).createResponse(false, null, err.message);
+                    q.push({
+                        row: row,
+                        rowNumber: rowNumber
+                    }, function (error, username) {
+                        if (error) {
+                            responseErrors.push({
+                                username: username,
+                                errorMessage: error.message
+                            })
                         }
                     })
                 })
             })
-            .catch(function (err) {
-                if (err) {
-                    return res.status(500).createResponse(false, null, err.message);
-                }
-            });
     })
-
-    res.send(req.file);
-}
+};

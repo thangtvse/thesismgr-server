@@ -19,4 +19,4 @@ exports.hasAccess = function (accessLevel) {
         }
 
     }
-}
+};

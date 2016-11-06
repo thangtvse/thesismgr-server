@@ -38,7 +38,12 @@ var UserSchema = new mongoose.Schema({
     field: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Field'
-    }]
+    }],
+
+    role: {
+        type: String,
+        required: true
+    }
 });
 
 
@@ -73,30 +78,39 @@ UserSchema.pre('save', function (next) {
 });
 
 // methods
-UserSchema.statics.login = function (email, password, next) {
+var login = function (email, password, next) {
 
-    User.findOne({ username: email }, function (err, user) {
+    User.findOne({username: email}, function (err, user) {
         if (err) {
             return next(err);
         }
 
         if (!user) {
-            return next({
-                message: "User not found."
-            });
+            return next(null, false);
         }
 
         bcrypt.compare(password, user.password, function (err, result) {
 
             if (err) {
-                return next({ message: err }, null);
+                return next({message: err}, null);
             }
 
             return next(null, result, user);
 
         })
     });
-}
+};
+
+UserSchema.statics.adminLogin = function (email, password, next) {
+    login(email, password, function(err, result, user) {
+        if (user && user.role != 'admin') {
+            return next(null, false);
+        }
+
+        return next(err, result, user);
+    })
+};
+
 
 var User = mongoose.model('user', UserSchema);
 

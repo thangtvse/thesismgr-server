@@ -9,4 +9,4 @@ module.exports = {
     public: ['lecturer', 'student'],
     lecturer: ['lecturer'],
     student: ['student']
-}
+};
