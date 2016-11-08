@@ -1,53 +1,24 @@
-/**
- * Created by Tran Viet Thang on 10/22/2016.
- */
-
-
 var express = require('express');
 var router = express.Router();
+var adminAuthCtrl = require('../controllers/authentication');
+var passport = require('passport');
 var authMiddleware = require('../middlewares/auth');
-var expressValidator = require('express-validator');
-var User = require('../models/User');
-var Office = require('../models/Office');
-var Field = require('../models/Field');
-var customValidators = require('../helpers/customValidators');
+var unless = require('../helpers/auth').unless;
 
-// Exclude some paths from middleware
-var unless = function (paths, middleware) {
-    return function (req, res, next) {
+router.use(unless(['/login'], authMiddleware.moderatorAuth));
 
+router.get('/', function(req, res) {
+    res.render('index');
+});
 
-        var shouldRunMiddleware = true;
+router.get('/login', adminAuthCtrl.getLogin);
 
-        paths.forEach(function (path) { 
-            if (req.path === path) {
-                shouldRunMiddleware = false;
-            }
-        });
-
-        if (shouldRunMiddleware) {
-            return middleware(req, res, next);
-        } else {
-            return next();
-        }
-    };
-};
-
-// middlewares ===============================================
-// authentication
-// router.use(unless(['/users/login'], authMiddleware));
-
-// param validations
-router.use(expressValidator({
-    customValidators: customValidators
+router.post('/login',  passport.authenticate('admin-login', {
+    successRedirect : '/', // redirect to the secure profile section
+    failureRedirect : '/login', // redirect back to the signup page if there is an error
+    failureFlash : true // allow flash messages
 }));
 
-// routes ============================================================
-router.use('/users', require('./admin/users'));
-router.use('/fields', require('./fields'));
-router.use('/offices', require('./offices'));
-router.use('/admin', require('./admin'));
-
-/* GET home page. */
+router.use('/users', require('./users'));
 
 module.exports = router;
