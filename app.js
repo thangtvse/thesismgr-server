@@ -18,12 +18,15 @@ var db = require('./helpers/db');
 var flash = require('connect-flash');
 var passport = require('passport');
 var session = require('express-session');
-
+var waterline = require('express-waterline');
 var app = express();
 
 // connect database
-db.connectDatabase(dbURI);
-db.createRootUserIfNeeded(rootUsername, rootPassword);
+// db.connectDatabase(dbURI);
+// db.createRootUserIfNeeded(rootUsername, rootPassword);
+db.createRootUserIfNeeded('admin@gmail.com', 'nopassword');
+// app.use(waterline.init(dbConfig));
+waterline.init(dbConfig)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

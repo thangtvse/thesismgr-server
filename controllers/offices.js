@@ -4,23 +4,25 @@
  */
 
 
-var Office = require('../models/Office');
+var getModels = require('express-waterline').getModels;
 var createResponse = require('../helpers/response').createRes;
-var mongoose = require('mongoose');
 var findAncestorsAndDescendants = require('../helpers/tree').findAncestorsAndDescendants;
 
 /**
  * Get a list all office in database
  */
 exports.getAllOffices = function (req, res) {
-    Office.find(function (err, offices) {
-        if (err) {
-            return res.status(500).send(createResponse(false, null, err.message));
-        }
 
-        return res.send(createResponse(true, offices, null));
-    })
-}
+    getModels('office').then(function (Office) {
+        Office.find(function (err, offices) {
+            if (err) {
+                return res.status(500).send(createResponse(false, null, err.message));
+            }
+
+            return res.send(createResponse(true, offices, null));
+        })
+    });
+};
 
 /**
  * Find an office by its ID
@@ -28,33 +30,32 @@ exports.getAllOffices = function (req, res) {
 exports.getOfficeById = function (req, res) {
     var id = req.params.id;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).send(createResponse(false, null, "Office not found."));
-    }
+    getModels('office').then(function (Office) {
 
-    Office.findById(id, function (err, office) {
-        if (err) {
-            return res.status(500).send(createResponse(false, null, err.message));
-        }
-
-        if (!office) {
-            return res.status(404).send(createResponse(false, null, "Office not found."));
-        }
-
-        findAncestorsAndDescendants(office, function (err, ancestors, descendants) {
+        Office.findById(id, function (err, office) {
             if (err) {
                 return res.status(500).send(createResponse(false, null, err.message));
             }
 
-            return res.send(
-                createResponse(true, {
-                    office: office,
-                    ancestors: ancestors,
-                    descendants: descendants
-                }, null));
+            if (!office) {
+                return res.status(404).send(createResponse(false, null, "Office not found."));
+            }
+
+            findAncestorsAndDescendants(office, function (err, ancestors, descendants) {
+                if (err) {
+                    return res.status(500).send(createResponse(false, null, err.message));
+                }
+
+                return res.send(
+                    createResponse(true, {
+                        office: office,
+                        ancestors: ancestors,
+                        descendants: descendants
+                    }, null));
+            })
         })
     })
-}
+};
 
 /**
  * Search an office by its name
@@ -62,39 +63,41 @@ exports.getOfficeById = function (req, res) {
 exports.searchOffice = function (req, res) {
     var searchText = req.query.text;
 
-    Office.find({
-        // Case-insensitive finding - Slow
-        name: { "$regex": searchText, "$options": "i" }
-    }, function (err, offices) {
+    getModels('office').then(function (Office) {
+        Office.find({
+            // Case-insensitive finding - Slow
+            name: {"$regex": searchText, "$options": "i"}
+        }, function (err, offices) {
 
-        var data = [];
+            var data = [];
 
-        console.log('length: ' + offices.length);
+            console.log('length: ' + offices.length);
 
-        if (offices.length > 0) {
-            offices.forEach(function (office) {
-                findAncestorsAndDescendants(office, function (err, ancestors, descendants) {
+            if (offices.length > 0) {
+                offices.forEach(function (office) {
+                    findAncestorsAndDescendants(office, function (err, ancestors, descendants) {
 
-                    if (err) {
-                        return res.status(500).send(createResponse(false, null, err.message));
-                    }
+                        if (err) {
+                            return res.status(500).send(createResponse(false, null, err.message));
+                        }
 
-                    data.push({
-                        office: office,
-                        ancestors: ancestors,
-                        descendants: descendants
+                        data.push({
+                            office: office,
+                            ancestors: ancestors,
+                            descendants: descendants
+                        });
+
+                        if (data.length == offices.length) {
+                            return res.send(createResponse(true, data, null));
+                        }
                     })
-
-                    if (data.length == offices.length) {
-                        return res.send(createResponse(true, data, null));
-                    }
-                })
-            });
-        } else {
-            return res.send(createResponse(true, data, null));
-        }
+                });
+            } else {
+                return res.send(createResponse(true, data, null));
+            }
+        })
     })
-}
+};
 
 /**
  * Add a new office to the database
@@ -103,54 +106,57 @@ exports.postOffice = function (req, res) {
     var officeName = req.body.name;
     var parentOfficeId = req.body.parent_id;
 
-    if (parentOfficeId) {
-        Office.findById(parentOfficeId, function (err, parentOffice) {
-            if (err) {
-                console.log(err);
-                return res.status(500).send(createResponse(false, null, err.message));
-            }
+    getModels('office').then(function (Office) {
 
-            if (parentOffice) {
-                var office = new Office({
-                    name: officeName,
-                    parentId: parentOfficeId
-                })
+        if (parentOfficeId) {
+            Office.findById(parentOfficeId, function (err, parentOffice) {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send(createResponse(false, null, err.message));
+                }
 
-                // save new fiew with parentId
-                office.save(function (err) {
-                    if (err) {
-                        return res.status(500).send(createResponse(false, null, err.message));
-                    }
+                if (parentOffice) {
+                    var office = new Office({
+                        name: officeName,
+                        parentId: parentOfficeId
+                    });
 
-                    // find root office and rebuild tree
-                    Office.findOne({
-                        parentId: null
-                    }, function (err, root) {
+                    // save new fiew with parentId
+                    office.save(function (err) {
                         if (err) {
                             return res.status(500).send(createResponse(false, null, err.message));
                         }
 
-                        Office.rebuildTree(root, 1, function () {
-                            return res.send(createResponse(true, office, null));
-                        })
+                        // // find root office and rebuild tree
+                        // Office.findOne({
+                        //     parentId: null
+                        // }, function (err, root) {
+                        //     if (err) {
+                        //         return res.status(500).send(createResponse(false, null, err.message));
+                        //     }
+                        //
+                        //     Office.rebuildTree(root, 1, function () {
+                        //         return res.send(createResponse(true, office, null));
+                        //     })
+                        // })
                     })
-                })
-            } else {
-                return res.send(createResponse(false, null, "Parent not found."));
-            }
+                } else {
+                    return res.send(createResponse(false, null, "Parent not found."));
+                }
 
-        })
-    } else {
-        var office = new Office({
-            name: officeName
-        })
+            })
+        } else {
+            var office = new Office({
+                name: officeName
+            });
 
-        office.save(function (err) {
-            if (err) {
-                return res.status(500).send(createResponse(false, null, err.message));
-            }
+            office.save(function (err) {
+                if (err) {
+                    return res.status(500).send(createResponse(false, null, err.message));
+                }
 
-            return res.send(createResponse(true, office, null));
-        })
-    }
-}
+                return res.send(createResponse(true, office, null));
+            })
+        }
+    });
+};

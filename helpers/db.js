@@ -6,6 +6,8 @@
 var mongoose = require('mongoose');
 var User = require('../models/User');
 var bcrypt = require('bcrypt-nodejs');
+var getModel = require('express-waterline').getModels;
+
 
 module.exports = {
 
@@ -48,38 +50,89 @@ module.exports = {
         });
     },
 
-    /**
-     * Create root user if not have one
-     * @param username {String} root username
-     * @param password {String} root password
-     */
+    // /**
+    //  * Create root user if not have one
+    //  * @param username {String} root username
+    //  * @param password {String} root password
+    //  */
+    // createRootUserIfNeeded: function (username, password) {
+    //     User.findOne({
+    //         role: 'admin'
+    //     }, function (err, admin) {
+    //
+    //         if (err) {
+    //             console.log('Create root error:\n' + err);
+    //             return;
+    //         }
+    //
+    //         if (!admin) {
+    //             var newRoot = new User({
+    //                 officerNumber: 0,
+    //                 username: username,
+    //                 password: password,
+    //                 role: "admin"
+    //             });
+    //
+    //             newRoot.save(function (err) {
+    //                 if (err) {
+    //                     if (err) {
+    //                         console.log('Create admin error:\n' + err);
+    //                         return;
+    //                     }
+    //                 }
+    //             })
+    //         }
+    //     })
+    // },
+
     createRootUserIfNeeded: function (username, password) {
-        User.findOne({
-            role: 'admin'
-        }, function (err, admin) {
+        var User = getModel('user').then(function (Model) {
 
-            if (err) {
-                console.log('Create root error:\n' + err);
-                return;
-            }
+            Model.findOne({
+                role: 'admin'
+            }).exec(function (err, admin) {
+                if (err) {
+                    console.log(err);
+                    return
+                }
 
-            if (!admin) {
-                var newRoot = new User({
-                    officerNumber: 0,
+                if (admin) {
+                    console.log("We already have an admin");
+                    return;
+                }
+
+                Model.create({
                     username: username,
                     password: password,
-                    role: "admin"
-                })
-
-                newRoot.save(function (err) {
+                    officerNumber: '1',
+                    role: 'admin'
+                }).exec(function (err, finn) {
                     if (err) {
-                        if (err) {
-                            console.log('Create admin error:\n' + err);
-                            return;
-                        }
+                        console.log(err);
+                        return
                     }
-                })
-            }
+
+                    console.log('Finn\'s id is:', finn.id);
+                });
+            });
+
+
+        })
+    },
+
+    createRootOfficeIfNeeded: function () {
+        var Office = getModel('office').then(function (Office) {
+            Office.find({}).exec(function (error, offices) {
+                if (error) {
+                    console.log(error);
+                    return
+                }
+
+                if (offices == null || offices.length == 0) {
+                    // create a root
+
+                }
+            })
         })
     }
 };

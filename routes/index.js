@@ -19,6 +19,7 @@ router.post('/login',  passport.authenticate('admin-login', {
     failureFlash : true // allow flash messages
 }));
 
+router.use('/fields', require('./fields'));
 router.use('/users', require('./users'));
 
 module.exports = router;

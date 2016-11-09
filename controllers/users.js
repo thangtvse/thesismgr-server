@@ -5,7 +5,6 @@
 
 var User = require('../models/User');
 var Office = require('../models/Office');
-var jwt = require('jsonwebtoken');
 var createResponse = require('../helpers/response').createRes;
 var bcrypt = require('bcrypt-nodejs');
 var _ = require('underscore');
@@ -18,7 +17,11 @@ var async = require('async');
 var util = require('util');
 
 
-// get a lecturer or student user by id
+/**
+ * Get an user by id
+ * @param req
+ * @param res
+ */
 exports.getUserByID = function (req, res) {
 
     var id = req.params.id;
@@ -26,7 +29,7 @@ exports.getUserByID = function (req, res) {
         {
             _id: id,
             role: {
-                $in: ['lecturer', 'student']
+                $in: ['lecturer', 'student', 'moderator']
             }
         },
         function (err, user) {
@@ -34,8 +37,29 @@ exports.getUserByID = function (req, res) {
                 return res.send(createResponse(false, {}, err.message));
             }
 
-            return res.send(createResponse(true, nil, _.omit(user.toObject(), 'password')));
+            return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
         });
+};
+
+/**
+ * Get all moderators
+ * @param req
+ * @param res
+ */
+exports.getAllModerator = function (req, res) {
+    User.find({
+        role: 'moderator'
+    }, function (err, moderators) {
+        if (err) {
+            return res.send(createResponse(false, {}, err.message));
+        }
+
+        var resModerators = _.map(moderators, function (moderator) {
+           return  _.omit(moderator.toObject(), 'password')
+        });
+
+        return res.send(createResponse(true, null, resModerators));
+    })
 };
 
 // get a moderator by id
@@ -51,7 +75,7 @@ exports.getModeratorByID = function (req, res) {
                 return res.send(createResponse(false, {}, err.message));
             }
 
-            return res.send(createResponse(true, nil, _.omit(user.toObject(), 'password')));
+            return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
         });
 };
 

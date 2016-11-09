@@ -29,4 +29,4 @@ exports.findAncestorsAndDescendants = function (node, next) {
             return next(null, sortedAncestors, sortedDescendants);
         });
     })
-}
+};
