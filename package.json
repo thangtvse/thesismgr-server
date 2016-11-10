@@ -35,6 +35,7 @@
     "passport-local": "^1.0.0",
     "randomstring": "^1.1.5",
     "sails-mongo": "^0.12.1",
+    "sails-mysql": "^0.11.5",
     "serve-favicon": "~2.3.0",
     "string-similarity": "^1.1.0",
     "underscore": "^1.8.3",

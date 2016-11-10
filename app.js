@@ -11,9 +11,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./routes');
 var dbConfig = require('./config/db');
-var dbURI = dbConfig.dbURI;
-var rootUsername = dbConfig.root_username;
-var rootPassword = dbConfig.root_password;
 var db = require('./helpers/db');
 var flash = require('connect-flash');
 var passport = require('passport');
@@ -24,9 +21,12 @@ var app = express();
 // connect database
 // db.connectDatabase(dbURI);
 // db.createRootUserIfNeeded(rootUsername, rootPassword);
-db.createRootUserIfNeeded('admin@gmail.com', 'nopassword');
+
 // app.use(waterline.init(dbConfig));
-waterline.init(dbConfig)
+waterline.init(dbConfig);
+db.createRootUserIfNeeded('admin@gmail.com', 'nopassword');
+db.createRootFieldIfNeeded();
+db.createRootOfficeIfNeeded();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -47,7 +47,7 @@ app.use(require('node-sass-middleware')({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // required for passport
-require('./config/passport')(passport)
+require('./config/passport')(passport);
 app.use(session({
     secret: 'thesismgr-system-uet-vnu', // session secret
     resave: true,

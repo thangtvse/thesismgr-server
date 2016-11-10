@@ -108,55 +108,15 @@ exports.postOffice = function (req, res) {
 
     getModels('office').then(function (Office) {
 
-        if (parentOfficeId) {
-            Office.findById(parentOfficeId, function (err, parentOffice) {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).send(createResponse(false, null, err.message));
-                }
+        Office.create({
+            name: officeName,
+            parent: parentOfficeId
+        }).exec(function (error, newOffice) {
+            if (error) {
+                return res.status(500).send(createResponse(false, null, error.message));
+            }
 
-                if (parentOffice) {
-                    var office = new Office({
-                        name: officeName,
-                        parentId: parentOfficeId
-                    });
-
-                    // save new fiew with parentId
-                    office.save(function (err) {
-                        if (err) {
-                            return res.status(500).send(createResponse(false, null, err.message));
-                        }
-
-                        // // find root office and rebuild tree
-                        // Office.findOne({
-                        //     parentId: null
-                        // }, function (err, root) {
-                        //     if (err) {
-                        //         return res.status(500).send(createResponse(false, null, err.message));
-                        //     }
-                        //
-                        //     Office.rebuildTree(root, 1, function () {
-                        //         return res.send(createResponse(true, office, null));
-                        //     })
-                        // })
-                    })
-                } else {
-                    return res.send(createResponse(false, null, "Parent not found."));
-                }
-
-            })
-        } else {
-            var office = new Office({
-                name: officeName
-            });
-
-            office.save(function (err) {
-                if (err) {
-                    return res.status(500).send(createResponse(false, null, err.message));
-                }
-
-                return res.send(createResponse(true, office, null));
-            })
-        }
+            return res.send(createResponse(true, newOffice, null))
+        })
     });
 };

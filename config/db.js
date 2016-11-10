@@ -3,7 +3,7 @@
  */
 var mongoAdapter = require('sails-mongo');
 var path = require('path');
-
+var mysqlAdapter = require('sails-mysql');
 // module.exports = {
 //     dbURI: "mongodb://localhost:27017/thesis_mgr",
 //     root_username: "admin@gmail.com",
@@ -15,14 +15,22 @@ console.log(path.join(process.cwd(), 'models'));
 module.exports = {
     dir: path.join(process.cwd(), 'models'),
     adapters: {
-        mongo: mongoAdapter
+        mongo: mongoAdapter,
+        mysql: mysqlAdapter
     },
     connections: {
-        mongo: {
-            adapter: 'mongo',
+        // default: {
+        //     adapter: 'mongo',
+        //     host: 'localhost',
+        //     port: 27017,
+        //     database: 'thesis-mgr'
+        // }
+        default: {
+            adapter: 'mysql',
             host: 'localhost',
-            port: 27017,
-            database: 'thesis-mgr'
+            database: 'thesis-mgr',
+            port: 3306,
+            user: 'root'
         }
     }
 };
