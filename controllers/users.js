@@ -151,35 +151,35 @@ exports.createUser = function (req, res) {
  * @param res
  * @returns {*}
  */
-exports.createLecturersUsingXLSX = function (req, res) {
+exports.createUsingXLSX = function (role) {
+    return function (req, res) {
+        var mailTransporter = nodemailer.createTransport(mailTransportConfig);
 
+        // check received file
+        var fileInfo = req.file;
+        if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            return res.status(400).send(createResponse(false, null, "Invalid xlsx file"));
+        }
 
-    var mailTransporter = nodemailer.createTransport(mailTransportConfig);
+        getModels('user').then(function (User) {
+            User.createUsingXLSX(role, fileInfo.path, mailTransporter, 'uendno@gmail.com', function (errors) {
 
-    // check received file
-    var fileInfo = req.file;
-    if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-        return res.status(400).send(createResponse(false, null, "Invalid xlsx file"));
+                // delete file
+                fs.unlink(fileInfo.path, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+
+                console.log(errors);
+
+                if (errors && errors.length >= 0) {
+                    return res.status(500).send(createResponse(false, errors, 'There are some error.'));
+                }
+
+                return res.send(createResponse(true, null, "Successfully!"));
+
+            })
+        });
     }
-
-    getModels('user').then(function (User) {
-       User.createUsingXLSX('lecturer', fileInfo.path, mailTransporter, 'uendno@gmail.com', function (errors) {
-
-           // delete file
-           fs.unlink(fileInfo.path, function (err) {
-               if (err) {
-                   console.log(err);
-               }
-           });
-
-           console.log(errors);
-
-           if (errors && errors.length >= 0) {
-               return res.status(500).send(createResponse(false, errors, 'There are some error.'));
-           }
-
-           return res.send(createResponse(true, null, "Successfully!"));
-
-       })
-    });
 };

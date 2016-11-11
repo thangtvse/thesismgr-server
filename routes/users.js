@@ -22,7 +22,7 @@ router.get('');
 
 router.post('/moderators/create_xlsx', [
     upload.single('xlsx'),
-    usersCtrl.createLecturersUsingXLSX
+    usersCtrl.createUsingXLSX('moderator')
 ]);
 
 router.get('/lecturers', [
@@ -34,7 +34,7 @@ router.get('/lecturers', [
 
 router.post('/lecturers/create_xlsx', [
     upload.single('xlsx'),
-    usersCtrl.createLecturersUsingXLSX
+    usersCtrl.createUsingXLSX('lecturer')
 ]);
 
 router.get('/:id', usersCtrl.getUserByID);
