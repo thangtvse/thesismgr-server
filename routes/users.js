@@ -21,8 +21,6 @@ router.get('/moderators/:id', [
     usersCtrl.getModeratorByID
 ]);
 
-
-
 router.post('/create', [
     hasAccess('moderator'),
     usersCtrl.createUser

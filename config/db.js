@@ -19,18 +19,18 @@ module.exports = {
         mysql: mysqlAdapter
     },
     connections: {
-        // default: {
-        //     adapter: 'mongo',
-        //     host: 'localhost',
-        //     port: 27017,
-        //     database: 'thesis-mgr'
-        // }
         default: {
-            adapter: 'mysql',
+            adapter: 'mongo',
             host: 'localhost',
-            database: 'thesis-mgr',
-            port: 3306,
-            user: 'root'
+            port: 27017,
+            database: 'thesis-mgr'
         }
+        // default: {
+        //     adapter: 'mysql',
+        //     host: 'localhost',
+        //     database: 'thesis-mgr',
+        //     port: 3306,
+        //     user: 'root'
+        // }
     }
 };

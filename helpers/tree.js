@@ -3,33 +3,82 @@
  * File: helpers\tree.js
  */
 
+var getModel = require('express-waterline').getModels;
+
 /**
- * Helper function for find both ancestors and descendents of a given field
- * 
- * @param node Given node
- * @param {function(Error, [], [])}next Callback function
+ * Find ancestors and descendants for an office node
+ * @param office
+ * @param next
  */
-exports.findAncestorsAndDescendants = function (node, next) {
-    node.descendants(function (err, descendants) {
-        if (err) {
-            return next(err, null, null);
+exports.findAncestorsAndDescendantsForOffice = function (office, next) {
+
+    getModel('office').then(function (Office) {
+       return findAncestorsAndDescendants(Office, office, next);
+    });
+};
+
+/**
+ * Find ancestors and descendants for a field node
+ * @param field
+ * @param next
+ */
+exports.findAncestorsAndDescendantsForField = function (field, next) {
+
+    getModel('field').then(function (Field) {
+        return findAncestorsAndDescendants(Field, field, next);
+    });
+};
+
+/**
+ * find ancestors and descendants for a node in a collection that implements nested set
+ * @param Model
+ * @param node
+ * @param next
+ */
+var findAncestorsAndDescendants = function (Model, node, next) {
+    Model.find({
+        left: {
+            '<': node.left
+        },
+        right: {
+            '>': node.right
+        }
+    }).exec(function (error, descendants) {
+
+        if (error) {
+            return next(error, null, null);
         }
 
-        node.ancestors(function (err, ancestors) {
-            if (err) {
-                return next(err, null, null);
+        Model.find({
+            left: {
+                '>': node.left
+            },
+            right: {
+                '<': node.right
+            }
+        }).exec(function (error, ancestors) {
+            if (error) {
+                return next(error, null, null);
             }
 
-            var condition = function (first, second) {
-                return first.lft - second.lft
-            }
-            var sortedAncestors = ancestors.sort(condition);
-            var sortedDescendants = descendants.sort(condition);
-
-            return next(null, sortedAncestors, sortedDescendants);
+            return next(null, sortNodeByLeft(ancestors), sortNodeByLeft(descendants));
         });
     })
 };
+
+/**
+ * Sort a set of nodes by left value
+ * @param nodes
+ * @returns {Query|Aggregate|*|Array.<T>}
+ */
+var sortNodeByLeft = function (nodes) {
+    var condition = function (first, second) {
+        return first.lft - second.lft
+    };
+    return nodes.sort(condition);
+};
+
+exports.sortNodeByLeft = sortNodeByLeft;
 
 /**
  * Function for execute before creating a node in nested set

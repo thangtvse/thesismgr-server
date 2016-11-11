@@ -6,7 +6,9 @@
 
 var getModels = require('express-waterline').getModels;
 var createResponse = require('../helpers/response').createRes;
-var findAncestorsAndDescendants = require('../helpers/tree').findAncestorsAndDescendants;
+var treeHelper = require('../helpers/tree');
+var findAncestorsAndDescendants = treeHelper.findAncestorsAndDescendantsForOffice;
+var sortNodesByLeft = treeHelper.sortNodeByLeft;
 
 /**
  * Get a list all office in database
@@ -19,7 +21,7 @@ exports.getAllOffices = function (req, res) {
                 return res.status(500).send(createResponse(false, null, err.message));
             }
 
-            return res.send(createResponse(true, offices, null));
+            return res.send(createResponse(true, sortNodesByLeft(offices), null));
         })
     });
 };

@@ -20,6 +20,8 @@ router.post('/login',  passport.authenticate('admin-login', {
 }));
 
 router.use('/fields', require('./fields'));
+router.use('/offices', require('./offices'));
 router.use('/users', require('./users'));
+router.use('/api', require('./api'));
 
 module.exports = router;
