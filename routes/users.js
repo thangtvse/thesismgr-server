@@ -6,13 +6,16 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/User');
 var usersCtrl = require('../controllers/users');
-var hasAccess = require('../middlewares/roles').hasAccess;
+var hasAccess = require('../middlewares/auth').hasAccess;
 var multer = require('multer');
-var upload = multer({ dest: 'temp/' });
+var upload = multer({dest: 'temp/'});
 
-router.get('/create_lecturers_xlsx', function (req, res) {
-    res.render('./users/create_lecturers');
-});
+router.get('/create_lecturers_xlsx', [
+    hasAccess('moderator'),
+    function (req, res) {
+        res.render('./users/create_lecturers');
+    }
+]);
 
 router.get('/:id', usersCtrl.getUserByID);
 

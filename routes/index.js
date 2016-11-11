@@ -2,26 +2,25 @@ var express = require('express');
 var router = express.Router();
 var adminAuthCtrl = require('../controllers/authentication');
 var passport = require('passport');
-var authMiddleware = require('../middlewares/auth');
-var unless = require('../helpers/auth').unless;
+var hasAccess = require('../middlewares/auth').hasAccess;
 
-router.use(unless(['/login'], authMiddleware.moderatorAuth));
-
-router.get('/', function(req, res) {
-    res.render('index');
-});
+router.get('/', [
+    hasAccess('moderator'),
+    function (req, res) {
+        res.render('index');
+    }
+]);
 
 router.get('/login', adminAuthCtrl.getLogin);
 
-router.post('/login',  passport.authenticate('admin-login', {
-    successRedirect : '/', // redirect to the secure profile section
-    failureRedirect : '/login', // redirect back to the signup page if there is an error
-    failureFlash : true // allow flash messages
+router.post('/login', passport.authenticate('admin-login', {
+    successRedirect: '/', // redirect to the secure profile section
+    failureRedirect: '/login', // redirect back to the signup page if there is an error
+    failureFlash: true // allow flash messages
 }));
 
 router.use('/fields', require('./fields'));
 router.use('/offices', require('./offices'));
 router.use('/users', require('./users'));
-router.use('/api', require('./api'));
 
 module.exports = router;
