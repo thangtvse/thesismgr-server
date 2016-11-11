@@ -32,7 +32,6 @@ gulp.task('minify-css', ['less'], function () {
 // Copy JS to dist
 gulp.task('js', function () {
     return gulp.src(['public/js/sb-admin-2.js'])
-        .pipe(header(banner, {pkg: pkg}))
         .pipe(gulp.dest('public/dist/js'))
         .pipe(browserSync.reload({
             stream: true
@@ -43,7 +42,6 @@ gulp.task('js', function () {
 gulp.task('minify-js', ['js'], function () {
     return gulp.src('public/js/sb-admin-2.js')
         .pipe(uglify())
-        .pipe(header(banner, {pkg: pkg}))
         .pipe(rename({suffix: '.min'}))
         .pipe(gulp.dest('public/dist/js'))
         .pipe(browserSync.reload({
@@ -92,10 +90,10 @@ gulp.task('copy', function () {
 });
 
 // Run everything
-gulp.task('default', ['minify-css', 'minify-js', 'copy']);
+gulp.task('default', ['minify-css', 'minify-js']);
 
 // Run server with nodemon
-gulp.task('nodemon',['watch'], function () {
+gulp.task('nodemon',['default', 'watch'], function () {
     nodemon({
         script: './bin/www',
         ext: 'js',
