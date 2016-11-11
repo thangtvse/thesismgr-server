@@ -10,11 +10,31 @@ var hasAccess = require('../middlewares/auth').hasAccess;
 var multer = require('multer');
 var upload = multer({dest: 'temp/'});
 
-router.get('/create_lecturers_xlsx', [
+
+router.get('/moderators',[
+    hasAccess('admin'),
+    function (req, res) {
+        res.render('./users/moderators');
+    }
+]);
+
+router.get('');
+
+router.post('/moderators/create_xlsx', [
+    upload.single('xlsx'),
+    usersCtrl.createLecturersUsingXLSX
+]);
+
+router.get('/lecturers', [
     hasAccess('moderator'),
     function (req, res) {
-        res.render('./users/create_lecturers');
+        res.render('./users/lecturers');
     }
+]);
+
+router.post('/lecturers/create_xlsx', [
+    upload.single('xlsx'),
+    usersCtrl.createLecturersUsingXLSX
 ]);
 
 router.get('/:id', usersCtrl.getUserByID);
@@ -30,9 +50,5 @@ router.post('/create', [
 ]);
 
 
-router.post('/create_lecturers_xlsx', [
-    upload.single('xlsx'),
-    usersCtrl.createLecturersUsingXLSX
-]);
 
 module.exports = router;

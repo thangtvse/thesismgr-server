@@ -14,6 +14,34 @@ var util = require('util');
 var getModels = require('express-waterline').getModels;
 
 /**
+ * Get all moderators
+ * @param req
+ * @param res
+ */
+exports.getAllModerator = function (req, res) {
+    getModels('user').then(function (User) {
+        User.find({
+            role: 'moderator'
+        }).paginate({
+            page: req.query.page,
+            skip: 10
+        }).exec(function (err, moderators) {
+            if (err) {
+                return res.send(createResponse(false, {}, err.message));
+            }
+
+            var resModerators = _.map(moderators, function (moderator) {
+                return _.omit(moderator.toObject(), 'password')
+            });
+
+            return res.send(createResponse(true, null, resModerators));
+        })
+    });
+};
+
+
+
+/**
  * Get an user by id
  * @param req
  * @param res
@@ -40,28 +68,7 @@ exports.getUserByID = function (req, res) {
 
 };
 
-/**
- * Get all moderators
- * @param req
- * @param res
- */
-exports.getAllModerator = function (req, res) {
-    getModels('user').then(function (User) {
-        User.find({
-            role: 'moderator'
-        }, function (err, moderators) {
-            if (err) {
-                return res.send(createResponse(false, {}, err.message));
-            }
 
-            var resModerators = _.map(moderators, function (moderator) {
-                return _.omit(moderator.toObject(), 'password')
-            });
-
-            return res.send(createResponse(true, null, resModerators));
-        })
-    });
-};
 
 // get a moderator by id
 exports.getModeratorByID = function (req, res) {
