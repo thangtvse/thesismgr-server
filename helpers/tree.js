@@ -4,7 +4,7 @@
  */
 
 var getModel = require('express-waterline').getModels;
-
+var sanitizeHtml = require('sanitize-html');
 /**
  * Find ancestors and descendants for an office node
  * @param office
@@ -13,7 +13,7 @@ var getModel = require('express-waterline').getModels;
 exports.findAncestorsAndDescendantsForOffice = function (office, next) {
 
     getModel('office').then(function (Office) {
-       return findAncestorsAndDescendants(Office, office, next);
+        return findAncestorsAndDescendants(Office, office, next);
     });
 };
 
@@ -165,4 +165,85 @@ exports.beforeCreateANode = function (Model, values, next) {
         }
 
     })
+};
+
+var createNode = function (node) {
+    return "<li>" + node.name + "<ul>";
+};
+
+exports.createTree = function (nodes) {
+
+    nodes = [
+        {
+            name: 'root',
+            left: 1,
+            right: 24
+        },
+        {
+            name: 'Nam',
+            left: 2,
+            right: 9
+        },
+        {
+            name: 'Mau',
+            left: 3,
+            right: 8
+        },
+        {
+            name: 'Thuy',
+            left: 4,
+            right: 5
+        },
+        {
+            name: 'Luyen',
+            left: 6,
+            right: 7
+        },
+        {
+            name: 'Ha',
+            left: 10,
+            right: 21
+        },
+        {
+            name: 'Long',
+            left: 11,
+            right: 12
+        }
+    ];
+
+    var htmlNodes = [];
+
+    for (var i = 0; i < nodes.length; i++) {
+
+        htmlNodes[i] = "";
+
+        if (i == 0) {
+            // first node
+            htmlNodes[i] = htmlNodes[i].concat("<ul>");
+        } else {
+
+            for (var j = i - 1; j >= 0; j--) {
+
+                if (nodes[i].left > nodes[j].left && nodes[i].left < nodes[j].right) {
+                    // if current node is a child of this node
+                    htmlNodes[i] = htmlNodes[i].concat(createNode(nodes[i]));
+                    break;
+                } else {
+                    // if current node is not a child of this node, close the <ul> tag of this node
+                    if (htmlNodes[j].indexOf("</ul>") == -1) {
+                        htmlNodes[i] = htmlNodes[i].concat("</ul></li>");
+                    }
+                }
+            }
+        }
+    }
+
+    var htmlString = "";
+    htmlNodes.forEach(function (htmlNode) {
+        htmlString = htmlString.concat(htmlNode);
+    });
+
+    htmlString = sanitizeHtml(htmlString);
+    htmlString = htmlString.replace(new RegExp("<ul></ul>", 'g'), "");
+    return htmlString;
 };
