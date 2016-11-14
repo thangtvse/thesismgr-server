@@ -18,7 +18,10 @@ router.get('/moderators',[
     }
 ]);
 
-router.get('');
+router.get('/api/moderators',[
+    hasAccess('admin'),
+    usersCtrl.getAllModerator
+]);
 
 router.post('/moderators/create_xlsx', [
     upload.single('xlsx'),

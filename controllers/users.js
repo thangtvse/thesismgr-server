@@ -12,6 +12,7 @@ var mailTransportConfig = require('../config/mail').transportConfig;
 var fs = require('fs');
 var util = require('util');
 var getModels = require('express-waterline').getModels;
+var numberOfUsersPerPage = require('../config/pagination').numberOfUsersPerPage;
 
 /**
  * Get all moderators
@@ -19,23 +20,32 @@ var getModels = require('express-waterline').getModels;
  * @param res
  */
 exports.getAllModerator = function (req, res) {
-    getModels('user').then(function (User) {
-        User.find({
-            role: 'moderator'
-        }).paginate({
-            page: req.query.page,
-            skip: 10
-        }).exec(function (err, moderators) {
-            if (err) {
-                return res.send(createResponse(false, {}, err.message));
-            }
 
-            var resModerators = _.map(moderators, function (moderator) {
-                return _.omit(moderator.toObject(), 'password')
-            });
+    req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
 
-            return res.send(createResponse(true, null, resModerators));
-        })
+    req.getValidationErrors().then(function(errors) {
+        if (errors) {
+            return res.status(400).send(createResponse(false, null, errors[0].msg));
+        }
+
+        getModels('user').then(function (User) {
+            User.find({
+                role: 'moderator'
+            }).paginate({
+                page: req.query.page,
+                limit: numberOfUsersPerPage
+            }).exec(function (err, moderators) {
+                if (err) {
+                    return res.send(createResponse(false, {}, err.message));
+                }
+
+                var resModerators = _.map(moderators, function (moderator) {
+                    return _.omit(moderator.toObject(), 'password')
+                });
+
+                return res.send(createResponse(true, null, resModerators));
+            })
+        });
     });
 };
 
