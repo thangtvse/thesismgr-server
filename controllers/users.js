@@ -157,6 +157,9 @@ exports.createUsingXLSX = function (role) {
 
         // check received file
         var fileInfo = req.file;
+
+        console.log(fileInfo);
+
         if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
             return res.status(400).send(createResponse(false, null, "Invalid xlsx file"));
         }

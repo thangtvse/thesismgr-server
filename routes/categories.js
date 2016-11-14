@@ -5,29 +5,28 @@
 
 var express = require('express');
 var router = express.Router();
-var fieldsCtrl = require('../controllers/fields');
 var hasAccess = require('../middlewares/auth').hasAccess;
 var util = require('util');
+var categoriesCtrl = require('../controllers/categories');
 
 // router.get('/search', fieldsCtrl.searchField);
 
-router.get('/fields', function (req, res) {
-    var fields = require('../helpers/tree').createTree();
-    console.log(util.inspect(fields));
-    res.render('./categories/fields', {fields: require('../helpers/tree').createTree()})
-});
+router.get('/fields', [
+    hasAccess('admin'),
+    categoriesCtrl.getFieldsView
+]);
 
-// router.post('/', [
-//     hasAccess('admin'),
-//     fieldsCtrl.postField
-// ]);
-
+router.post('/fields', [
+    hasAccess('admin'),
+    categoriesCtrl.postField
+]);
 
 
-// router.delete('/:id',[
-//   hasAccess('admin'),
-//   fieldsCtrl.deleteField
-// ]);
+
+router.get('/fields/delete',[
+  hasAccess('admin'),
+    categoriesCtrl.deleteField
+]);
 
 
 module.exports = router;

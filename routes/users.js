@@ -37,7 +37,7 @@ router.post('/lecturers/create_xlsx', [
     usersCtrl.createUsingXLSX('lecturer')
 ]);
 
-router.get('/:id', usersCtrl.getUserByID);
+// router.get('/:id', usersCtrl.getUserByID);
 
 router.get('/moderators/:id', [
     hasAccess(['moderator']),

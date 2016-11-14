@@ -51,6 +51,9 @@
 .submit_file {
   clear: both;
 }
+.form-group.input-group.category-search {
+  margin: 10px 10px 10px 10px;
+}
 body {
   background-color: #f8f8f8;
 }

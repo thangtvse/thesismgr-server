@@ -1,7 +1,7 @@
 <!Doctype html>
 <html>
 <meta charset="utf-8"/>
-<%- include('./patrials/head.ejs', {title: "ThesisMgr"}) %>
+<%- include('../patrials/head.ejs', {title: "ThesisMgr"}) %>
 <% var quotation= [{
     "dimension" : 0,
     "currency": "RMB",
@@ -51,20 +51,20 @@
         "price": "4.5",
         "factory": "hsf"}];
 %>
-<%- include ./patrials/scripts.ejs%>
-<%- include mod/moderator_js.ejs%>
+<%- include ../patrials/scripts.ejs%>
+<%- include moderator.javascripts.ejs%>
 
 <body>
 <div id="wrapper">
 
-    <% include ./patrials/navbar.ejs %>
+    <% include ../patrials/navbar.ejs %>
 
     <!-- Navigation -->
     <div id="page-wrapper">
 
         <div class="container-fluid">
             <div class="editdata"  style="padding: 10px;">
-                <%- include ./mod/admin_add_moderator_modal.ejs%>
+                <%- include moderators.modal.ejs%>
             </div>
             <table class="table table-hover table-striped" id="officer_table" >
                 <tr>
@@ -105,8 +105,6 @@
 
 </div>
 <!-- /#wrapper -->
-
-
 
 </body>
 </html>

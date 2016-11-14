@@ -5,6 +5,9 @@
 
 var getModel = require('express-waterline').getModels;
 var sanitizeHtml = require('sanitize-html');
+var util = require('util');
+var async = require("async");
+
 /**
  * Find ancestors and descendants for an office node
  * @param office
@@ -73,7 +76,7 @@ var findAncestorsAndDescendants = function (Model, node, next) {
  */
 var sortNodeByLeft = function (nodes) {
     var condition = function (first, second) {
-        return first.lft - second.lft
+        return first.left - second.left
     };
     return nodes.sort(condition);
 };
@@ -121,44 +124,73 @@ exports.beforeCreateANode = function (Model, values, next) {
             Model.findOne({
                 id: values.parentId
             }).exec(function (error, parent) {
+
+                if (error) {
+                    return next(error);
+                }
+
                 values.left = parent.right;
                 values.right = parent.right + 1;
-                parent.right = parent.right + 2;
                 parent.save(function (error) {
                     if (error) {
+                        console.log(error);
                         return next(error);
                     }
 
-                    Model.update(
+                    Model.find(
                         {
                             left: {
-                                '>=': values.right
+                                '>=': values.left
                             }
-                        },
-                        {
-                            left: left + 2
                         }
-                    ).exec(function (error, updated) {
+                    ).exec(function (error, fields) {
                         if (error) {
+                            console.log(error);
                             return next(error);
                         }
 
-                        Model.update(
-                            {
-                                right: {
-                                    '>=': values.right
-                                }
-                            },
-                            {
-                                right: right + 2
-                            }
-                        ).exec(function (error, updated) {
-                            if (error) {
-                                return next(error);
-                            }
+                        async.each(fields,
+                            function (field, callback) {
+                                field.left = field.left + 2;
+                                field.save(function (error) {
+                                    return callback(error);
+                                });
+                            }, function (error) {
 
-                            next();
-                        })
+                                if (error) {
+                                    console.log(error);
+                                    return next(error);
+                                }
+
+                                Model.find(
+                                    {
+                                        right: {
+                                            '>=': values.left
+                                        }
+                                    }
+                                ).exec(function (error, fields) {
+                                    if (error) {
+                                        console.log(error);
+                                        return next(error);
+                                    }
+
+                                    async.each(fields,
+                                        function (field, callback) {
+                                            field.right = field.right + 2;
+                                            field.save(function (error) {
+                                                callback(error);
+                                            });
+                                        }, function (error) {
+
+                                            if (error) {
+                                                console.log(error);
+                                                return next(error);
+                                            }
+
+                                            return next()
+                                        });
+                                })
+                            });
                     })
                 });
             })
@@ -167,49 +199,135 @@ exports.beforeCreateANode = function (Model, values, next) {
     })
 };
 
+
+exports.afterDestroyANode = function (Model, left, right, next) {
+    // find all descendants
+
+    Model.find({
+        left: {
+            ">": left
+        },
+        right: {
+            "<": right
+        }
+    }).exec(function (error, descendants) {
+
+        if (error) {
+            console.log(error);
+            return next(error);
+        }
+
+        var numOfRemovedNodes = descendants.length + 1;
+
+        Model.destroy({
+            left: {
+                ">": left
+            },
+            right: {
+                "<": right
+            }
+        }).exec(function (error) {
+            if (error) {
+                console.log(error);
+                return next(error);
+            }
+
+            // update left and right
+            Model.find({
+                left: {
+                    ">": right
+                }
+            }).exec(function (error, nodes) {
+                if (error) {
+                    console.log(error);
+                    return next(error);
+                }
+
+                console.log("updating left >" + right);
+
+                async.each(nodes,
+                    function (node, callback) {
+
+                        console.log("updating:");
+                        console.log(util.inspect(node));
+
+                        node.left = node.left - numOfRemovedNodes * 2;
+                        node.save(function (error) {
+                            if (error) {
+                                console.log(error);
+                                return callback(error);
+                            }
+
+                            callback();
+                        })
+                    }, function (error) {
+
+                        console.log("updated");
+
+                        if (error) {
+                            console.log(error);
+                            return next(error);
+                        }
+
+                        Model.find({
+                            right: {
+                                ">": right
+                            }
+                        }).exec(function (error, nodes) {
+                            if (error) {
+                                console.log(error);
+                                return next(error);
+                            }
+
+                            console.log("updating right >" + right);
+
+                            async.each(nodes,
+                                function (node, callback) {
+                                    node.right = node.right - numOfRemovedNodes * 2;
+                                    node.save(function (error) {
+                                        if (error) {
+                                            console.log(error);
+                                            return callback(error);
+                                        }
+
+                                        callback();
+                                    })
+                                }, function (error) {
+                                    if (error) {
+                                        console.log(error);
+                                        return next(error);
+                                    }
+
+                                    return next();
+
+                                })
+                        })
+                    })
+            })
+        })
+
+    })
+};
+
 var createNode = function (node) {
-    return "<li>" + node.name + "<ul>";
+
+    return "<li style='list-style-type: none'><div class=\"panel panel-default\" style='margin-bottom: 4px; position: relative;'><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
+
+};
+
+var createLeaf = function (node) {
+    return createNode(node);
+};
+
+var editButton = function (node) {
+    return "<a style='position: absolute; right: 60px' href=\"#\" data-action=\"edit\" data-id=\"" + node.id + "\" class=\"category-hierarchy edit\">  Edit </a>"
+};
+
+var deleteButton = function (node) {
+    return "<a style='position: absolute; right: 10px;' href=\"#\" data-action=\"delete\" data-id=\"" + node.id + "\" class=\"category-hierarchy delete\">Delete </a>"
 };
 
 exports.createTree = function (nodes) {
-
-    nodes = [
-        {
-            name: 'root',
-            left: 1,
-            right: 24
-        },
-        {
-            name: 'Nam',
-            left: 2,
-            right: 9
-        },
-        {
-            name: 'Mau',
-            left: 3,
-            right: 8
-        },
-        {
-            name: 'Thuy',
-            left: 4,
-            right: 5
-        },
-        {
-            name: 'Luyen',
-            left: 6,
-            right: 7
-        },
-        {
-            name: 'Ha',
-            left: 10,
-            right: 21
-        },
-        {
-            name: 'Long',
-            left: 11,
-            right: 12
-        }
-    ];
 
     var htmlNodes = [];
 
@@ -219,14 +337,28 @@ exports.createTree = function (nodes) {
 
         if (i == 0) {
             // first node
-            htmlNodes[i] = htmlNodes[i].concat("<ul>");
+            htmlNodes[i] = htmlNodes[i].concat("<ul style='list-style-type: none; padding-left: 0px'>");
         } else {
 
             for (var j = i - 1; j >= 0; j--) {
 
                 if (nodes[i].left > nodes[j].left && nodes[i].left < nodes[j].right) {
                     // if current node is a child of this node
-                    htmlNodes[i] = htmlNodes[i].concat(createNode(nodes[i]));
+
+                    var numOfChild = 0;
+
+                    nodes.forEach(function (node) {
+                        if (node.left > nodes[i].left && node.right < nodes[i].right) {
+                            numOfChild++;
+                        }
+                    });
+
+                    if (numOfChild > 0) {
+                        htmlNodes[i] = htmlNodes[i].concat(createNode(nodes[i]));
+                    } else {
+                        htmlNodes[i] = htmlNodes[i].concat(createLeaf(nodes[i]));
+                    }
+
                     break;
                 } else {
                     // if current node is not a child of this node, close the <ul> tag of this node
@@ -243,7 +375,13 @@ exports.createTree = function (nodes) {
         htmlString = htmlString.concat(htmlNode);
     });
 
-    htmlString = sanitizeHtml(htmlString);
+
+    htmlString = sanitizeHtml(htmlString, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['input', 'label']),
+        allowedAttributes: false
+    });
+
     htmlString = htmlString.replace(new RegExp("<ul></ul>", 'g'), "");
+
     return htmlString;
 };

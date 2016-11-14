@@ -1,5 +1,5 @@
 var getModel = require('express-waterline').getModels;
-var beforeCreateANode = require('../helpers/tree').beforeCreateANode;
+var treeHelper = require('../helpers/tree');
 module.exports = {
     identity: 'field',
     connection: 'default',
@@ -16,13 +16,11 @@ module.exports = {
         },
 
         left: {
-            type: 'integer',
-            required: true
+            type: 'integer'
         },
 
         right: {
-            type: 'integer',
-            required: true
+            type: 'integer'
         },
 
         users: {
@@ -32,7 +30,7 @@ module.exports = {
     },
     beforeCreate: function (values, next) {
         getModel('field').then(function (Field) {
-            beforeCreateANode(Field, values, next);
+            treeHelper.beforeCreateANode(Field, values, next);
         })
     }
 };

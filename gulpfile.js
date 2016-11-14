@@ -31,7 +31,7 @@ gulp.task('minify-css', ['less'], function () {
 
 // Copy JS to dist
 gulp.task('js', function () {
-    return gulp.src(['public/js/sb-admin-2.js'])
+    return gulp.src(['public/js/*.js'])
         .pipe(gulp.dest('public/dist/js'))
         .pipe(browserSync.reload({
             stream: true
@@ -40,7 +40,7 @@ gulp.task('js', function () {
 
 // Minify JS
 gulp.task('minify-js', ['js'], function () {
-    return gulp.src('public/js/sb-admin-2.js')
+    return gulp.src('public/js/*.js')
         .pipe(uglify())
         .pipe(rename({suffix: '.min'}))
         .pipe(gulp.dest('public/dist/js'))

@@ -8,10 +8,12 @@
 
     <!-- Modal content -->
     <div class="add_mod_modal-content">
-        <span class="add_mod_close">×</span>
-        <label>Chọn file excel</label>
-        <input type="file" name="upload" accept=".xlsx, .xls" class="btn green ">
-        <input type="submit" name="upload" class="btn btn-primary submit-file" >
+        <form role="form" action="/users/moderators/create_xlsx" method="post" enctype="multipart/form-data">
+            <span class="add_mod_close">×</span>
+            <label>Chọn file excel</label>
+            <input type="file" name="xlsx" accept=".xlsx, .xls" class="btn green " required>
+            <input type="submit" name="upload" class="btn btn-primary submit-file" >
+        </form>
     </div>
 </div>
 <script>
