@@ -23,32 +23,32 @@ exports.getAllModerator = function (req, res) {
 
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
 
-    req.getValidationErrors().then(function(errors) {
-        if (errors) {
-            return res.status(400).send(createResponse(false, null, errors[0].msg));
-        }
+    var errors = req.validationErrors();
 
-        getModels('user').then(function (User) {
-            User.find({
-                role: 'moderator'
-            }).paginate({
-                page: req.query.page,
-                limit: numberOfUsersPerPage
-            }).exec(function (err, moderators) {
-                if (err) {
-                    return res.send(createResponse(false, {}, err.message));
-                }
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
 
-                var resModerators = _.map(moderators, function (moderator) {
-                    return _.omit(moderator.toObject(), 'password')
-                });
+    getModels('user').then(function (User) {
+        User.find({
+            role: 'moderator'
+        }).paginate({
+            page: req.query.page,
+            limit: numberOfUsersPerPage
+        }).exec(function (err, moderators) {
+            if (err) {
+                return res.send(createResponse(false, {}, err.message));
+            }
 
-                return res.send(createResponse(true, null, resModerators));
-            })
-        });
+            var resModerators = _.map(moderators, function (moderator) {
+                return _.omit(moderator.toObject(), 'password')
+            });
+
+            return res.send(createResponse(true, null, resModerators));
+        })
     });
-};
 
+};
 
 
 /**
@@ -77,7 +77,6 @@ exports.getUserByID = function (req, res) {
     });
 
 };
-
 
 
 // get a moderator by id

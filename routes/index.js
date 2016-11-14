@@ -3,6 +3,11 @@ var router = express.Router();
 var adminAuthCtrl = require('../controllers/authentication');
 var passport = require('passport');
 var hasAccess = require('../middlewares/auth').hasAccess;
+var expressValidator = require('express-validator');
+
+router.use(expressValidator({
+    customValidators: require('../helpers/customValidators')
+}));
 
 router.get('/', [
     hasAccess('moderator'),
