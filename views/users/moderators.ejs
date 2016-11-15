@@ -52,7 +52,6 @@
         "factory": "hsf"}];
 %>
 <%- include ../patrials/scripts.ejs%>
-<%- include moderator.javascripts.ejs%>
 
 <body>
 <div id="wrapper">
@@ -64,7 +63,7 @@
 
         <div class="container-fluid">
             <div class="editdata"  style="padding: 10px;">
-                <%- include moderators.modal.ejs%>
+                <%- include users.modal.ejs%>
             </div>
             <table class="table table-hover table-striped" id="officer_table" >
                 <tr>
@@ -80,31 +79,33 @@
                 </tr>
                 <% } %>
             </table>
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <li>
-                        <a href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li>
-                        <a href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+            <div  style="text-align: center">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li>
+                            <a href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li>
+                            <a href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 
 
 </div>
 <!-- /#wrapper -->
-
+<%- include('./users.javascripts.ejs', {actions: "/users/moderators/create_xlsx"})%>
 </body>
 </html>

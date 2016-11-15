@@ -1,0 +1,22 @@
+
+
+<button class="btn btn-default btn-number" data-type="plus" id="btn_add"><i class="fa fa-plus" aria-hidden="true"></i></button>
+<div class="edit-enable-btn-group">
+    <label> Edit Table</label>
+    <input type="checkbox"  data-toggle="toggle" id="enable">
+</div>
+<!-- The Modal -->
+<div id="add_mod_modal" class="add_mod_modal">
+
+    <!-- Modal content -->
+    <div class="add_mod_modal-content">
+        <form role="form"  method="post" enctype="multipart/form-data" name="post_excel">
+            <!--<span class="add_mod_close">×</span>-->
+            <label>Chọn file excel</label>
+            <input type="file" name="xlsx" accept=".xlsx, .xls" class="btn green " required>
+            <input type="button" name="upload" class="btn btn-primary submit_file"  value="Hủy" >
+            <input type="submit" name="upload" class="btn btn-primary submit-file" style=" float:right;" >
+
+        </form>
+    </div>
+</div>

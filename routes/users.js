@@ -40,6 +40,18 @@ router.post('/lecturers/create_xlsx', [
     usersCtrl.createUsingXLSX('lecturer')
 ]);
 
+router.get('/students', [
+    hasAccess('moderator'),
+    function (req, res) {
+        res.render('./users/students');
+    }
+]);
+
+router.post('/students/create_xlsx', [
+    upload.single('xlsx'),
+    usersCtrl.createUsingXLSX('student')
+]);
+
 // router.get('/:id', usersCtrl.getUserByID);
 
 router.get('/moderators/:id', [
