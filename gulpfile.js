@@ -97,6 +97,7 @@ gulp.task('nodemon',['default', 'watch'], function () {
     nodemon({
         script: './bin/www',
         ext: 'js',
+        ignore: ["public/js", "public/dist/js"],
         env: {
             'NODE_ENV': 'development'
         }
