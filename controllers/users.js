@@ -185,7 +185,7 @@ exports.createUsingXLSX = function (role) {
 
                 console.log(errors);
 
-                if (errors && errors.length >= 0) {
+                if (errors && errors.length > 0) {
                     return res.status(500).send(createResponse(false, errors, 'There are some error.'));
                 }
 
