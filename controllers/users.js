@@ -186,7 +186,7 @@ exports.createUsingXLSX = function (role) {
 
                 if (errors && errors.length > 0) {
                     req.flash('errorMessage', 'There are some error.\n' + errors.toString());
-                    return res.status(500).send(createResponse(false, errors, 'There are some error.'));
+                    // return res.status(500).send(createResponse(false, errors, 'There are some error.'));
                 }
 
                 return res.redirect('/users/' + role + 's');
