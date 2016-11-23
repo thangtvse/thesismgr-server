@@ -17,12 +17,10 @@ module.exports = {
 
         left: {
             type: 'integer',
-            required: true
         },
 
         right: {
             type: 'integer',
-            required: true
         },
 
         users: {

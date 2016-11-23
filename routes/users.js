@@ -11,59 +11,88 @@ var multer = require('multer');
 var upload = multer({dest: 'temp/'});
 
 
-router.get('/moderators',[
+// MODERATORS =========================================
+router.get('/moderators', [
     hasAccess('admin'),
-    function (req, res) {
-        res.render('./users/moderators');
-    }
+    usersCtrl.getUserListPage('moderator')
 ]);
 
-router.get('/api/moderators',[
+router.get('/api/moderators', [
     hasAccess('admin'),
-    usersCtrl.getAllModerator
+    usersCtrl.getAllUsers('moderator')
+]);
+
+router.get('/api/moderators/:id', [
+    hasAccess(['moderator']),
+    usersCtrl.getUserByID('moderator')
+]);
+
+router.post('/moderators/create', [
+    hasAccess('admin'),
+    usersCtrl.createUser('moderator')
 ]);
 
 router.post('/moderators/create_xlsx', [
+    hasAccess('admin'),
     upload.single('xlsx'),
     usersCtrl.createUsingXLSX('moderator')
 ]);
 
+
+// LECTURERS =========================================
+
 router.get('/lecturers', [
     hasAccess('moderator'),
-    function (req, res) {
-        res.render('./users/lecturers');
-    }
+    usersCtrl.getUserListPage('lecturer')
+]);
+
+router.get('/api/lecturers', [
+    hasAccess('moderator'),
+    usersCtrl.getAllUsers('lecturer')
+]);
+
+router.get('/api/lecturers/:id', [
+    hasAccess(['student']),
+    usersCtrl.getUserByID('lecturer')
+]);
+
+router.post('/lecturers/create', [
+    hasAccess('moderator'),
+    usersCtrl.createUser('lecturer')
 ]);
 
 router.post('/lecturers/create_xlsx', [
+    hasAccess(['moderator']),
     upload.single('xlsx'),
     usersCtrl.createUsingXLSX('lecturer')
 ]);
 
+
+// STUDENTS =========================================
+
 router.get('/students', [
     hasAccess('moderator'),
-    function (req, res) {
-        res.render('./users/students');
-    }
+    usersCtrl.getUserListPage('student')
+]);
+
+router.get('/api/students', [
+    hasAccess('moderator'),
+    usersCtrl.getAllUsers('student')
+]);
+
+router.get('/api/students/:id', [
+    hasAccess(['student']),
+    usersCtrl.getUserByID('student')
+]);
+
+router.post('/students/create', [
+    hasAccess('moderator'),
+    usersCtrl.createUser('student')
 ]);
 
 router.post('/students/create_xlsx', [
     upload.single('xlsx'),
-    usersCtrl.createUsingXLSX('student')
+    usersCtrl.createUsingXLSX('moderator')
 ]);
-
-// router.get('/:id', usersCtrl.getUserByID);
-
-router.get('/moderators/:id', [
-    hasAccess(['moderator']),
-    usersCtrl.getModeratorByID
-]);
-
-router.post('/create', [
-    hasAccess('moderator'),
-    usersCtrl.createUser
-]);
-
-
 
 module.exports = router;

@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    $(".field-search-item.link").click(function (e) {
+    $(".office-search-item.link").click(function (e) {
         var a = $(this);
 
         // set text for drop-down menu
@@ -8,10 +8,10 @@ $(document).ready(function () {
         if (a.attr("data-id") != null) {
             // set value for form
 
-            $(".new-field-parent-id").val(a.attr("data-id"));
+            $(".new-office-parent-id").val(a.attr("data-id"));
 
         } else {
-            $(".new-field-parent-id").val(null);
+            $(".new-office-parent-id").val(null);
         }
 
 
@@ -24,7 +24,7 @@ $(document).ready(function () {
 
         console.log("keyup with text: " + searchText);
 
-        $(".field-search-item").each(function (index) {
+        $(".office-search-item").each(function (index) {
 
             var item = $(this);
 
@@ -41,7 +41,7 @@ $(document).ready(function () {
         var a = $(this);
 
         bootbox.confirm({
-            title: "Remove field?",
+            title: "Remove office?",
             message: "All of its descendants will also be removed.",
             buttons: {
                 cancel: {
@@ -53,7 +53,7 @@ $(document).ready(function () {
             },
             callback: function (result) {
                 if(result == true) {
-                    window.location.href="/categories/fields/delete?id=" + a.attr("data-id");
+                    window.location.href="/categories/offices/delete?id=" + a.attr("data-id");
                     e.preventDefault();
                 }
             }

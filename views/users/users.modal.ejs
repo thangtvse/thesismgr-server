@@ -17,38 +17,59 @@
 
         <div class="tab-content">
             <div id="menu1" class="tab-pane fade in active">
-                <form method="post" name="register" action="/users/create">
+                <form method="post" name="register" action="<%= createOneAction %>">
                     <div class="form-group">
-                        <label for="office_number">Officer Number:</label>
+                        <label for="office_number">
+                            <% if (role != "student") { %>
+                                Officer Number:
+                            <% } else { %>
+                                Student Code:
+                            <% }%>
+                        </label>
                         <input type="number" class="form-control" id="office_number" name="officer_number">
                     </div>
                     <div class="form-group">
                         <label for="username">User Name:</label>
-                        <input type="text" class="form-control" id="username" name="username">
+                        <input type="email" class="form-control" id="username" name="username">
                     </div>
                     <div class="form-group">
-                        <label for="office">Office Id:</label>
-                        <input type="number" class="form-control" id="office" name="office_id">
+                        <label for="office">Office: </label>
+                        <input class="office_id" type="text" id="office" name="office_id" hidden>
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="category-search-drop-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                No parent
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                <li>
+                                    <div class="form-group input-group category-search">
+                                        <input type="text" class="form-control category-search input">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button"><i class="fa fa-search"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </li>
+                                <% offices.forEach(function (office) { %>
+                                <li class="office-search-item"><a href="#" data-name="<%=office.name%>" data-id="<%=office.id%>" class="office-search-item link"><%=office.name%></a></li>
+                                <% }) %>
+                            </ul>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="name">Name:</label>
                         <input type="text" class="form-control" id="name" name="full_name">
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Role:</label>
-                        <input type="text" class="form-control" id="role" name="role">
                     </div>
                     <input type="button" name="upload" class="btn btn-primary submit_file"  value="Hủy" >
                     <input type="submit" name="upload" class="btn btn-primary submit-file" style=" float:right;" >
                 </form>
             </div>
             <div id="menu2" class="tab-pane fade">
-                <form role="form"  method="post" enctype="multipart/form-data" name="post_excel">
+                <form role="form"  method="post" enctype="multipart/form-data" name="post_excel" >
                     <label>Chọn file excel</label>
                     <input type="file" name="xlsx" accept=".xlsx, .xls" class="btn green " required>
                     <input type="button" name="upload" class="btn btn-primary submit_file"  value="Hủy" >
                     <input type="submit" name="upload" class="btn btn-primary submit-file" style=" float:right;" >
-
                 </form>
             </div>
         </div>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../patrials/head.ejs', {title: "ThesisMgr"}) %>
+
+<body>
+
+<div id="wrapper">
+
+    <% include ../patrials/navbar.ejs %>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Offices</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row">
+                <!-- show any messages that come back with authentication -->
+                <% if (message != null && message.length > 0) { %>
+                <div class="alert alert-danger"><%= message %></div>
+                <% } %>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Office hierachy
+                        </div>
+                        <div class="panel-body">
+                            <%- office_hierarchy %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Add an office
+                        </div>
+                        <div class="panel-body">
+
+                            <form role="form" action="/categories/offices" method="post">
+                                <div class="form-group">
+                                    <label>Office name</label>
+                                    <input class="form-control new-office-name" type="text" name="name" required>
+                                    <p class="help-block">Name of the new office that you want to add.</p>
+                                    <label>Parent office</label>
+                                    <input class="new-office-parent-id" type="text" name="parent_id" hidden>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="category-search-drop-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            No parent
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <div class="form-group input-group category-search">
+                                                    <input type="text" class="form-control category-search input">
+                                                    <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button"><i class="fa fa-search"></i>
+                                                </button>
+                                            </span>
+                                                </div>
+                                            </li>
+                                            <li class="office-search-item"><a href="#" class="office-search-item link" data-name="No parent">No parent</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <% offices.forEach(function (office) { %>
+                                            <li class="office-search-item"><a href="#" data-name="<%=office.name%>" data-id="<%=office.id%>" class="office-search-item link"><%=office.name%></a></li>
+                                            <% }) %>
+                                        </ul>
+                                    </div>
+                                    <p class="help-block">Parent of the new office that you want to add.</p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Add Office</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ../patrials/scripts.ejs %>
+
+<script type="text/javascript" src="/dist/js/categories.offices.min.js"></script>
+<script language="JavaScript">
+
+</script>
+
+</body>
+
+</html>
+
+
+
+

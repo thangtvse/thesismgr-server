@@ -14,150 +14,152 @@ var util = require('util');
 var getModels = require('express-waterline').getModels;
 var numberOfUsersPerPage = require('../config/pagination').numberOfUsersPerPage;
 
-/**
- * Get all moderators
- * @param req
- * @param res
- */
-exports.getAllModerator = function (req, res) {
 
-    req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
+exports.getUserListPage = function (role) {
+    return function (req, res) {
+        getModels('office').then(function (Office) {
+            Office.find().exec(function (error, offices) {
+                if (error) {
+                    return req.flash('errorMessage', error.message);
+                }
 
-    var errors = req.validationErrors();
 
-    if (errors) {
-        return res.status(400).send(createResponse(false, null, errors[0].msg));
-    }
+                var filteredOffices = offices.filter(function (office) {
+                    if (office.left == 1) {
+                        return false
+                    } else {
+                        return true
+                    }
+                })
 
-    getModels('user').then(function (User) {
-        User.find({
-            role: 'moderator'
-        }).paginate({
-            page: req.query.page,
-            limit: numberOfUsersPerPage
-        }).exec(function (err, moderators) {
-            if (err) {
-                return res.send(createResponse(false, {}, err.message));
-            }
-
-            var resModerators = _.map(moderators, function (moderator) {
-                return _.omit(moderator.toObject(), 'password')
-            });
-
-            return res.send(createResponse(true, null, resModerators));
+                res.render('./users/' + role + 's', {
+                    offices: _.map(filteredOffices, function (office) {
+                        return office.toObject();
+                    })
+                })
+            })
         })
-    });
-
+    }
 };
 
-
 /**
- * Get an user by id
- * @param req
- * @param res
+ * Get all users by role
+ * @param role role of user
  */
-exports.getUserByID = function (req, res) {
+exports.getAllUsers = function (role) {
+    return function (req, res) {
 
-    getModels('user').then(function (User) {
-        var id = req.params.id;
-        User.findOne(
-            {
-                id: id,
-                role: {
-                    $in: ['lecturer', 'student', 'moderator']
-                }
-            },
-            function (err, user) {
+        req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
+
+        var errors = req.validationErrors();
+
+        if (errors) {
+            return res.status(400).send(createResponse(false, null, errors[0].msg));
+        }
+
+        getModels('user').then(function (User) {
+            User.find({
+                role: role
+            }).paginate({
+                page: req.query.page,
+                limit: numberOfUsersPerPage
+            }).exec(function (err, moderators) {
                 if (err) {
                     return res.send(createResponse(false, {}, err.message));
                 }
 
-                return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
-            });
-    });
+                var resModerators = _.map(moderators, function (moderator) {
+                    return _.omit(moderator.toObject(), 'password')
+                });
 
+                return res.send(createResponse(true, null, resModerators));
+            })
+        });
+
+    }
 };
-
-
-// get a moderator by id
-exports.getModeratorByID = function (req, res) {
-    var id = req.params.id;
-    getModels('user').then(function (User) {
-        User.findOne(
-            {
-                _id: id,
-                role: 'moderator'
-            },
-            function (err, user) {
-                if (err) {
-                    return res.send(createResponse(false, {}, err.message));
-                }
-
-                return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
-            });
-    });
-};
-
 
 /**
- * Create an user
- * @param req
- * @param res
+ * Get an user by id and role
+ * @param role: role of user
  */
-exports.createUser = function (req, res) {
-
-    // validation
-    req.checkBody('officer_number', 'Invalid officer number.').notEmpty().isOfficerNumberAvailable();
-    req.checkBody('username', 'Invalid username').notEmpty().isEmail();
-    req.checkBody('username', 'Username taken').isUsernameAvailable();
-    req.checkBody('role', 'Invalid role').notEmpty().isIn('moderator', 'lecturer', 'student');
-    req.checkBody('office_id', 'Invalid office ID').notEmpty().isOfficeIDAvailable();
-    req.checkBody('full_name', 'Invalid full name').notEmpty();
-
-    req.asyncValidationErrors()
-        .then(function () {
-
-            // create user
-
-            var officerNumber = req.body.officer_number;
-            var username = req.body.username;
-            var role = req.body.role;
-            var password = randomstring.generate(10);
-            var officeID = req.body.office_id;
-            var fullName = req.body.full_name;
-
-            getModels('user').then(function (User) {
-
-                User.create({
-                    officerNumber: officer_number,
-                    username: username,
-                    password: password,
-                    officeID: officeID,
-                    fullName: fullName,
+exports.getUserByID = function (role) {
+    return function (req, res) {
+        getModels('user').then(function (User) {
+            var id = req.params.id;
+            User.findOne(
+                {
+                    id: id,
                     role: role
-                }).exec(function (error, newUser) {
-                    if (error) {
-                        return res.send(createResponse(false, {}, error.message));
+                },
+                function (err, user) {
+                    if (err) {
+                        return res.send(createResponse(false, {}, err.message));
                     }
 
-                    return res.send(createResponse(true,
-                        newUser,
-                        "Create account successfully!"));
+                    return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
                 });
-            });
-        })
-        .catch(function (errors) {
-            console.log(errors.length);
-            console.log(errors);
-            return res.status(400).send(createResponse(false, null, errors[0].msg));
         });
+
+    }
 };
 
+/**
+ * Create an user with a role
+ * @param role: role of user
+ */
+exports.createUser = function (role) {
+    return function (req, res) {
+
+        // validation
+        req.checkBody('officer_number', 'Invalid officer number.').notEmpty().isOfficerNumberAvailable();
+        req.checkBody('username', 'Invalid username').notEmpty().isEmail();
+        req.checkBody('username', 'Username taken').isUsernameAvailable();
+        req.checkBody('office_id', 'Invalid office ID').notEmpty().isOfficeIDAvailable();
+        req.checkBody('full_name', 'Invalid full name').notEmpty();
+
+        req.asyncValidationErrors()
+            .then(function () {
+
+                // create user
+
+                var officerNumber = req.body.officer_number;
+                var username = req.body.username;
+                var password = randomstring.generate(10);
+                var officeID = req.body.office_id;
+                var fullName = req.body.full_name;
+
+                getModels('user').then(function (User) {
+
+                    User.create({
+                        officerNumber: officer_number,
+                        username: username,
+                        password: password,
+                        officeID: officeID,
+                        fullName: fullName,
+                        role: role
+                    }).exec(function (error, newUser) {
+                        if (error) {
+                            return res.send(createResponse(false, {}, error.message));
+                        }
+
+                        return res.send(createResponse(true,
+                            newUser,
+                            "Create account successfully!"));
+                    });
+                });
+            })
+            .catch(function (errors) {
+                console.log(errors.length);
+                console.log(errors);
+                return res.status(400).send(createResponse(false, null, errors[0].msg));
+            });
+    };
+};
 
 /**
  * Create a list of user using xlsx
- * @param req
- * @param res
+ * @param role role of users
  * @returns {*}
  */
 exports.createUsingXLSX = function (role) {

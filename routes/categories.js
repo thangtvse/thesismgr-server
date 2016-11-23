@@ -11,22 +11,36 @@ var categoriesCtrl = require('../controllers/categories');
 
 // router.get('/search', fieldsCtrl.searchField);
 
+// Fields ========================
 router.get('/fields', [
     hasAccess('admin'),
-    categoriesCtrl.getFieldsView
+    categoriesCtrl.getView('field')
 ]);
 
 router.post('/fields', [
     hasAccess('admin'),
-    categoriesCtrl.postField
+    categoriesCtrl.post('field')
 ]);
-
-
 
 router.get('/fields/delete',[
   hasAccess('admin'),
-    categoriesCtrl.deleteField
+    categoriesCtrl.delete('field')
 ]);
 
+// Offices =========================
+router.get('/offices', [
+    hasAccess('admin'),
+    categoriesCtrl.getView('office')
+]);
+
+router.post('/offices', [
+    hasAccess('admin'),
+    categoriesCtrl.post('office')
+]);
+
+router.get('/offices/delete',[
+    hasAccess('admin'),
+    categoriesCtrl.delete('office')
+]);
 
 module.exports = router;

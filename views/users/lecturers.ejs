@@ -63,7 +63,11 @@
 
         <div class="container-fluid">
             <div class="editdata"  style="padding: 10px;">
-                <%- include users.modal.ejs%>
+                <%- include('./users.modal.ejs', {
+                    role: "lecturer",
+                    createOneAction: "/users/lecturers/create",
+                    offices: offices
+                })%>
             </div>
             <table class="table table-hover table-striped" id="officer_table" >
                 <tr>
@@ -106,6 +110,8 @@
 
 </div>
 <!-- /#wrapper -->
-<%- include('./users.javascripts.ejs', {actions: "/users/lecturers/create_xlsx"})%>
+<%- include('./users.javascripts.ejs', {
+    actions: "/users/lecturers/create_xlsx"
+})%>
 </body>
 </html>
