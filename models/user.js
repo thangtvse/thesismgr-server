@@ -36,6 +36,27 @@ var login = function (email, password, next) {
     });
 };
 
+var sendMail = function (username, password, senderEmail, mailTransporter) {
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+        from: '"ThesisMgr System 👥" <' + senderEmail + '>', // sender address
+        to: username, // list of receivers
+        subject: 'Invitation Mail', // Subject line
+        text: 'username: ' + username + "\n" + "password: " + password // plaintext body
+        //  html: '<b>Hello world 🐴</b>' // html body
+    };
+
+    console.log("sending mail to " + username);
+    // send mail with defined transport object
+    mailTransporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            return console.log(util.inspect(error, false, 2, true));
+        }
+
+        console.log(util.inspect(info, false, 2, true));
+    });
+};
+
 
 module.exports = {
     identity: 'user',
@@ -185,25 +206,9 @@ module.exports = {
                                 return callback(error, username);
                             }
 
-                            // setup e-mail data with unicode symbols
-                            var mailOptions = {
-                                from: '"ThesisMgr System 👥" <' + senderEmail + '>', // sender address
-                                to: username, // list of receivers
-                                subject: 'Invitation Mail', // Subject line
-                                text: 'username: ' + username + "\n" + "password: " + password // plaintext body
-                                //  html: '<b>Hello world 🐴</b>' // html body
-                            };
+                            callback();
 
-                            console.log("sending mail to " + username);
-                            // send mail with defined transport object
-                            mailTransporter.sendMail(mailOptions, function (error, info) {
-                                if (error) {
-                                    return callback(error, username);
-                                }
-
-                                console.log(util.inspect(info, false, 2, true));
-                                return callback();
-                            });
+                            sendMail(username, password, senderEmail, mailTransporter);
                         });
                     });
 
@@ -245,6 +250,25 @@ module.exports = {
                         })
                     })
             })
+        });
+    },
+
+
+    createOne: function (officerNumber, username, password, officeID, fullName, role, senderEmail, mailTransporter, next) {
+        getModel('user').then(function (User) {
+
+            User.create({
+                officerNumber: officerNumber,
+                username: username,
+                password: password,
+                officeID: officeID,
+                fullName: fullName,
+                role: role
+            }).exec(function (error, newUser) {
+                next(error, newUser);
+
+                sendMail(username, password, senderEmail, mailTransporter);
+            });
         });
     }
 };

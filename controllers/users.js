@@ -134,24 +134,15 @@ exports.createUser = function (role) {
                 var fullName = req.body.full_name;
 
                 getModels('user').then(function (User) {
-
-                    User.create({
-                        officerNumber: officerNumber,
-                        username: username,
-                        password: password,
-                        officeID: officeID,
-                        fullName: fullName,
-                        role: role
-                    }).exec(function (error, newUser) {
+                    var mailTransporter = nodemailer.createTransport(mailTransportConfig);
+                    User.createOne(officerNumber, username, password, officeID, fullName, role, 'uendno@gmail.com', mailTransporter, function (error, newUser) {
                         if (error) {
                             req.flash('errorMessage', error.message);
-                            res.redirect('/users/' + role + 's');
-                            return
                         }
 
                         return res.redirect('/users/' + role + 's');
-                    });
-                });
+                    })
+                })
             })
             .catch(function (errors) {
                 console.log(errors.length);
@@ -191,14 +182,14 @@ exports.createUsingXLSX = function (role) {
                     }
                 });
 
-                console.log(errors);
+                console.log("CreateXLSX ERROR: " + errors);
 
                 if (errors && errors.length > 0) {
+                    req.flash('errorMessage', 'There are some error.\n' + errors.toString());
                     return res.status(500).send(createResponse(false, errors, 'There are some error.'));
                 }
 
-                return res.send(createResponse(true, null, "Successfully!"));
-
+                return res.redirect('/users/' + role + 's');
             })
         });
     }
