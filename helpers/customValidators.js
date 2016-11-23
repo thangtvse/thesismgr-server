@@ -52,10 +52,10 @@ module.exports = {
     isOfficeIDAvailable: function (officeID) {
         return new Promise(function (resolve, reject) {
             getModel('office').then(function (Office) {
-                Office.findOne({_id: officeID})
+                Office.findOne({id: officeID})
                     .then(function (office) {
                         if (office) {
-                            resovle;
+                            resolve();
                         } else {
                             reject(office)
                         }

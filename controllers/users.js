@@ -13,7 +13,7 @@ var fs = require('fs');
 var util = require('util');
 var getModels = require('express-waterline').getModels;
 var numberOfUsersPerPage = require('../config/pagination').numberOfUsersPerPage;
-
+var randomstring = require('randomstring');
 
 exports.getUserListPage = function (role) {
     return function (req, res) {
@@ -30,12 +30,13 @@ exports.getUserListPage = function (role) {
                     } else {
                         return true
                     }
-                })
+                });
 
                 res.render('./users/' + role + 's', {
                     offices: _.map(filteredOffices, function (office) {
                         return office.toObject();
-                    })
+                    }),
+                    message: req.flash('errorMessage')
                 })
             })
         })
@@ -111,6 +112,9 @@ exports.getUserByID = function (role) {
 exports.createUser = function (role) {
     return function (req, res) {
 
+        console.log(util.inspect(req.body));
+
+
         // validation
         req.checkBody('officer_number', 'Invalid officer number.').notEmpty().isOfficerNumberAvailable();
         req.checkBody('username', 'Invalid username').notEmpty().isEmail();
@@ -132,7 +136,7 @@ exports.createUser = function (role) {
                 getModels('user').then(function (User) {
 
                     User.create({
-                        officerNumber: officer_number,
+                        officerNumber: officerNumber,
                         username: username,
                         password: password,
                         officeID: officeID,
@@ -140,19 +144,21 @@ exports.createUser = function (role) {
                         role: role
                     }).exec(function (error, newUser) {
                         if (error) {
-                            return res.send(createResponse(false, {}, error.message));
+                            req.flash('errorMessage', error.message);
+                            res.redirect('/users/' + role + 's');
+                            return
                         }
 
-                        return res.send(createResponse(true,
-                            newUser,
-                            "Create account successfully!"));
+                        return res.redirect('/users/' + role + 's');
                     });
                 });
             })
             .catch(function (errors) {
                 console.log(errors.length);
                 console.log(errors);
-                return res.status(400).send(createResponse(false, null, errors[0].msg));
+                req.flash('errorMessage', errors[0].msg);
+                res.redirect('/users/' + role + 's');
+                return
             });
     };
 };

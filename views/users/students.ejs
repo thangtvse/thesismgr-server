@@ -62,6 +62,10 @@
     <div id="page-wrapper">
 
         <div class="container-fluid">
+            <!-- show any messages that come back with authentication -->
+            <% if (message.length > 0) { %>
+            <div class="alert alert-danger"><%= message %></div>
+            <% } %>
             <div class="editdata"  style="padding: 10px;">
                 <%- include('./users.modal.ejs', {
                     role: "student",
