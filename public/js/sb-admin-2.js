@@ -32,6 +32,8 @@ $(function() {
         return this.href == url;
     }).addClass('active').parent();
 
+    $(".navbar-default.sidebar").removeAttr("hidden");
+
     while (true) {
         if (element.is('li')) {
             element = element.parent().addClass('in').parent();

@@ -14,32 +14,50 @@ var util = require('util');
 var getModels = require('express-waterline').getModels;
 var numberOfUsersPerPage = require('../config/pagination').numberOfUsersPerPage;
 var randomstring = require('randomstring');
+var paginationConfig = require('../config/pagination');
 
 exports.getUserListPage = function (role) {
     return function (req, res) {
-        getModels('office').then(function (Office) {
-            Office.find().exec(function (error, offices) {
+        getModels('user').then(function (User) {
+            User.count({
+                role: role
+            }).exec(function (error, numberOfUsers) {
                 if (error) {
-                    return req.flash('errorMessage', error.message);
+                    req.flash('errorMessage', error.message);
+                    return res.redirect('/users/' + role + 's');
                 }
 
+                console.log("FOUND " + numberOfUsers + " " + role + "s");
 
-                var filteredOffices = offices.filter(function (office) {
-                    if (office.left == 1) {
-                        return false
-                    } else {
-                        return true
-                    }
-                });
+                getModels('office').then(function (Office) {
+                    Office.find().exec(function (error, offices) {
+                        if (error) {
+                            req.flash('errorMessage', error.message);
+                            return res.redirect('/users/' + role + 's');
+                        }
 
-                res.render('./users/' + role + 's', {
-                    offices: _.map(filteredOffices, function (office) {
-                        return office.toObject();
-                    }),
-                    message: req.flash('errorMessage')
+
+                        var filteredOffices = offices.filter(function (office) {
+                            if (office.left == 1) {
+                                return false
+                            } else {
+                                return true
+                            }
+                        });
+
+
+                        res.render('./users/' + role + 's', {
+                            offices: _.map(filteredOffices, function (office) {
+                                return office.toObject();
+                            }),
+                            numberOfPages: Math.floor(numberOfUsers / paginationConfig.numberOfUsersPerPage) + 1,
+                            numberOfUsersPerPage: paginationConfig.numberOfUsersPerPage,
+                            message: req.flash('errorMessage')
+                        })
+                    })
                 })
             })
-        })
+        });
     }
 };
 

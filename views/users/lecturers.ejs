@@ -2,56 +2,63 @@
 <html>
 <meta charset="utf-8"/>
 <%- include('../patrials/head.ejs', {title: "Lecturers"}) %>
-<% var quotation= [{
-    "dimension" : 0,
+<% var quotation = [{
+    "dimension": 0,
     "currency": "RMB",
     "quantity": "100",
     "price": "3",
-    "factory": "rx"},
+    "factory": "rx"
+},
     {
-        "dimension" : 0,
+        "dimension": 0,
         "currency": "RMB",
         "quantity": "200",
         "price": "4",
-        "factory": "rx"},
+        "factory": "rx"
+    },
     {
-        "dimension" : 1,
+        "dimension": 1,
         "currency": "RMB",
         "quantity": "100",
         "price": "3",
-        "factory": "rx"},
+        "factory": "rx"
+    },
     {
-        "dimension" : 1,
+        "dimension": 1,
         "currency": "RMB",
         "quantity": "200",
         "price": "5",
-        "factory": "rx"},
+        "factory": "rx"
+    },
     {
-        "dimension" : 0,
+        "dimension": 0,
         "currency": "RMB",
         "quantity": "100",
         "price": "1.2",
-        "factory": "hsf"},
+        "factory": "hsf"
+    },
     {
-        "dimension" : 0,
+        "dimension": 0,
         "currency": "RMB",
         "quantity": "200",
         "price": "2.4",
-        "factory": "hsf"},
+        "factory": "hsf"
+    },
     {
-        "dimension" : 1,
+        "dimension": 1,
         "currency": "RMB",
         "quantity": "100",
         "price": "3",
-        "factory": "hsf"},
+        "factory": "hsf"
+    },
     {
-        "dimension" : 1,
+        "dimension": 1,
         "currency": "RMB",
         "quantity": "200",
         "price": "4.5",
-        "factory": "hsf"}];
+        "factory": "hsf"
+    }];
 %>
-<%- include ../patrials/scripts.ejs%>
 
 <body>
 <div id="wrapper">
@@ -66,28 +73,34 @@
             <% if (message.length > 0) { %>
             <div class="alert alert-danger"><%= message %></div>
             <% } %>
-            <div class="editdata"  style="padding: 10px;">
+            <div class="editdata" style="padding: 10px;">
                 <%- include('./users.modal.ejs', {
-                    role: "lecturer",
-                    createOneAction: "/users/lecturers/create",
-                    offices: offices
-                })%>
+                role: "lecturer",
+                createOneAction: "/users/lecturers/create",
+                offices: offices
+                }) %>
             </div>
-            <table class="table table-hover table-striped" id="officer_table" >
+            <table class="table table-hover table-striped" id="officer_table">
                 <tr>
-                    <th>Officer_number</th><th>office</th><th>full_name</th><th>role - moderator</th>
+                    <th>Officer_number</th>
+                    <th>office</th>
+                    <th>full_name</th>
+                    <th>role - moderator</th>
                 </tr>
 
                 <% for (var i = 0; i < quotation.length; i++) { %>
                 <tr scope="row">
                     <td><%= quotation[i].dimension %> </td>
-                    <td><a class="tdText" href="#" data-type="text" data-placement="right" ><%= quotation[i].quantity %></a></td>
-                    <td><a class="tdText" href="#" data-type="text" data-placement="right" ><%= quotation[i].factory %></a></td>
-                    <td><a class="tdText" href="#" data-type="text" data-placement="right" ><%= quotation[i].factory %></a></td>
+                    <td><a class="tdText" href="#" data-type="text"
+                           data-placement="right"><%= quotation[i].quantity %></a></td>
+                    <td><a class="tdText" href="#" data-type="text"
+                           data-placement="right"><%= quotation[i].factory %></a></td>
+                    <td><a class="tdText" href="#" data-type="text"
+                           data-placement="right"><%= quotation[i].factory %></a></td>
                 </tr>
                 <% } %>
             </table>
-            <div  style="text-align: center">
+            <div style="text-align: center">
                 <nav aria-label="Page navigation">
                     <ul class="pagination">
                         <li>
@@ -95,11 +108,12 @@
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
+
+                        <% for (var i = 0; i < numberOfPages; i++) {
+                            console.log("page: " + (i + 1) + " of " + numberOfPages) %>
+                        <li><a class="page-indicator" href="#<%=i+1%>"><%= i + 1 %></a></li>
+                        <% } %>
+
                         <li>
                             <a href="#" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
@@ -114,8 +128,10 @@
 
 </div>
 <!-- /#wrapper -->
+
+<%- include ../patrials/scripts.ejs%>
 <%- include('./users.javascripts.ejs', {
-    actions: "/users/lecturers/create_xlsx"
-})%>
+actions: "/users/lecturers/create_xlsx"
+}) %>
 </body>
 </html>
