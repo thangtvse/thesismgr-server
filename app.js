@@ -1,19 +1,32 @@
+/*
+ * Project: ThesisMgr-Server
+ * File: app.js
+ */
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var routes = require('./controllers');
-
-var dbURI = require('./config/db').dbURI;
+var routes = require('./routes');
+var dbConfig = require('./config/db');
 var db = require('./helpers/db');
-
+var flash = require('connect-flash');
+var passport = require('passport');
+var session = require('express-session');
+var waterline = require('express-waterline');
 var app = express();
 
 // connect database
-db.connectDatabase(dbURI);
+// db.connectDatabase(dbURI);
+// db.createRootUserIfNeeded(rootUsername, rootPassword);
+
+// app.use(waterline.init(dbConfig));
+waterline.init(dbConfig);
+db.createRootUserIfNeeded('admin@gmail.com', 'nopassword');
+db.createRootFieldIfNeeded();
+db.createRootOfficeIfNeeded();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,7 +45,18 @@ app.use(require('node-sass-middleware')({
     sourceMap: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'apidoc')));
+
+// required for passport
+require('./config/passport')(passport);
+app.use(session({
+    secret: 'thesismgr-system-uet-vnu', // session secret
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
 app.use(routes);
 
 // catch 404 and forward to error handler

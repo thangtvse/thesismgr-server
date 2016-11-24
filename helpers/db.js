@@ -1,43 +1,116 @@
-/**
- * Created by Tran Viet Thang on 10/22/2016.
+/*
+ * Project: ThesisMgr-Server
+ * File: helpers\db.js
  */
 
-
-var mongoose = require('mongoose');
+var bcrypt = require('bcrypt-nodejs');
+var getModel = require('express-waterline').getModels;
+var util = require('util');
 
 module.exports = {
-    connectDatabase: function (dbURI) {
-        /**
-         * Created by uendn on 5/1/2016.
-         */
 
-        console.log("Connecting to MongoDB: " + dbURI);
+    /**
+     * Create a new Admin if needed
+     * @param username
+     * @param password
+     */
+    createRootUserIfNeeded: function (username, password) {
+        getModel('user').then(function (User) {
 
-        // Create the database connection
-        mongoose.connect(dbURI);
+            User.findOne({
+                role: 'admin'
+            }).exec(function (err, admin) {
+                if (err) {
+                    console.log(err);
+                    return
+                }
 
-        // CONNECTION EVENTS
-        // When successfully connected
-        mongoose.connection.on('connected', function () {
-            console.log("DB connected");
-        });
+                if (admin) {
+                    console.log('We already have an admin');
+                    console.log(util.inspect(admin, false, 2, true));
+                    return;
+                }
 
-        // If the connection throws an error
-        mongoose.connection.on('error', function (err) {
-            console.log('DB connection has an error: ' + err);
-        });
+                User.create({
+                    username: username,
+                    password: password,
+                    officerNumber: '1',
+                    role: 'admin'
+                }).exec(function (err, finn) {
+                    if (err) {
+                        console.log(err);
+                        return
+                    }
 
-        // If the connection is disconnected
-        mongoose.connection.on('disconnected', function () {
-            console.log('DB disconnected');
-        });
+                    console.log('Finn\'s id is:', finn.id);
+                });
+            });
 
-        // If the Node process ends, close the Mongoose connection
-        process.on('SIGINT', function () {
-            mongoose.connection.close(function () {
-                console.log('Mongoose disconnected through the app termination');
-                process.exit(0);
+
+        })
+    },
+
+    /**
+     * Create a new root for office collection if needed
+     */
+    createRootOfficeIfNeeded: function () {
+        getModel('office').then(function (Office) {
+            Office.findOne({
+                name: 'root'
+            }).exec(function (error, root) {
+                if (error) {
+                    console.log(error);
+                    return
+                }
+
+                if (root == null) {
+                    // create a root
+                    Office.create({
+                        name: 'root',
+                        left: 1,
+                        right: 2
+                    }).exec(function (error, newOffice) {
+                        if (error) {
+                            console.log(error);
+                        }
+                    })
+                } else {
+                    console.log('We already have a root office');
+                    console.log(util.inspect(root, false, 2, true));
+                }
             })
-        });
+        })
+    },
+
+    /**
+     * Create a new root for field collection if needed
+     */
+    createRootFieldIfNeeded: function () {
+        getModel('field').then(function (Field) {
+            Field.findOne({
+                name: 'root'
+            }).exec(function (error, root) {
+                if (error) {
+                    console.log(error);
+                    return
+                }
+
+                if (root == null) {
+                    // create a root
+                    Field.create({
+                        name: 'root',
+                        left: 1,
+                        right: 2
+                    }).exec(function (error, newField) {
+                        if (error) {
+                            console.log(error);
+                        }
+                    })
+                } else {
+                    console.log('We already have a root field');
+                    console.log(util.inspect(root, false, 2, true));
+                }
+            })
+        })
     }
 };

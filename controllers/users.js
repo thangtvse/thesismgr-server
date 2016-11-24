@@ -1,81 +1,197 @@
-/**
- * Created by Tran Viet Thang on 10/22/2016.
+/*
+ * Project: ThesisMgr-Server
+ * File: controllers\users.js
  */
 
-var express = require('express');
-var router = express.Router();
 
-var User = require('../models/User');
 var createResponse = require('../helpers/response').createRes;
-var validator = require('../helpers/validator');
+var bcrypt = require('bcrypt-nodejs');
+var _ = require('underscore');
+var nodemailer = require('nodemailer');
+var mailTransportConfig = require('../config/mail').transportConfig;
+var fs = require('fs');
+var util = require('util');
+var getModels = require('express-waterline').getModels;
+var numberOfUsersPerPage = require('../config/pagination').numberOfUsersPerPage;
 
 /**
- * @api {get} /users/:id Request User information by users id
- * @apiName GetUser
- * @apiGroup User
- *
- *
- * @apiSuccess {String} _id Users id
- * @apiSuccess {String} username Created username.
+ * Get all moderators
+ * @param req
+ * @param res
  */
-router.get('/:id', function (req, res) {
-    var id = req.params.id;
+exports.getAllModerator = function (req, res) {
 
-    User.findById(id, function (err, user) {
-        if (err) {
-            return res.send(createResponse(false, {}, err.message));
-        }
+    req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
 
-        return res.send(createResponse(true, {}, {
-            _id: user._id,
-            username: user.username
-        }));
-    });
+    var errors = req.validationErrors();
 
-});
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
 
-/**
- * @api {post} /users/register Register an account
- * @apiName Register
- * @apiGroup User
- *
- * @apiParam {Boolean} username Unique username. Must be an email
- * @apiParam {String} password password
- *
- *
- * @apiSuccess {Boolean} success Success or not
- * @apiSuccess {Object} data Returned data
- * @apiSuccess {String} data._id Users id
- * @apiSuccess {String} data.username Created username.
- */
-router.post('/register', function (req, res) {
-
-    var username = req.body.username;
-    var password = req.body.password;
-
-    validator.validateRegistration(username, password, function (err) {
-        if (err) {
-            return res.send(createResponse(false, {}, err.message));
-        }
-
-        var newUser = new User({
-            username: username,
-            password: password
-        });
-
-        newUser.save(function (err, savedUser) {
+    getModels('user').then(function (User) {
+        User.find({
+            role: 'moderator'
+        }).paginate({
+            page: req.query.page,
+            limit: numberOfUsersPerPage
+        }).exec(function (err, moderators) {
             if (err) {
                 return res.send(createResponse(false, {}, err.message));
             }
 
-            return res.send(createResponse(true,
-                {
-                    _id: savedUser._id,
-                    username: username
-                },
-                "Create account successfully!"));
+            var resModerators = _.map(moderators, function (moderator) {
+                return _.omit(moderator.toObject(), 'password')
+            });
+
+            return res.send(createResponse(true, null, resModerators));
         })
     });
-});
 
-module.exports = router;
+};
+
+
+/**
+ * Get an user by id
+ * @param req
+ * @param res
+ */
+exports.getUserByID = function (req, res) {
+
+    getModels('user').then(function (User) {
+        var id = req.params.id;
+        User.findOne(
+            {
+                id: id,
+                role: {
+                    $in: ['lecturer', 'student', 'moderator']
+                }
+            },
+            function (err, user) {
+                if (err) {
+                    return res.send(createResponse(false, {}, err.message));
+                }
+
+                return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
+            });
+    });
+
+};
+
+
+// get a moderator by id
+exports.getModeratorByID = function (req, res) {
+    var id = req.params.id;
+    getModels('user').then(function (User) {
+        User.findOne(
+            {
+                _id: id,
+                role: 'moderator'
+            },
+            function (err, user) {
+                if (err) {
+                    return res.send(createResponse(false, {}, err.message));
+                }
+
+                return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
+            });
+    });
+};
+
+
+/**
+ * Create an user
+ * @param req
+ * @param res
+ */
+exports.createUser = function (req, res) {
+
+    // validation
+    req.checkBody('officer_number', 'Invalid officer number.').notEmpty().isOfficerNumberAvailable();
+    req.checkBody('username', 'Invalid username').notEmpty().isEmail();
+    req.checkBody('username', 'Username taken').isUsernameAvailable();
+    req.checkBody('role', 'Invalid role').notEmpty().isIn('moderator', 'lecturer', 'student');
+    req.checkBody('office_id', 'Invalid office ID').notEmpty().isOfficeIDAvailable();
+    req.checkBody('full_name', 'Invalid full name').notEmpty();
+
+    req.asyncValidationErrors()
+        .then(function () {
+
+            // create user
+
+            var officerNumber = req.body.officer_number;
+            var username = req.body.username;
+            var role = req.body.role;
+            var password = randomstring.generate(10);
+            var officeID = req.body.office_id;
+            var fullName = req.body.full_name;
+
+            getModels('user').then(function (User) {
+
+                User.create({
+                    officerNumber: officer_number,
+                    username: username,
+                    password: password,
+                    officeID: officeID,
+                    fullName: fullName,
+                    role: role
+                }).exec(function (error, newUser) {
+                    if (error) {
+                        return res.send(createResponse(false, {}, error.message));
+                    }
+
+                    return res.send(createResponse(true,
+                        newUser,
+                        "Create account successfully!"));
+                });
+            });
+        })
+        .catch(function (errors) {
+            console.log(errors.length);
+            console.log(errors);
+            return res.status(400).send(createResponse(false, null, errors[0].msg));
+        });
+};
+
+
+/**
+ * Create a list of user using xlsx
+ * @param req
+ * @param res
+ * @returns {*}
+ */
+exports.createUsingXLSX = function (role) {
+    return function (req, res) {
+        var mailTransporter = nodemailer.createTransport(mailTransportConfig);
+
+        // check received file
+        var fileInfo = req.file;
+
+        console.log(fileInfo);
+
+        if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            return res.status(400).send(createResponse(false, null, "Invalid xlsx file"));
+        }
+
+        getModels('user').then(function (User) {
+            User.createUsingXLSX(role, fileInfo.path, mailTransporter, 'uendno@gmail.com', function (errors) {
+
+                // delete file
+                fs.unlink(fileInfo.path, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+
+                console.log(errors);
+
+                if (errors && errors.length > 0) {
+                    return res.status(500).send(createResponse(false, errors, 'There are some error.'));
+                }
+
+                return res.send(createResponse(true, null, "Successfully!"));
+
+            })
+        });
+    }
+};

@@ -8,20 +8,49 @@
     "sampleUrl": "http://localhost:3000"
   },
   "scripts": {
-    "start": "apidoc -i controllers/ -o apidoc/ && node ./bin/www"
+    "start": "node ./bin/www",
+    "build": "apidoc -i routes/ -o apidoc/ && node ./bin/www"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.15.1",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
-    "ejs": "~2.4.1",
+    "ejs": "^2.5.2",
+    "exceljs": "^0.2.35",
     "express": "~4.13.4",
+    "express-session": "^1.14.2",
+    "express-validator": "^2.21.0",
+    "express-waterline": "^0.6.0",
     "jsonwebtoken": "^7.1.9",
     "mongoose": "^4.6.4",
+    "mongoose-nested-set": "0.0.7",
+    "mongoose-role": "^2.0.0",
     "morgan": "~1.7.0",
+    "multer": "^1.2.0",
     "node-sass-middleware": "0.8.0",
+    "nodemailer": "^2.6.4",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "randomstring": "^1.1.5",
+    "sails-mongo": "^0.12.1",
+    "sails-mysql": "^0.11.5",
+    "sanitize-html": "^1.13.0",
     "serve-favicon": "~2.3.0",
+    "string-similarity": "^1.1.0",
+    "underscore": "^1.8.3",
     "validator": "^6.1.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.13.0",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^2.0.10",
+    "gulp-header": "^1.8.7",
+    "gulp-less": "^3.1.0",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.5.4",
+    "webpack": "^1.13.3"
   }
 }
