@@ -4,7 +4,7 @@
  */
 var express = require('express');
 var router = express.Router();
-var User = require('../models/User');
+var User = require('../models/user');
 var usersCtrl = require('../controllers/users');
 var hasAccess = require('../middlewares/auth').hasAccess;
 var multer = require('multer');

@@ -55,6 +55,18 @@
 .form-group.input-group.category-search {
   margin: 10px 10px 10px 10px;
 }
+th.name {
+  width: 150px;
+}
+th.id {
+  width: 50px;
+}
+th.topic {
+  width: 250px;
+}
+th.details {
+  width: auto;
+}
 body {
   background-color: #f8f8f8;
 }
