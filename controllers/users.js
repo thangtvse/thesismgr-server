@@ -29,16 +29,16 @@ exports.getUserListPage = function (role) {
 
                 console.log("FOUND " + numberOfUsers + " " + role + "s");
 
-                getModels('office').then(function (Office) {
-                    Office.find().exec(function (error, offices) {
+                getModels('unit').then(function (Unit) {
+                    Unit.find().exec(function (error, units) {
                         if (error) {
                             req.flash('errorMessage', error.message);
                             return res.redirect('/users/' + role + 's');
                         }
 
 
-                        var filteredOffices = offices.filter(function (office) {
-                            if (office.left == 1) {
+                        var filteredUnits = units.filter(function (unit) {
+                            if (unit.left == 1) {
                                 return false
                             } else {
                                 return true
@@ -47,8 +47,9 @@ exports.getUserListPage = function (role) {
 
 
                         res.render('./users/' + role + 's', {
-                            offices: _.map(filteredOffices, function (office) {
-                                return office.toObject();
+                            req: req,
+                            units: _.map(filteredUnits, function (unit) {
+                                return unit.toObject();
                             }),
                             numberOfPages: Math.floor(numberOfUsers / paginationConfig.numberOfUsersPerPage) + 1,
                             numberOfUsersPerPage: paginationConfig.numberOfUsersPerPage,
@@ -82,17 +83,20 @@ exports.getAllUsers = function (role) {
             }).paginate({
                 page: req.query.page,
                 limit: numberOfUsersPerPage
-            }).exec(function (err, moderators) {
-                if (err) {
-                    return res.send(createResponse(false, {}, err.message));
-                }
-
-                var resModerators = _.map(moderators, function (moderator) {
-                    return _.omit(moderator.toObject(), 'password')
-                });
-
-                return res.send(createResponse(true, null, resModerators));
             })
+                .populate('fields')
+                .populate('unit')
+                .exec(function (err, moderators) {
+                    if (err) {
+                        return res.send(createResponse(false, {}, err.message));
+                    }
+
+                    var resModerators = _.map(moderators, function (moderator) {
+                        return _.omit(moderator.toObject(), 'password')
+                    });
+
+                    return res.send(createResponse(true, null, resModerators));
+                })
         });
 
     }
@@ -110,8 +114,10 @@ exports.getUserByID = function (role) {
                 {
                     id: id,
                     role: role
-                },
-                function (err, user) {
+                })
+                .populate('fields')
+                .populate('unit')
+                .exec(function (err, user) {
                     if (err) {
                         return res.send(createResponse(false, {}, err.message));
                     }
@@ -132,12 +138,11 @@ exports.createUser = function (role) {
 
         console.log(util.inspect(req.body));
 
-
         // validation
         req.checkBody('officer_number', 'Invalid officer number.').notEmpty().isOfficerNumberAvailable();
-        req.checkBody('username', 'Invalid username').notEmpty().isEmail();
-        req.checkBody('username', 'Username taken').isUsernameAvailable();
-        req.checkBody('office_id', 'Invalid office ID').notEmpty().isOfficeIDAvailable();
+        req.checkBody('email', 'Invalid email').notEmpty().isEmail();
+        req.checkBody('email', 'Email taken').isEmailAvailable();
+        req.checkBody('unit_id', 'Invalid unit ID').notEmpty().isUnitIDAvailable();
         req.checkBody('full_name', 'Invalid full name').notEmpty();
 
         req.asyncValidationErrors()
@@ -146,14 +151,13 @@ exports.createUser = function (role) {
                 // create user
 
                 var officerNumber = req.body.officer_number;
-                var username = req.body.username;
-                var password = randomstring.generate(10);
-                var officeID = req.body.office_id;
+                var email = req.body.email;
+                var unitID = req.body.unit_id;
                 var fullName = req.body.full_name;
 
                 getModels('user').then(function (User) {
                     var mailTransporter = nodemailer.createTransport(mailTransportConfig);
-                    User.createOne(officerNumber, username, password, officeID, fullName, role, 'uendno@gmail.com', mailTransporter, function (error, newUser) {
+                    User.createOne(officerNumber, email, unitID, fullName, role, 'uendno@gmail.com', mailTransporter, function (error, newUser) {
                         if (error) {
                             req.flash('errorMessage', error.message);
                         }
@@ -163,8 +167,6 @@ exports.createUser = function (role) {
                 })
             })
             .catch(function (errors) {
-                console.log(errors.length);
-                console.log(errors);
                 req.flash('errorMessage', errors[0].msg);
                 res.redirect('/users/' + role + 's');
                 return
@@ -186,7 +188,7 @@ exports.createUsingXLSX = function (role) {
 
         console.log(fileInfo);
 
-        if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+        if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-unitdocument.spreadsheetml.sheet") {
             return res.status(400).send(createResponse(false, null, "Invalid xlsx file"));
         }
 

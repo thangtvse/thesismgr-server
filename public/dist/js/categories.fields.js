@@ -36,7 +36,7 @@ $(document).ready(function () {
         })
     });
 
-    $(".category-hierarchy.delete").click(function (e) {
+    $(".category-item.delete").click(function (e) {
 
         var a = $(this);
 
@@ -60,5 +60,19 @@ $(document).ready(function () {
         });
     });
 
+    $(".category-item.edit").click(function (e) {
+        var a = $(this);
+
+        bootbox.prompt(
+            "Change course name.",
+            function (result) {
+
+                post("/categories/fields/update", {
+                    id: a.attr("data-id"),
+                    name: result
+                });
+
+            });
+    })
 
 });

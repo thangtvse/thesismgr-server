@@ -280,7 +280,7 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
 
                 @example
                 $('#form-div').on('save'), function(e, params){
-                    if(params.newValue === 'username') {...}
+                    if(params.newValue === 'email') {...}
                 });
                 **/
                 this.$div.triggerHandler('save', {newValue: newValue, submitValue: submitValue, response: response});
@@ -388,7 +388,7 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
     @example
     var $form = $('&lt;div&gt;').editableform({
         type: 'text',
-        name: 'username',
+        name: 'email',
         url: '/post',
         value: 'vitaliy'
     });
@@ -1060,7 +1060,7 @@ Applied as jQuery method.
                     @event shown 
                     @param {Object} event event object
                     @example
-                    $('#username').on('shown', function(e, editable) {
+                    $('#email').on('shown', function(e, editable) {
                         editable.input.$input.val('overwriting value of input..');
                     });                     
                     **/                      
@@ -1149,7 +1149,7 @@ Applied as jQuery method.
             @param {object} event event object
             @param {string} reason Reason caused hiding. Can be <code>save|cancel|onblur|nochange|manual</code>
             @example
-            $('#username').on('hidden', function(e, reason) {
+            $('#email').on('hidden', function(e, reason) {
                 if(reason === 'save' || reason === 'cancel') {
                     //auto-open next editable
                     $(this).closest('tr').next().find('.editable').editable('show');
@@ -1200,7 +1200,7 @@ Applied as jQuery method.
             @param {mixed} params.newValue submitted value
             @param {Object} params.response ajax response
             @example
-            $('#username').on('save', function(e, params) {
+            $('#email').on('save', function(e, params) {
                 //assuming server response: '{success: true}'
                 var pk = $(this).data('editableContainer').options.pk;
                 if(params.response && params.response.success) {
@@ -1586,10 +1586,10 @@ Makes editable any HTML element on the page. Applied as jQuery method.
                @param {Object} editable editable instance (as here it cannot accessed via data('editable'))
                @since 1.2.0
                @example
-               $('#username').on('init', function(e, editable) {
+               $('#email').on('init', function(e, editable) {
                    alert('initialized ' + editable.options.name);
                });
-               $('#username').editable();
+               $('#email').editable();
                **/                  
                 this.$element.triggerHandler('init', this);
             }, this));
@@ -1881,7 +1881,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             @param {mixed} params.newValue submitted value
             @param {Object} params.response ajax response
             @example
-            $('#username').on('save', function(e, params) {
+            $('#email').on('save', function(e, params) {
                 alert('Saved value: ' + params.newValue);
             });
             **/
@@ -1959,7 +1959,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
     @method $().editable(options)
     @params {Object} options
     @example
-    $('#username').editable({
+    $('#email').editable({
         type: 'text',
         url: '/post',
         pk: 1
@@ -1975,10 +1975,10 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             @method validate()
             @returns {Object} validation errors map
             @example
-            $('#username, #fullname').editable('validate');
+            $('#email, #fullname').editable('validate');
             // possible result:
             {
-              username: "username is required",
+              email: "email is required",
               fullname: "fullname should be minimum 3 letters length"
             }
             **/
@@ -2001,14 +2001,14 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             @param {bool} isSingle whether to return just value of single element
             @returns {Object} object of element names and values
             @example
-            $('#username, #fullname').editable('getValue');
+            $('#email, #fullname').editable('getValue');
             //result:
             {
-            username: "superuser",
+            email: "superuser",
             fullname: "John"
             }
             //isSingle = true
-            $('#username').editable('getValue', true);
+            $('#email').editable('getValue', true);
             //result "superuser" 
             **/
             case 'getValue':
@@ -2029,7 +2029,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             Internally it runs client-side validation for all fields and submits only in case of success.  
             See <a href="#newrecord">creating new records</a> for details.  
             Since 1.5.1 `submit` can be applied to single element to send data programmatically. In that case
-            `url`, `success` and `error` is taken from initial options and you can just call `$('#username').editable('submit')`. 
+            `url`, `success` and `error` is taken from initial options and you can just call `$('#email').editable('submit')`.
             
             @method submit(options)
             @param {object} options 
@@ -2172,7 +2172,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
         @example
         $('#edit-button').click(function(e) {
             e.stopPropagation();
-            $('#username').editable('toggle');
+            $('#email').editable('toggle');
         });
 
         @property toggle 
@@ -2290,7 +2290,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
         @example
         <div id="user">
           <!-- empty -->
-          <a href="#" data-name="username" data-type="text" class="editable-click editable-empty" data-value="" title="Username">Empty</a>
+          <a href="#" data-name="email" data-type="text" class="editable-click editable-empty" data-value="" title="Email">Empty</a>
           <!-- non-empty -->
           <a href="#" data-name="group" data-type="select" data-source="/groups" data-value="1" class="editable-click" title="Group">Operator</a>
         </div>     
@@ -2881,12 +2881,12 @@ Text input
 @extends abstractinput
 @final
 @example
-<a href="#" id="username" data-type="text" data-pk="1">awesome</a>
+<a href="#" id="email" data-type="text" data-pk="1">awesome</a>
 <script>
 $(function(){
-    $('#username').editable({
+    $('#email').editable({
         url: '/post',
-        title: 'Enter username'
+        title: 'Enter email'
     });
 });
 </script>

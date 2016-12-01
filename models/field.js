@@ -23,11 +23,12 @@ module.exports = {
             type: 'integer'
         },
 
-        users: {
-            collection: 'user',
+        lecturers: {
+            collection: 'lecturer',
             via: 'fields'
         }
     },
+
     beforeCreate: function (values, next) {
         getModel('field').then(function (Field) {
             treeHelper.beforeCreateANode(Field, values, next);

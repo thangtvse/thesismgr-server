@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<%- include('./patrials/head.ejs', {title: "ThesisMgr"}) %>
+<%- include('./partials/head.ejs', {title: "ThesisMgr"}) %>
 
 <body>
 
 <div id="wrapper">
 
-    <% include ./patrials/navbar.ejs %>
+    <%- include('./partials/navbar.ejs'), {
+        req: req
+    }
+    %>
 
     <!-- Navigation -->
+
     <div id="page-wrapper">
 
         <div class="container-fluid">
@@ -21,7 +25,7 @@
 </div>
 <!-- /#wrapper -->
 
-<%- include ./patrials/scripts.ejs%>
+<%- include ./partials/scripts.ejs %>
 
 </body>
 

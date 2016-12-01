@@ -12,7 +12,9 @@ router.use(expressValidator({
 router.get('/', [
     hasAccess('moderator'),
     function (req, res) {
-        res.render('index');
+        res.render('index', {
+            req: req
+        });
     }
 ]);
 

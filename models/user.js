@@ -10,11 +10,12 @@ var stringSimilarity = require('string-similarity');
 var async = require('async');
 var util = require('util');
 var _ = require('underscore');
+var treeHelper = require('../helpers/tree');
 
-var login = function (email, password, next) {
+var login = function (officerNumber, password, next) {
 
     getModel('user').then(function (User) {
-        User.findOne({username: email}, function (error, user) {
+        User.findOne({officerNumber: officerNumber}, function (error, user) {
             if (error) {
                 return next(error);
             }
@@ -36,27 +37,6 @@ var login = function (email, password, next) {
     });
 };
 
-var sendMail = function (username, password, senderEmail, mailTransporter) {
-    // setup e-mail data with unicode symbols
-    var mailOptions = {
-        from: '"ThesisMgr System 👥" <' + senderEmail + '>', // sender address
-        to: username, // list of receivers
-        subject: 'Invitation Mail', // Subject line
-        text: 'username: ' + username + "\n" + "password: " + password // plaintext body
-        //  html: '<b>Hello world 🐴</b>' // html body
-    };
-
-    console.log("sending mail to " + username);
-    // send mail with defined transport object
-    mailTransporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            return console.log(util.inspect(error, false, 2, true));
-        }
-
-        console.log(util.inspect(info, false, 2, true));
-    });
-};
-
 
 module.exports = {
     identity: 'user',
@@ -70,7 +50,7 @@ module.exports = {
             required: true
         },
 
-        username: {
+        email: {
             type: 'string',
             unique: true,
             required: true
@@ -85,28 +65,49 @@ module.exports = {
             type: 'string'
         },
 
-        office: {
-            model: 'office'
+        faculty: {
+            model: 'unit'
         },
 
-        fields: {
-            collection: 'field',
-            via: 'users',
-            dominant: true
+        unit: {
+            model: 'unit',
+            required: true,
         },
 
         role: {
             type: 'string',
+            in: ['admin', 'lecturer', 'moderator', 'student'],
             required: true
+        },
+
+        lecturer: {
+            collection: 'lecturer',
+            via: 'user'
+        },
+
+        student: {
+            collection: 'student',
+            via: 'user'
         }
+
     },
+
     beforeCreate: function (values, next) {
 
+        console.log(util.inspect(values));
+
+        // hash password
         bcrypt.genSalt(10, function (error, salt) {
-            if (error) return next(error);
+            if (error) {
+                console.log(error);
+                return next(error);
+            }
 
             bcrypt.hash(values.password, salt, null, function (error, hash) {
-                if (error) return next(error);
+                if (error) {
+                    console.log(error);
+                    return next(error);
+                }
 
                 values.password = hash;
                 next();
@@ -120,9 +121,9 @@ module.exports = {
      * @param password
      * @param next
      */
-    adminLogin: function (email, password, next) {
-        login(email, password, function (error, result, user) {
-            if (user && user.role != 'admin') {
+    adminLogin: function (officerNumber, password, next) {
+        login(officerNumber, password, function (error, result, user) {
+            if (user && user.role != 'admin' && user.role != 'moderator') {
                 return next(null, false);
             }
 
@@ -133,142 +134,201 @@ module.exports = {
     /**
      * Create a list of user using xlsx
      * @param role
+     * @param specifiedFaculty
      * @param filePath
      * @param mailTransporter
      * @param senderEmail
+     * @param afterCreateAnUser
      * @param next
      */
-    createUsingXLSX: function (role, filePath, mailTransporter, senderEmail, next) {
-        getModel('office').then(function (Office) {
-            // find all offices
-            Office.find(function (error, offices) {
+    createUsingXLSX: function (role, specifiedFaculty, filePath, afterCreateAnUser, next) {
 
-                if (error) {
-                    return next([error])
-                }
+        getModel('user').then(function (User) {
+            getModel('unit').then(function (Unit) {
+                // find all units
+                Unit.find(function (error, units) {
 
-                // get all office names
-
-                var filterdOffices = _.filter(offices, function (office) {
-                    return (office.name != null);
-                });
-
-                var officeNames = _.map(filterdOffices, function (office) {
-                    return office.name;
-                });
-
-
-                // create a queue object with concurrency 2
-                var q = async.queue(function (task, callback) {
-
-                    var row = task.row;
-
-                    if (row._number == 1) {
-                        return callback();
+                    if (error) {
+                        return next([error])
                     }
 
-                    // File format: No., Officer Number, Full Name, Office, Username
-                    var values = row.values;
+                    // get all unit names
 
-                    // get username
-                    var username = values[5];
-                    if (username.text) {
-                        username = username.text;
-                    }
-
-                    // random password
-                    var password = randomstring.generate(10);
-
-                    // find best match office
-                    console.log("row value: " + row.values[4] + " office name: " + officeNames + " with length: " + officeNames.length);
-                    var bestMatchOfficeName = stringSimilarity.findBestMatch(row.values[4], officeNames).bestMatch.target;
-                    var indexOfBestMatchOffice = officeNames.indexOf(bestMatchOfficeName);
-
-                    // find index of best match office name in the offices array
-                    if (indexOfBestMatchOffice == -1) {
-                        var error = new Error("Internal error.");
-                        return callback(error, username);
-                    }
-
-
-                    getModel('user').then(function (User) {
-                        // save new lecturer
-
-                        User.create({
-                            officerNumber: values[2],
-                            username: username,
-                            password: password,
-                            officeID: offices[indexOfBestMatchOffice]._id,
-                            fullName: values[3],
-                            role: 'lecturer'
-                        }).exec(function (error, newUser) {
-                            if (error) {
-                                return callback(error, username);
-                            }
-
-                            callback();
-
-                            sendMail(username, password, senderEmail, mailTransporter);
-                        });
+                    var filterdUnits = _.filter(units, function (unit) {
+                        return (unit.name != null);
                     });
 
-                }, 2);
+                    var unitNames = _.map(filterdUnits, function (unit) {
+                        return unit.name;
+                    });
 
 
-                var responseErrors = [];
+                    // create a queue object with concurrency 2
+                    var q = async.queue(function (task, callback) {
 
-                q.drain = function () {
+                        var row = task.row;
 
-                    if (responseErrors.length > 0) {
+                        if (row._number == 1) {
+                            return callback();
+                        }
 
-                        return next(responseErrors);
+                        // File format: No., Officer Number, Full Name, Unit, Email
+                        var values = row.values;
 
-                    } else {
-                        return next([]);
-                    }
+                        // get email
+                        var email = values[5];
+                        if (!email) {
+                            return callback();
+                        }
 
-                };
+                        if (email.text) {
+                            email = email.text;
+                        }
 
-                // read xlsx file
-                var workbook = new Excel.Workbook();
-                workbook.xlsx.readFile(filePath)
-                    .then(function () {
-                        var worksheet = workbook.getWorksheet("Sheet1");
-                        worksheet.eachRow({includeEmpty: true}, function (row, rowNumber) {
+                        // random password
+                        var password = randomstring.generate(10);
 
-                            q.push({
-                                row: row,
-                                rowNumber: rowNumber
-                            }, function (error, username) {
+                        // find best match unit
+
+                        if (typeof values[4] != 'string') {
+                            return callback(new Error('File error: Wrong format!'));
+                        }
+                        var bestMatchUnitName = stringSimilarity.findBestMatch(row.values[4], unitNames).bestMatch.target;
+                        var indexOfBestMatchUnit = unitNames.indexOf(bestMatchUnitName);
+                        // find index of best match unit name in the units array
+                        if (indexOfBestMatchUnit == -1) {
+                            var error = new Error("Internal error.");
+                            return callback(error, email);
+                        }
+
+                        var unit = units[indexOfBestMatchUnit];
+
+                        var process = function () {
+                            // save new user
+
+                            Unit.getFacultyOfUnit(unit, function (error, faculty) {
                                 if (error) {
-                                    responseErrors.push({
-                                        username: username,
-                                        errorMessage: error.message
-                                    })
+                                    return callback(error, email);
                                 }
+
+                                User.create({
+                                    officerNumber: values[2],
+                                    email: email,
+                                    password: password,
+                                    unit: unit,
+                                    faculty: faculty,
+                                    fullName: values[3],
+                                    role: role
+                                }).exec(function (error, newUser) {
+                                    if (error) {
+                                        return callback(error, email);
+                                    }
+
+                                    return afterCreateAnUser(values, newUser, password, callback);
+
+                                });
+
+                            });
+                        };
+
+
+                        if (specifiedFaculty.left != 1 && unit != specifiedFaculty) {
+
+                            Unit.getFacultyOfUnit(unit, function (error, faculty) {
+                                if (faculty != specifiedFaculty) {
+                                    return callback(new Error("User: " + email + " is not in your faculty (" + specifiedFaculty.name + ")"));
+                                }
+
+                                process();
+                            });
+
+                        } else {
+                            process();
+                        }
+
+                    }, 2);
+
+                    var responseErrors = [];
+
+                    q.drain = function () {
+
+                        if (responseErrors.length > 0) {
+
+                            return next(responseErrors);
+
+                        } else {
+                            return next([]);
+                        }
+
+                    };
+
+                    // read xlsx file
+                    var workbook = new Excel.Workbook();
+                    workbook.xlsx.readFile(filePath)
+                        .then(function () {
+                            var worksheet = workbook.getWorksheet("Sheet1");
+                            worksheet.eachRow({includeEmpty: true}, function (row, rowNumber) {
+
+                                q.push({
+                                    row: row,
+                                    rowNumber: rowNumber
+                                }, function (error, email) {
+                                    if (error) {
+                                        responseErrors.push(error);
+                                    }
+                                })
                             })
                         })
-                    })
-            })
+                })
+            });
         });
     },
 
 
-    createOne: function (officerNumber, username, password, officeID, fullName, role, senderEmail, mailTransporter, next) {
+    /**
+     * Create one user
+     * @param officerNumber
+     * @param email
+     * @param password
+     * @param unitID
+     * @param fullName
+     * @param role
+     * @param senderEmail
+     * @param mailTransporter
+     * @param next
+     */
+    createOne: function (officerNumber, email, unitID, fullName, role, next) {
         getModel('user').then(function (User) {
 
-            User.create({
-                officerNumber: officerNumber,
-                username: username,
-                password: password,
-                officeID: officeID,
-                fullName: fullName,
-                role: role
-            }).exec(function (error, newUser) {
-                next(error, newUser);
 
-                sendMail(username, password, senderEmail, mailTransporter);
+            var password = randomstring.generate(10);
+
+            //get Faculty
+            getModel('unit').then(function (Unit) {
+
+                Unit.getFacultyOfUnitID(unitID, function (error, faculty) {
+
+
+                    if (error) {
+                        console.log(error);
+                        return next(error);
+                    }
+
+
+                    User.create({
+                        officerNumber: officerNumber,
+                        email: email,
+                        password: password,
+                        unit: unitID,
+                        faculty: faculty,
+                        fullName: fullName,
+                        role: role
+                    }).exec(function (error, newUser) {
+                        console.log(util.inspect(newUser));
+                        return next(error, newUser, password);
+                    });
+                })
             });
         });
-    }
+    },
 };

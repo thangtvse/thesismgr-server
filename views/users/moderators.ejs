@@ -1,122 +1,91 @@
-<!Doctype html>
-<html>
-<meta charset="utf-8"/>
-<%- include('../patrials/head.ejs', {title: "ThesisMgr"}) %>
-<% var quotation= [{
-    "dimension" : 0,
-    "currency": "RMB",
-    "quantity": "100",
-    "price": "3",
-    "factory": "rx"},
-    {
-        "dimension" : 0,
-        "currency": "RMB",
-        "quantity": "200",
-        "price": "4",
-        "factory": "rx"},
-    {
-        "dimension" : 1,
-        "currency": "RMB",
-        "quantity": "100",
-        "price": "3",
-        "factory": "rx"},
-    {
-        "dimension" : 1,
-        "currency": "RMB",
-        "quantity": "200",
-        "price": "5",
-        "factory": "rx"},
-    {
-        "dimension" : 0,
-        "currency": "RMB",
-        "quantity": "100",
-        "price": "1.2",
-        "factory": "hsf"},
-    {
-        "dimension" : 0,
-        "currency": "RMB",
-        "quantity": "200",
-        "price": "2.4",
-        "factory": "hsf"},
-    {
-        "dimension" : 1,
-        "currency": "RMB",
-        "quantity": "100",
-        "price": "3",
-        "factory": "hsf"},
-    {
-        "dimension" : 1,
-        "currency": "RMB",
-        "quantity": "200",
-        "price": "4.5",
-        "factory": "hsf"}];
-%>
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../partials/head.ejs', {title: "ThesisMgr"}) %>
 
 <body>
+
 <div id="wrapper">
 
-    <% include ../patrials/navbar.ejs %>
+    <% include ../partials/navbar.ejs %>
 
     <!-- Navigation -->
     <div id="page-wrapper">
 
         <div class="container-fluid">
-            <!-- show any messages that come back with authentication -->
-            <% if (message.length > 0) { %>
-            <div class="alert alert-danger"><%= message %></div>
-            <% } %>
-            <div class="editdata"  style="padding: 10px;">
-                <%- include('./users.modal.ejs', {
-                    role: "moderator",
-                    createOneAction: "/users/moderators/create",
-                    offices: offices
-                })%>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Moderators</h1>
+                </div>
+                <!-- /.col-lg-12 -->
             </div>
-            <table class="table table-hover table-striped" id="officer_table" >
-                <tr>
-                    <th>Officer_number</th><th>office</th><th>full_name</th><th>role - moderator</th>
-                </tr>
 
-                <% for (var i = 0; i < quotation.length; i++) { %>
-                <tr scope="row">
-                    <td><%= quotation[i].dimension %> </td>
-                    <td><a class="tdText" href="#" data-type="text" data-placement="right" ><%= quotation[i].quantity %></a></td>
-                    <td><a class="tdText" href="#" data-type="text" data-placement="right" ><%= quotation[i].factory %></a></td>
-                    <td><a class="tdText" href="#" data-type="text" data-placement="right" ><%= quotation[i].factory %></a></td>
-                </tr>
+            <div class="row">
+                <!-- show any messages that come back with authentication -->
+                <% if (message != null && message.length > 0) { %>
+                <div class="alert alert-danger"><%= message %></div>
                 <% } %>
-            </table>
-            <div  style="text-align: center">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li>
-                            <a href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
+            </div>
 
-                        <% for (var i = 0; i < numberOfPages; i++) {
-                            console.log("page: " + (i + 1) + " of " + numberOfPages) %>
-                        <li><a class="page-indicator" href="#<%=i+1%>"><%= i + 1 %></a></li>
-                        <% } %>
+            <div class="row">
+                <div class="col-lg-8">
+                    <% faculties.forEach(function (faculty) { %>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <%= faculty.name %>
+                        </div>
+                        <div class="panel-body">
+                            <% moderators.filter(function (moderator) {
+                                return moderator.faculty.id == faculty.id;
+                            }).forEach(function (moderator) { %>
+                            <div class="panel panel-default category-item">
+                                <div class="panel-body">
+                                    <%= moderator.officerNumber %> - <%= moderator.fullName %> - <span
+                                            class="label label-default"><%= moderator.unit.name %></span></h3>
 
-                        <li>
-                            <a href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                                </div>
+                            </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <% }) %>
+
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Add a moderator
+                        </div>
+                        <div class="panel-body">
+                            <form role="form" action="/users/moderators/assign" method="post">
+                                <div class="form-group">
+                                    <label>Officer number</label>
+                                    <input class="form-control" id="new-moderator-officer-number" type="text"
+                                           name="officer_number" list="officer-number-search-list" required>
+                                    <datalist id="officer-number-search-list">
+
+                                    </datalist>
+                                    <p class="help-block">Name of the new course that you want to add.</p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Assign moderator</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-
 </div>
 <!-- /#wrapper -->
-<%- include ../patrials/scripts.ejs%>
-<%- include('./users.javascripts.ejs', {
-actions: "/users/moderators/create_xlsx"
-})%>
+
+<%- include ../partials/scripts.ejs %>
+<script type="text/javascript" src="/dist/js/users.moderators.min.js"></script>
 </body>
+
 </html>
+
+
+
+

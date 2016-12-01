@@ -5,7 +5,9 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/User');
-var usersCtrl = require('../controllers/users');
+var moderatorsCtrl = require('../controllers/users.moderators');
+var lecturersCtrl = require('../controllers/users.lecturers');
+var studentsCtrl = require('../controllers/users.students');
 var hasAccess = require('../middlewares/auth').hasAccess;
 var multer = require('multer');
 var upload = multer({dest: 'temp/'});
@@ -14,28 +16,17 @@ var upload = multer({dest: 'temp/'});
 // MODERATORS =========================================
 router.get('/moderators', [
     hasAccess('admin'),
-    usersCtrl.getUserListPage('moderator')
+    moderatorsCtrl.getView
 ]);
 
-router.get('/api/moderators', [
+router.post('/moderators/assign', [
     hasAccess('admin'),
-    usersCtrl.getAllUsers('moderator')
+    moderatorsCtrl.assignModerator
 ]);
 
-router.get('/api/moderators/:id', [
-    hasAccess(['moderator']),
-    usersCtrl.getUserByID('moderator')
-]);
-
-router.post('/moderators/create', [
+router.post('/moderators/revoke', [
     hasAccess('admin'),
-    usersCtrl.createUser('moderator')
-]);
-
-router.post('/moderators/create_xlsx', [
-    hasAccess('admin'),
-    upload.single('xlsx'),
-    usersCtrl.createUsingXLSX('moderator')
+    moderatorsCtrl.revokeModerator
 ]);
 
 
@@ -43,28 +34,28 @@ router.post('/moderators/create_xlsx', [
 
 router.get('/lecturers', [
     hasAccess('moderator'),
-    usersCtrl.getUserListPage('lecturer')
+    lecturersCtrl.getLecturerListPage
 ]);
 
 router.get('/api/lecturers', [
     hasAccess('moderator'),
-    usersCtrl.getAllUsers('lecturer')
+    lecturersCtrl.getAllLecturersAPI
 ]);
 
-router.get('/api/lecturers/:id', [
-    hasAccess(['student']),
-    usersCtrl.getUserByID('lecturer')
+router.get('/api/lecturers/search-by-officer-number', [
+    hasAccess('moderator'),
+    lecturersCtrl.searchLecturerByOfficerNumberAPI
 ]);
 
 router.post('/lecturers/create', [
     hasAccess('moderator'),
-    usersCtrl.createUser('lecturer')
+    lecturersCtrl.createLecturer
 ]);
 
-router.post('/lecturers/create_xlsx', [
+router.post('/lecturers/create-xlsx', [
     hasAccess(['moderator']),
     upload.single('xlsx'),
-    usersCtrl.createUsingXLSX('lecturer')
+    lecturersCtrl.createUsingXLSX
 ]);
 
 
@@ -72,27 +63,28 @@ router.post('/lecturers/create_xlsx', [
 
 router.get('/students', [
     hasAccess('moderator'),
-    usersCtrl.getUserListPage('student')
+    studentsCtrl.getStudentListPage
 ]);
 
 router.get('/api/students', [
     hasAccess('moderator'),
-    usersCtrl.getAllUsers('student')
+    studentsCtrl.getAllStudentsAPI
 ]);
 
-router.get('/api/students/:id', [
-    hasAccess(['student']),
-    usersCtrl.getUserByID('student')
+router.get('/api/students/search-by-officer-number', [
+    hasAccess('moderator'),
+    studentsCtrl.searchStudentByOfficerNumberAPI
 ]);
 
 router.post('/students/create', [
     hasAccess('moderator'),
-    usersCtrl.createUser('student')
+    studentsCtrl.createStudent
 ]);
 
-router.post('/students/create_xlsx', [
+router.post('/students/create-xlsx', [
+    hasAccess(['moderator']),
     upload.single('xlsx'),
-    usersCtrl.createUsingXLSX('moderator')
+    studentsCtrl.createUsingXLSX
 ]);
 
 module.exports = router;
