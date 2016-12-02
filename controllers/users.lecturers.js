@@ -178,6 +178,76 @@ exports.searchLecturerByOfficerNumberAPI = function (req, res) {
     })
 };
 
+/**
+ * Get a lecturer info by id
+ * @param req
+ * @param res
+ * @returns {*}
+ */
+exports.getLecturerByIdAPI = function (req, res) {
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+    getModel('user').then(function (User) {
+        getModel('lecturer').then(function (Lecturer) {
+
+            User.findOne({
+                id: req.params.id,
+                role: ['lecturer', 'moderator']
+            })
+                .sort({
+                    createdAt: 'desc'
+                })
+                .populate('lecturer')
+                .populate('unit')
+                .populate('faculty')
+                .exec(function (error, user) {
+                    if (error) {
+                        return res.status(400).send(createResponse(false, null, error.message));
+                    }
+
+                    if (user == null) {
+                        return res.status(404).send(createResponse(false, null, "User not found."));
+                    }
+
+                    if (user.lecturer == null || user.lecturer.length == 0) {
+                        return res.status(500).send(createResponse(false, null, "There are some internal errors."));
+                    }
+
+                    var resLecturer = user.toObject();
+
+                    Lecturer.findOne({
+                        id: user.lecturer[0].id
+                    })
+                        .populate('fields')
+                        .exec(function (error, lecturer) {
+
+                            if (error) {
+                                return res.status(400).send(createResponse(false, null, error.message));
+                            }
+
+                            resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
+
+                            return res.send(createResponse(true, resLecturer, null));
+                        });
+                });
+        });
+    });
+};
+
+/**
+ * Update lecturer info
+ * @param req
+ * @param res
+ */
+exports.updateLecturerInfoAPI = function (req, res) {
+    
+};
+
 // /**
 //  * Get an user by id and role
 //  * @param role: role of user
