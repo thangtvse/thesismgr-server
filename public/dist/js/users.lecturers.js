@@ -113,7 +113,7 @@ var getData = function () {
     }
 
     $.ajax({
-        url: "/users/api/lecturers",
+        url: "/admin/users/api/lecturers",
         method: "GET",
         data: data,
         success: success,

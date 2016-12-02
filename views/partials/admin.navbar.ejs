@@ -247,15 +247,15 @@
                     <ul class="nav nav-second-level">
                         <% if (req.user.role == 'admin') { %>
                         <li>
-                            <a href="/users/moderators">Moderators</a>
+                            <a href="/admin/users/moderators">Moderators</a>
                         </li>
                         <% } %>
 
                         <li>
-                            <a href="/users/lecturers">Lecturers</a>
+                            <a href="/admin/users/lecturers">Lecturers</a>
                         </li>
                         <li>
-                            <a href="/users/students">Students</a>
+                            <a href="/admin/users/students">Students</a>
                         </li>
                     </ul>
                     <!-- /.nav-second-level -->
@@ -265,21 +265,21 @@
                     <ul class="nav nav-second-level">
                         <% if (req.user.role == 'admin') { %>
                         <li>
-                            <a href="/categories/units">Units</a>
+                            <a href="/admin/categories/units">Units</a>
                         </li>
                         <% } %>
 
                         <% if (req.user.role == 'admin') { %>
                         <li>
-                            <a href="/categories/fields">Fields</a>
+                            <a href="/admin/categories/fields">Fields</a>
                         </li>
                         <% } %>
 
                         <li>
-                            <a href="/categories/courses">Courses</a>
+                            <a href="/admin/categories/courses">Courses</a>
                         </li>
                         <li>
-                            <a href="/categories/programs">Programs</a>
+                            <a href="/admin/categories/programs">Programs</a>
                         </li>
                     </ul>
                     <!-- /.nav-second-level -->
@@ -288,13 +288,13 @@
                     <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Theses<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <a href="/categories/programs">Theses</a>
+                            <a href="/admin/categories/programs">Theses</a>
                         </li>
                         <li>
-                            <a href="/categories/courses">Sessions</a>
+                            <a href="/admin/categories/courses">Sessions</a>
                         </li>
                         <li>
-                            <a href="/categories/programs">Requests</a>
+                            <a href="/admin/categories/programs">Requests</a>
                         </li>
                     </ul>
                     <!-- /.nav-second-level -->

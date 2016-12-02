@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<%- include('./partials/head.ejs', {title: "ThesisMgr"}) %>
+<%- include('../partials/head.ejs', {title: "ThesisMgr"}) %>
 
 <body>
 
 <div id="wrapper">
 
-    <%- include('./partials/navbar.ejs'), {
+    <%- include('../partials/admin.navbar.ejs'), {
         req: req
     }
     %>
@@ -25,7 +25,7 @@
 </div>
 <!-- /#wrapper -->
 
-<%- include ./partials/scripts.ejs %>
+<%- include ../partials/scripts.ejs %>
 
 </body>
 

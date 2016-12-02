@@ -2,18 +2,18 @@
  * Project: ThesisMgr-Server
  * File: controllers\users.js
  */
-var createResponse = require('../helpers/response').createRes;
+var createResponse = require('../../helpers/response').createRes;
 var bcrypt = require('bcrypt-nodejs');
 var _ = require('underscore');
 var nodemailer = require('nodemailer');
-var mailTransportConfig = require('../config/mail').transportConfig;
+var mailTransportConfig = require('../../config/mail').transportConfig;
 var fs = require('fs');
 var util = require('util');
 var getModel = require('express-waterline').getModels;
-var numberOfUsersPerPage = require('../config/pagination').numberOfUsersPerPage;
+var numberOfUsersPerPage = require('../../config/pagination').numberOfUsersPerPage;
 var randomstring = require('randomstring');
-var paginationConfig = require('../config/pagination');
-var authHelper = require('../helpers/auth');
+var paginationConfig = require('../../config/pagination');
+var authHelper = require('../../helpers/auth');
 var async = require('async');
 
 /**
@@ -26,7 +26,7 @@ exports.getStudentListPage = function (req, res) {
         Student.count().exec(function (error, numOfStudents) {
             if (error) {
                 req.flash('errorMessage', error.message);
-                return res.redirect('/users/students');
+                return res.redirect('/admin/users/students');
             }
 
             getModel('unit').then(function (Unit) {
@@ -39,7 +39,7 @@ exports.getStudentListPage = function (req, res) {
                         ).exec(function (error, units) {
                             if (error) {
                                 req.flash('errorMessage', error.message);
-                                return res.redirect('/users/students');
+                                return res.redirect('/admin/users/students');
                             }
 
                             var filteredUnits = units.filter(function (unit) {
@@ -63,13 +63,13 @@ exports.getStudentListPage = function (req, res) {
                             Course.find().exec(function (error, courses) {
                                 if (error) {
                                     req.flash('errorMessage', error.message);
-                                    return res.redirect('/users/students');
+                                    return res.redirect('/admin/users/students');
                                 }
 
                                 Program.find().exec(function (error, programs) {
                                     if (error) {
                                         req.flash('errorMessage', error.message);
-                                        return res.redirect('/users/students');
+                                        return res.redirect('/admin/users/students');
                                     }
 
                                     var numberOfPages;
@@ -79,7 +79,7 @@ exports.getStudentListPage = function (req, res) {
                                         numberOfPages = Math.floor(numOfStudents / paginationConfig.numberOfUsersPerPage) + 1;
                                     }
 
-                                    res.render('./users/students', {
+                                    res.render('./admin/users/students', {
                                         req: req,
                                         faculties: _.map(filteredUnits, function (unit) {
                                             return unit.toObject();
@@ -280,17 +280,16 @@ exports.createStudent = function (req, res) {
                             req.flash('errorMessage', error.message);
                         }
 
-                        return res.redirect('/users/students');
+                        return res.redirect('/admin/users/students');
                     })
                 })
             });
         })
         .catch(function (errors) {
             req.flash('errorMessage', errors[0].msg);
-            return res.redirect('/users/students');
+            return res.redirect('/admin/users/students');
         });
 };
-
 
 /**
  * Create a list of student using xlsx
@@ -306,7 +305,7 @@ exports.createUsingXLSX = function (req, res) {
 
     if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         req.flash('errorMessage', 'Invalid file type');
-        return res.redirect('/users/students');
+        return res.redirect('/admin/users/students');
     }
 
 
@@ -333,7 +332,7 @@ exports.createUsingXLSX = function (req, res) {
                 // return res.status(500).send(createResponse(false, errors, 'There are some error.'));
             }
 
-            return res.redirect('/users/students');
+            return res.redirect('/admin/users/students');
         })
     });
 

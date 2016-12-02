@@ -1,13 +1,13 @@
 <!Doctype html>
 <html>
 <meta charset="utf-8"/>
-<%- include('../partials/head.ejs', {title: "Students"}) %>
+<%- include('../../partials/head.ejs', {title: "Students"}) %>
 
 
 <body>
 <div id="wrapper">
 
-    <% include ../partials/navbar.ejs %>
+    <% include ../../partials/admin.navbar.ejs %>
 
     <span id="number-of-pages" hidden><%= numberOfPages %></span>
     <span id="current-role" hidden><%= req.user.role %></span>
@@ -59,7 +59,7 @@
                             <div class="tab-content">
                                 <div id="menu1" class="tab-pane fade in active">
                                     <p class="help-block">Fill in information for the student that you want to add.</p>
-                                    <form method="post" name="register" action="students/create">
+                                    <form method="post" name="register" action="/admin/users/students/create">
                                         <div class="form-group">
                                             <label for="unit_number">
                                                 Student Code:
@@ -119,7 +119,7 @@
                                     <p class="help-block">The excel file must be formatted like the one this image. Name of columns do not need to be exactly the same as this image but their order must be fixed in this order.</p>
                                     <img src="/dist/img/students.excel-example.png" style="max-width:100%;">
                                     <form role="form" method="post" enctype="multipart/form-data"
-                                          action="students/create-xlsx" style="margin-top: 10px">
+                                          action="/admin/users/students/create-xlsx" style="margin-top: 10px">
                                         <label>Excel file</label>
                                         <input type="file" name="xlsx" accept=".xlsx, .xls" class="custom-file-input"
                                                required>
@@ -162,7 +162,7 @@
 </div>
 <!-- /#wrapper -->
 
-<%- include ../partials/scripts.ejs %>
+<%- include ../../partials/scripts.ejs %>
 <script type="text/javascript" src="/dist/js/users.students.min.js"></script>
 </body>
 </html>

@@ -5,9 +5,9 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/User');
-var moderatorsCtrl = require('../controllers/users.moderators');
-var lecturersCtrl = require('../controllers/users.lecturers');
-var studentsCtrl = require('../controllers/users.students');
+var moderatorsCtrl = require('../controllers/admin/users.moderators.js');
+var lecturersCtrl = require('../controllers/admin/users.lecturers.js');
+var studentsCtrl = require('../controllers/admin/users.students.js');
 var hasAccess = require('../middlewares/auth').hasAccess;
 var multer = require('multer');
 var upload = multer({dest: 'temp/'});

@@ -1,5 +1,5 @@
 var getModel = require('express-waterline').getModels;
-var treeHelper = require('../helpers/tree');
+var treeHelper = require('../../helpers/tree');
 var util = require('util');
 
 
@@ -15,7 +15,7 @@ exports.getView = function (type) {
                 if (error) {
                     console.log(error);
                     req.flash('errorMessage', error.message);
-                    return res.redirect('/categories/' + type + 's');
+                    return res.redirect('/admin/categories/' + type + 's');
                 }
 
                 var sortedFields = treeHelper.sortNodeByLeft(fields);
@@ -40,7 +40,7 @@ exports.getView = function (type) {
                 data['message'] =  req.flash('errorMessage');
                 data.req = req;
 
-                return res.render('./categories/' + type + 's', data)
+                return res.render('./admin/categories/' + type + 's', data)
 
             })
         })
@@ -61,13 +61,13 @@ exports.post = function (type) {
 
         if (!fieldName) {
             req.flash('errorMessage', "Field name must not be null.");
-            return res.redirect('/categories/' + type + 's');
+            return res.redirect('/admin/categories/' + type + 's');
         }
 
         if (type == 'unit' && req.body.type == null) {
             // If this is a unit so it must have a type
             req.flash('errorMessage', 'Type must not be null');
-            return res.redirect('/categories/' + type + 's');
+            return res.redirect('/admin/categories/' + type + 's');
         }
 
         console.log("creating field: " + fieldName + " with parent id: " + parentFieldID);
@@ -91,10 +91,10 @@ exports.post = function (type) {
                 if (error) {
                     console.log(error);
                     req.flash('errorMessage', error.message);
-                    return res.redirect('/categories/' + type + 's');
+                    return res.redirect('/admin/categories/' + type + 's');
                 }
 
-                return res.redirect("/categories/" + type + "s");
+                return res.redirect("admin/categories/" + type + "s");
             })
         })
     }
@@ -131,7 +131,7 @@ exports.delete = function (type) {
                     if (error) {
                         console.log(error);
                         req.flash('errorMessage', error.message);
-                        return res.redirect('/categories/' + type + 's');
+                        return res.redirect('/admin/categories/' + type + 's');
                     }
 
                     treeHelper.afterDestroyANode(Field, left, right, function (error) {
@@ -140,7 +140,7 @@ exports.delete = function (type) {
                             req.flash('errorMessage', error.message);
                         }
 
-                        return res.redirect('/categories/' + type + 's');
+                        return res.redirect('/admin/categories/' + type + 's');
                     });
 
 
@@ -166,7 +166,7 @@ exports.update = function (type) {
 
         if (errors) {
             req.flash('errorMessage', errors[0].msg);
-            return res.redirect('/categories/' + type + 's');
+            return res.redirect('/admin/categories/' + type + 's');
         }
 
         getModel(type).then(function (Category) {
@@ -180,7 +180,7 @@ exports.update = function (type) {
                     req.flash('errorMessage', error.message);
                 }
 
-                return res.redirect('/categories/' + type + 's');
+                return res.redirect('/admin/categories/' + type + 's');
             })
         })
 

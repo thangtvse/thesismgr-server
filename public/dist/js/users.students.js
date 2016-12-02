@@ -120,7 +120,7 @@ var getData = function () {
     }
 
     $.ajax({
-        url: "/users/api/students",
+        url: "/admin/users/api/students",
         method: "GET",
         data: data,
         success: success,

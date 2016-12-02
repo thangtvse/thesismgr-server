@@ -53,7 +53,7 @@ $(document).ready(function () {
             },
             callback: function (result) {
                 if(result == true) {
-                    window.location.href="/categories/fields/delete?id=" + a.attr("data-id");
+                    window.location.href="/admin/categories/fields/delete?id=" + a.attr("data-id");
                     e.preventDefault();
                 }
             }
@@ -67,7 +67,7 @@ $(document).ready(function () {
             "Change course name.",
             function (result) {
                 if (result != null && result != "") {
-                    post("/categories/fields/update", {
+                    post("/admin/categories/fields/update", {
                         id: a.attr("data-id"),
                         name: result
                     });

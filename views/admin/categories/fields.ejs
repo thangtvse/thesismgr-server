@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<%- include('../partials/head.ejs', {title: "ThesisMgr"}) %>
+<%- include('../../partials/head.ejs', {title: "ThesisMgr"}) %>
 
 <body>
 
 <div id="wrapper">
 
-    <% include ../partials/navbar.ejs %>
+    <% include ../../partials/admin.navbar.ejs %>
 
     <!-- Navigation -->
     <div id="page-wrapper">
@@ -46,7 +46,7 @@
                         </div>
                         <div class="panel-body">
 
-                            <form role="form" action="/categories/fields" method="post">
+                            <form role="form" action="/admin/categories/fields" method="post">
                                 <div class="form-group">
                                     <label>Field name</label>
                                     <input class="form-control new-field-name" type="text" name="name" required>
@@ -100,7 +100,7 @@
 </div>
 <!-- /#wrapper -->
 
-<%- include ../partials/scripts.ejs %>
+<%- include ../../partials/scripts.ejs %>
 
 <script type="text/javascript" src="/dist/js/categories.fields.min.js"></script>
 

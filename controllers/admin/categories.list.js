@@ -1,6 +1,6 @@
 var getModel = require('express-waterline').getModels;
 var util = require('util');
-var checkFacultyForProcess = require('../helpers/auth').checkFacultyForProcess;
+var checkFacultyForProcess = require('../../helpers/auth').checkFacultyForProcess;
 
 var isValidType = function (type) {
     return !(type != 'program' && type != 'course');
@@ -28,7 +28,7 @@ exports.getView = function (type) {
                             if (error) {
                                 console.log(error);
                                 req.flash('errorMessage', error.message);
-                                return res.redirect('./categories/' + type + 's');
+                                return res.redirect('/admin/categories/' + type + 's');
                             }
 
                             Unit.find({
@@ -38,7 +38,7 @@ exports.getView = function (type) {
                                 if (error) {
                                     console.log(error);
                                     req.flash('errorMessage', error.message);
-                                    return res.redirect('./categories/' + type + 's');
+                                    return res.redirect('/admin/categories/' + type + 's');
                                 }
 
                                 var kCategories = type + "s";
@@ -50,7 +50,7 @@ exports.getView = function (type) {
                                 data.currentFaculty = currentFaculty;
                                 data.req = req;
 
-                                return res.render('./categories/' + type + 's', data)
+                                return res.render('./admin/categories/' + type + 's', data)
                             });
                         })
                 };
@@ -91,7 +91,7 @@ exports.post = function (type) {
                                 req.flash('errorMessage', error.message);
                             }
 
-                            return res.redirect('/categories/' + type + 's');
+                            return res.redirect('/admin/categories/' + type + 's');
                         })
                     });
                 })
@@ -99,7 +99,7 @@ exports.post = function (type) {
             .catch(function (errors) {
                 console.log(util.inspect(errors));
                 req.flash('errorMessage', errors[0].msg);
-                return res.redirect('/categories/' + type + 's');
+                return res.redirect('/admin/categories/' + type + 's');
             })
     }
 };
@@ -115,7 +115,7 @@ exports.delete = function (type) {
 
         if (id == null) {
             req.flash('errorMessage', 'Null ID');
-            return res.redirect('/categories/' + type + 's');
+            return res.redirect('/admin/categories/' + type + 's');
         }
 
         getModel(type).then(function (Category) {
@@ -127,7 +127,7 @@ exports.delete = function (type) {
                         req.flash('errorMessage', error.message);
                     }
 
-                    return res.redirect('/categories/' + type + 's');
+                    return res.redirect('/admin/categories/' + type + 's');
                 })
             });
         })
@@ -150,7 +150,7 @@ exports.update = function (type) {
 
         if (errors) {
             req.flash('errorMessage', errors[0].msg);
-            return res.redirect('/categories/' + type + 's');
+            return res.redirect('/admin/categories/' + type + 's');
         }
 
         getModel(type).then(function (Category) {
@@ -158,7 +158,7 @@ exports.update = function (type) {
             Category.findOne(req.body.id).exec(function (error, category) {
                 if (error) {
                     req.flash('errorMessage', error.message);
-                    return res.redirect('/categories/' + type + 's');
+                    return res.redirect('/admin/categories/' + type + 's');
                 }
 
                 if (category == null) {
@@ -172,7 +172,7 @@ exports.update = function (type) {
                             req.flash('errorMessage', error.message);
                         }
 
-                        return res.redirect('/categories/' + type + 's');
+                        return res.redirect('/admin/categories/' + type + 's');
                     })
                 })
             });

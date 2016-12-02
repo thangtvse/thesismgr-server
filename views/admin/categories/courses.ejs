@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<%- include('../partials/head.ejs', {title: "ThesisMgr"}) %>
+<%- include('../../partials/head.ejs', {title: "ThesisMgr"}) %>
 
 <body>
 
 <div id="wrapper">
 
-    <% include ../partials/navbar.ejs %>
+    <% include ../../partials/admin.navbar.ejs %>
 
     <!-- Navigation -->
     <div id="page-wrapper">
@@ -16,7 +16,7 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Programs</h1>
+                    <h1 class="page-header">Courses</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -30,7 +30,6 @@
 
             <div class="row">
                 <div class="col-lg-8">
-
                     <% if (req.user.role == 'admin') {
                     faculties.forEach(function (faculty) { %>
                     <div class="panel panel-default">
@@ -38,14 +37,14 @@
                             <%= faculty.name %>
                         </div>
                         <div class="panel-body">
-                            <% programs.filter(function (program) {
-                                return program.faculty.id == faculty.id;
-                            }).forEach(function (program) { %>
+                            <% courses.filter(function (course) {
+                                return course.faculty.id == faculty.id;
+                            }).forEach(function (course) { %>
                             <div class="panel panel-default category-item">
                                 <div class="panel-body">
-                                    <%= program.name %>
-                                    <a class="category-item edit" style="position: absolute; right: 60px" href="#" data-action="edit" data-id="<%=program.id%>">Edit</a>
-                                    <a class="category-item delete" style="position: absolute; right: 10px" href="#" data-action="delete" data-id="<%=program.id%>">Delete</a>
+                                    <%= course.name %>
+                                    <a class="category-item edit" style="position: absolute; right: 60px" href="#" data-action="edit" data-id="<%=course.id%>">Edit</a>
+                                    <a class="category-item delete" style="position: absolute; right: 10px" href="#" data-action="delete" data-id="<%=course.id%>">Delete</a>
                                 </div>
                             </div>
                             <% }) %>
@@ -58,14 +57,14 @@
                             <%= currentFaculty.name %>
                         </div>
                         <div class="panel-body">
-                            <% programs.filter(function (program) {
-                                return program.faculty.id == currentFaculty.id;
-                            }).forEach(function (program) { %>
+                            <% courses.filter(function (course) {
+                                return course.faculty.id == currentFaculty.id;
+                            }).forEach(function (course) { %>
                             <div class="panel panel-default category-item">
                                 <div class="panel-body">
-                                    <%= program.name %>
-                                    <a class="category-item edit" style="position: absolute; right: 60px" href="#" data-action="edit" data-id="<%=program.id%>">Edit</a>
-                                    <a class="category-item delete" style="position: absolute; right: 10px" href="#" data-action="delete" data-id="<%=program.id%>">Delete</a>
+                                    <%= course.name %>
+                                    <a class="category-item edit" style="position: absolute; right: 60px" href="#" data-action="edit" data-id="<%=course.id%>">Edit</a>
+                                    <a class="category-item delete" style="position: absolute; right: 10px" href="#" data-action="delete" data-id="<%=course.id%>">Delete</a>
                                 </div>
                             </div>
                             <% }) %>
@@ -77,14 +76,14 @@
                 <div class="col-lg-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Add a program
+                            Add a course
                         </div>
                         <div class="panel-body">
-                            <form role="form" action="/categories/programs" method="post">
+                            <form role="form" action="/admin/categories/courses" method="post">
                                 <div class="form-group">
-                                    <label>Program name</label>
-                                    <input class="form-control new-program-name" type="text" name="name" required>
-                                    <p class="help-block">Name of the new program that you want to add.</p>
+                                    <label>Course name</label>
+                                    <input class="form-control new-course-name" type="text" name="name" required>
+                                    <p class="help-block">Name of the new course that you want to add.</p>
                                 </div>
 
                                 <% if (req.user.role == 'admin') { %>
@@ -95,11 +94,11 @@
                                         <option value="<%=faculty.id%>"><%= faculty.name %></option>
                                         <% }) %>
                                     </select>
-                                    <p class="help-block">Faculty of the new program that you want to add.</p>
+                                    <p class="help-block">Faculty of the new course that you want to add.</p>
                                 </div>
                                 <% }%>
 
-                                <button type="submit" class="btn btn-primary">Add Program</button>
+                                <button type="submit" class="btn btn-primary">Add Course</button>
                             </form>
                         </div>
                     </div>
@@ -110,9 +109,9 @@
 </div>
 <!-- /#wrapper -->
 
-<%- include ../partials/scripts.ejs %>
+<%- include ../../partials/scripts.ejs %>
 
-<script type="text/javascript" src="/dist/js/categories.programs.min.js"></script>
+<script type="text/javascript" src="/dist/js/categories.courses.min.js"></script>
 
 </body>
 

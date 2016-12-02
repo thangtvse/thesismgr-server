@@ -7,8 +7,8 @@ var express = require('express');
 var router = express.Router();
 var hasAccess = require('../middlewares/auth').hasAccess;
 var util = require('util');
-var hierarchicalCategoriesCtrl = require('../controllers/categories.hierarchy');
-var listCategoriesCtrl = require('../controllers/categories.list');
+var hierarchicalCategoriesCtrl = require('../controllers/admin/categories.hierarchy.js');
+var listCategoriesCtrl = require('../controllers/admin/categories.list.js');
 // router.get('/search', fieldsCtrl.searchField);
 
 // Fields ========================

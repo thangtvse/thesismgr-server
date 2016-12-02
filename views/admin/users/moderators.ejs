@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<%- include('../partials/head.ejs', {title: "ThesisMgr"}) %>
+<%- include('../../partials/head.ejs', {title: "ThesisMgr"}) %>
 
 <body>
 
 <div id="wrapper">
 
-    <% include ../partials/navbar.ejs %>
+    <% include ../../partials/admin.navbar.ejs %>
 
     <!-- Navigation -->
     <div id="page-wrapper">
@@ -58,7 +58,7 @@
                             Add a moderator
                         </div>
                         <div class="panel-body">
-                            <form role="form" action="/users/moderators/assign" method="post">
+                            <form role="form" action="/admin/users/moderators/assign" method="post">
                                 <div class="form-group">
                                     <label>Officer number</label>
                                     <input class="form-control" id="new-moderator-officer-number" type="text"
@@ -80,7 +80,7 @@
 </div>
 <!-- /#wrapper -->
 
-<%- include ../partials/scripts.ejs %>
+<%- include ../../partials/scripts.ejs %>
 <script type="text/javascript" src="/dist/js/users.moderators.min.js"></script>
 </body>
 

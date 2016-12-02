@@ -17,7 +17,7 @@ exports.getView = function (req, res) {
                     if (error) {
                         console.log(error);
                         req.flash('errorMessage', error.message);
-                        return res.redirect('/users/moderators');
+                        return res.redirect('/admin/users/moderators');
                     }
 
                     Unit.find({
@@ -27,10 +27,10 @@ exports.getView = function (req, res) {
                         if (error) {
                             console.log(error);
                             req.flash('errorMessage', error.message);
-                            return res.redirect('/users/moderators');
+                            return res.redirect('/admin/users/moderators');
                         }
 
-                        return res.render('./users/moderators', {
+                        return res.render('./admin/users/moderators', {
                             message: req.flash('errorMessage'),
                             moderators: moderators,
                             faculties: faculties,
@@ -56,7 +56,7 @@ exports.assignModerator = function (req, res) {
     if (errors && errors.length > 0) {
         console.log(errors);
         req.flash('errorMessage', errors[0].msg);
-        return res.redirect('/users/moderators');
+        return res.redirect('/admin/users/moderators');
     }
     getModel('user').then(function (User) {
 
@@ -67,23 +67,23 @@ exports.assignModerator = function (req, res) {
             if (error) {
                 console.log(error);
                 req.flash('errorMessage', error.message);
-                return res.redirect('/users/moderators');
+                return res.redirect('/admin/users/moderators');
             }
 
             if (user == null) {
                 console.log("User not found.");
                 req.flash('errorMessage', "User not found.");
-                return res.redirect('/users/moderators');
+                return res.redirect('/admin/users/moderators');
             }
 
             if (user.role == "moderator" || user.role == "admin") {
                 req.flash('errorMessage', "Can't not assign this user.");
-                return res.redirect('/users/moderators');
+                return res.redirect('/admin/users/moderators');
             }
 
             if (user.role != 'lecturer') {
                 req.flash('errorMessage', "Can't not assign this user");
-                return res.redirect('/users/moderators');
+                return res.redirect('/admin/users/moderators');
             }
 
             user.role = 'moderator';
@@ -93,7 +93,7 @@ exports.assignModerator = function (req, res) {
                     req.flash('errorMessage', error.message);
                 }
 
-                return res.redirect('/users/moderators');
+                return res.redirect('/admin/users/moderators');
             })
 
         })
@@ -113,7 +113,7 @@ exports.revokeModerator = function (req, res) {
     if (errors && errors.length > 0) {
         console.log(errors);
         req.flash('errorMessage', errors[0].msg);
-        return res.redirect('/users/moderators');
+        return res.redirect('/admin/users/moderators');
     }
 
     getModel('user', function (User) {
@@ -123,7 +123,7 @@ exports.revokeModerator = function (req, res) {
 
             if (user.role != 'moderator') {
                 req.flash('errorMessage', "Can't not assign this user");
-                return res.redirect('/users/moderators');
+                return res.redirect('/admin/users/moderators');
             }
 
             user.role = 'lecturer';
@@ -133,7 +133,7 @@ exports.revokeModerator = function (req, res) {
                     req.flash('errorMessage', error.message);
                 }
 
-                return res.redirect('/users/moderators');
+                return res.redirect('/admin/users/moderators');
             })
         })
     })

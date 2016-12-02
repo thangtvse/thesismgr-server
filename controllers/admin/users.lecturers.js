@@ -2,18 +2,18 @@
  * Project: ThesisMgr-Server
  * File: controllers\users.js
  */
-var createResponse = require('../helpers/response').createRes;
+var createResponse = require('../../helpers/response').createRes;
 var bcrypt = require('bcrypt-nodejs');
 var _ = require('underscore');
 var nodemailer = require('nodemailer');
-var mailTransportConfig = require('../config/mail').transportConfig;
+var mailTransportConfig = require('../../config/mail').transportConfig;
 var fs = require('fs');
 var util = require('util');
 var getModel = require('express-waterline').getModels;
-var numberOfUsersPerPage = require('../config/pagination').numberOfUsersPerPage;
+var numberOfUsersPerPage = require('../../config/pagination').numberOfUsersPerPage;
 var randomstring = require('randomstring');
-var paginationConfig = require('../config/pagination');
-var authHelper = require('../helpers/auth');
+var paginationConfig = require('../../config/pagination');
+var authHelper = require('../../helpers/auth');
 var async = require('async');
 
 /**
@@ -26,14 +26,14 @@ exports.getLecturerListPage = function (req, res) {
         Lecturer.count().exec(function (error, numOfLecturers) {
             if (error) {
                 req.flash('errorMessage', error.message);
-                return res.redirect('/users/lecturers');
+                return res.redirect('/admin/users/lecturers');
             }
 
             getModel('unit').then(function (Unit) {
                 Unit.find().exec(function (error, units) {
                     if (error) {
                         req.flash('errorMessage', error.message);
-                        return res.redirect('/users/lecturers');
+                        return res.redirect('/admin/users/lecturers');
                     }
 
                     var filteredUnits = units.filter(function (unit) {
@@ -51,7 +51,7 @@ exports.getLecturerListPage = function (req, res) {
                         numberOfPages = Math.floor(numOfLecturers / paginationConfig.numberOfUsersPerPage) + 1;
                     }
 
-                    res.render('./users/lecturers', {
+                    res.render('./admin/users/lecturers', {
                         req: req,
                         units: _.map(filteredUnits, function (unit) {
                             return unit.toObject();
@@ -245,7 +245,7 @@ exports.getLecturerByIdAPI = function (req, res) {
  * @param res
  */
 exports.updateLecturerInfoAPI = function (req, res) {
-    
+
 };
 
 // /**
@@ -308,14 +308,14 @@ exports.createLecturer = function (req, res) {
                             req.flash('errorMessage', error.message);
                         }
 
-                        return res.redirect('/users/lecturers');
+                        return res.redirect('/admin/users/lecturers');
                     })
                 })
             });
         })
         .catch(function (errors) {
             req.flash('errorMessage', errors[0].msg);
-            return res.redirect('/users/lecturers');
+            return res.redirect('/admin/users/lecturers');
         });
 };
 
@@ -334,7 +334,7 @@ exports.createUsingXLSX = function (req, res) {
 
     if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         req.flash('errorMessage', 'Invalid file type');
-        return res.redirect('/users/lecturers');
+        return res.redirect('/admin/users/lecturers');
     }
 
 
@@ -361,7 +361,7 @@ exports.createUsingXLSX = function (req, res) {
                 // return res.status(500).send(createResponse(false, errors, 'There are some error.'));
             }
 
-            return res.redirect('/users/lecturers');
+            return res.redirect('/admin/users/lecturers');
         })
     });
 
