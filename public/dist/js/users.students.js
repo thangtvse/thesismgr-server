@@ -37,7 +37,47 @@ $(document).ready(function () {
         }
     });
 
+
+    configCourseAndProgram();
+
+    $("#faculty_id").change(function () {
+        configCourseAndProgram();
+    })
 });
+
+var configCourseAndProgram = function () {
+    var facultyID = $("#faculty_id").val();
+
+    var courseSelected = false;
+
+    $(".course-option-item").each(function (index, element) {
+        if ($(this).attr("data-faculty-id") != facultyID) {
+            $(this).hide();
+            $(this).attr("selected", false);
+        } else {
+            $(this).show();
+            if (courseSelected == false) {
+                $(this).attr("selected", true);
+                courseSelected = true;
+            }
+        }
+    });
+
+    var programSelected = false;
+
+    $(".program-option-item").each(function (index, element) {
+        if ($(this).attr("data-faculty-id") != facultyID) {
+            $(this).hide();
+            $(this).attr("selected", false);
+        } else {
+            $(this).show();
+            if (programSelected == false) {
+                $(this).attr("selected", true);
+                programSelected = true;
+            }
+        }
+    })
+};
 
 var success = function (response) {
     if (response.status == true) {
@@ -75,7 +115,7 @@ var getData = function () {
         page: page
     };
 
-    if($("#current-role").text() == "moderator") {
+    if ($("#current-role").text() == "moderator") {
         data.faculty_id = $("#current-facultyID").text();
     }
 
@@ -101,6 +141,7 @@ var setDataToTable = function () {
                 '<td>' + student.faculty.name + '</td>' +
                 '<td>' + student.student.course.name + '</td>' +
                 '<td>' + student.student.program.name + '</td>' +
+                '<td>' + student.student.thesisRegistrable + '</td>' +
                 '</tr>'
             )
         }

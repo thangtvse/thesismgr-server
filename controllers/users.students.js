@@ -32,7 +32,11 @@ exports.getStudentListPage = function (req, res) {
             getModel('unit').then(function (Unit) {
                 getModel('course').then(function (Course) {
                     getModel('program').then(function (Program) {
-                        Unit.find().exec(function (error, units) {
+                        Unit.find(
+                            {
+                                type: 'faculty'
+                            }
+                        ).exec(function (error, units) {
                             if (error) {
                                 req.flash('errorMessage', error.message);
                                 return res.redirect('/users/students');
@@ -40,11 +44,21 @@ exports.getStudentListPage = function (req, res) {
 
                             var filteredUnits = units.filter(function (unit) {
                                 if (unit.left == 1) {
-                                    return false
+                                    return false;
                                 } else {
-                                    return true
+                                    return true;
                                 }
                             });
+
+                            if (req.user.role == 'moderator') {
+                                var filteredUnits = filteredUnits.filter(function (unit) {
+                                    if (unit.id == req.user.faculty.id) {
+                                        return true;
+                                    } else {
+                                        return false;
+                                    }
+                                });
+                            }
 
                             Course.find().exec(function (error, courses) {
                                 if (error) {
@@ -67,7 +81,7 @@ exports.getStudentListPage = function (req, res) {
 
                                     res.render('./users/students', {
                                         req: req,
-                                        units: _.map(filteredUnits, function (unit) {
+                                        faculties: _.map(filteredUnits, function (unit) {
                                             return unit.toObject();
                                         }),
                                         courses: _.map(courses, function (course) {

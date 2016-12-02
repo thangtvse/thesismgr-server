@@ -30,12 +30,12 @@ $(document).ready(function () {
         bootbox.prompt(
             "Change program name.",
             function (result) {
-
-                post("/categories/programs/update", {
-                    id: a.attr("data-id"),
-                    name: result
-                });
-
+                if (result != null && result != "") {
+                    post("/categories/programs/update", {
+                        id: a.attr("data-id"),
+                        name: result
+                    });
+                }
             });
     })
 });

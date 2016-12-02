@@ -11,7 +11,7 @@
 
     <span id="number-of-pages" hidden><%= numberOfPages %></span>
     <span id="current-role" hidden><%= req.user.role %></span>
-    <span id="current-facultyID" hiddne><%= req.user.faculty.id %></span>
+    <span id="current-facultyID" hidden><%= req.user.faculty.id %></span>
 
     <!-- Navigation -->
     <div id="page-wrapper">
@@ -113,8 +113,10 @@
                                 </div>
                                 <div id="menu2" class="tab-pane fade">
                                     <p class="help-block">Create a list of lecturer using a excel(.xlsx) file.</p>
+                                    <p class="help-block">The excel file must be formatted like the one this image. Name of columns do not need to be exactly the same as this image but their order must be fixed in this order.</p>
+                                    <img src="/dist/img/lecturers.excel-example.png" style="max-width:100%;">
                                     <form role="form" method="post" enctype="multipart/form-data"
-                                          action="lecturers/create-xlsx">
+                                          action="lecturers/create-xlsx" style="margin-top: 10px">
                                         <label>Excel file</label>
                                         <input type="file" name="xlsx" accept=".xlsx, .xls" class="custom-file-input"
                                                required>

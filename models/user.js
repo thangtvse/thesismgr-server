@@ -154,11 +154,11 @@ module.exports = {
 
                     // get all unit names
 
-                    var filterdUnits = _.filter(units, function (unit) {
+                    var filteredUnits = _.filter(units, function (unit) {
                         return (unit.name != null);
                     });
 
-                    var unitNames = _.map(filterdUnits, function (unit) {
+                    var unitNames = _.map(filteredUnits, function (unit) {
                         return unit.name;
                     });
 
@@ -201,7 +201,7 @@ module.exports = {
                             return callback(error, email);
                         }
 
-                        var unit = units[indexOfBestMatchUnit];
+                        var unit = filteredUnits[indexOfBestMatchUnit];
 
                         var process = function () {
                             // save new user

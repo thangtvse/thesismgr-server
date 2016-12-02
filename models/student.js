@@ -51,24 +51,54 @@ module.exports = {
      * @param next {function (Error, Student)}
      */
     createOne: function (officerNumber, email, unitID, fullName, courseID, programID, senderEmail, mailTransporter, next) {
-        getModel('user').then(function (User) {
-            User.createOne(officerNumber, email, unitID, fullName, 'student', function (error, user, originalPassword) {
-                if (error) {
-                    return next(error, null);
-                }
 
-                getModel('student').then(function (Student) {
-                    Student.create({
-                        user: user,
-                        course: courseID,
-                        program: programID
-                    }).exec(function (error, student) {
-                        next(error, student);
-                        return sendMail(email, originalPassword, senderEmail, mailTransporter);
-                    })
-                })
+
+        getModel('unit').then(function (Unit) {
+            Unit.getFacultyOfUnitID(unitID, function (error, faculty) {
+               if (error) {
+                   return next(error);
+               }
+
+               getModel('course').then(function (Course) {
+                   Course.findOne({
+                       id: courseID
+                   }).exec(function (error, course) {
+
+                       getModel('program').then(function (Program) {
+                           Program.findOne({
+                               id: programID
+                           }).exec(function (error, program) {
+
+                               if (course.faculty != program.faculty || course.faculty != faculty.id) {
+                                   return next(new Error("Faculty of unit, course and program do not match."));
+                               }
+
+                               getModel('user').then(function (User) {
+                                   User.createOne(officerNumber, email, unitID, fullName, 'student', function (error, user, originalPassword) {
+                                       if (error) {
+                                           return next(error, null);
+                                       }
+
+
+                                       getModel('student').then(function (Student) {
+                                           Student.create({
+                                               user: user,
+                                               course: courseID,
+                                               program: programID
+                                           }).exec(function (error, student) {
+                                               next(error, student);
+                                               return sendMail(email, originalPassword, senderEmail, mailTransporter);
+                                           })
+                                       })
+                                   })
+                               })
+
+                           })
+                       })
+                   })
+               })
             })
-        })
+        });
     },
 
     /**
@@ -92,59 +122,64 @@ module.exports = {
                             return next([error]);
                         }
 
-                        var courseNames = _.map(_.filter(courses, function (course) {
-                            return (course.name != null);
-                        }), function (course) {
-                            return course.name;
-                        });
-
-                        var programNames = _.map(_.filter(programs, function (program) {
-                            return (program.name != null);
-                        }), function (program) {
-                            return program.name;
-                        });
-
-                        if (courseNames == null || courseNames.length == 0 || programNames == null || programNames.length == 0) {
-                            return next([new Error('Internal error: Lack of courses and programs.')]);
-                        }
-
-                        console.log(util.inspect(courseNames));
-                        console.log(util.inspect(programNames));
-
                         getModel('user').then(function (User) {
                             User.createUsingXLSX('student', specifiedFaculty, filePath, function (values, user, originalPassword, callback) {
                                     getModel('student').then(function (Student) {
 
-                                        if (typeof values[6] != 'string' || typeof values[7] != 'string') {
-                                            return callback(new Error('File error: Wrong format!'));
-                                        }
+                                        var filteredCourses = _.filter(courses, function (course) {
+                                            return (course.name != null && course.faculty == user.faculty);
+                                        });
 
-                                        var bestMatchCourseName = stringSimilarity.findBestMatch(values[6], courseNames).bestMatch.target;
-                                        var indexOfBestMatchCourse = courseNames.indexOf(bestMatchCourseName);
-                                        var bestMatchProgramName = stringSimilarity.findBestMatch(values[7], programNames).bestMatch.target;
-                                        var indexOfBestMatchProgram = programNames.indexOf(bestMatchProgramName);
+                                        var courseNames = _.map(filteredCourses, function (course) {
+                                            return course.name;
+                                        });
 
-                                        console.log('Finding: ' + values[6] + ' and ' + values[7]);
+                                        var filteredPrograms = _.filter(programs, function (program) {
+                                            return (program.name != null && program.faculty == user.faculty);
+                                        });
 
-                                        Student.create({
-                                            user: user,
-                                            course: courses[indexOfBestMatchCourse],
-                                            program: programs[indexOfBestMatchProgram]
-                                        }).exec(function (error, student) {
-                                            if (error) {
-                                                console.log(error);
-                                                return next([error]);
+                                        var programNames = _.map(filteredPrograms, function (program) {
+                                            return program.name;
+                                        });
+
+                                        if (courseNames == null || courseNames.length == 0 || programNames == null || programNames.length == 0) {
+                                            User.destroy(user.id).exec(function (error) {
+                                                if (error) {
+                                                    return callback(error);
+                                                }
+
+                                                return callback(new Error('Internal error: No course or program matches.'));
+                                            });
+                                        } else {
+                                            if (typeof values[6] != 'string' || typeof values[7] != 'string') {
+                                                return callback(new Error('File error: Wrong format!'));
                                             }
 
-                                            sendMail(user.email, originalPassword, senderEmail, mailTransporter);
-                                            return callback();
-                                        })
+                                            var bestMatchCourseName = stringSimilarity.findBestMatch(values[6], courseNames).bestMatch.target;
+                                            var indexOfBestMatchCourse = courseNames.indexOf(bestMatchCourseName);
+                                            var bestMatchProgramName = stringSimilarity.findBestMatch(values[7], programNames).bestMatch.target;
+                                            var indexOfBestMatchProgram = programNames.indexOf(bestMatchProgramName);
+
+                                            console.log('Finding: ' + values[6] + ' and ' + values[7]);
+
+                                            Student.create({
+                                                user: user,
+                                                course: filteredCourses[indexOfBestMatchCourse],
+                                                program: filteredPrograms[indexOfBestMatchProgram]
+                                            }).exec(function (error, student) {
+                                                if (error) {
+                                                    console.log(error);
+                                                    return callback(error);
+                                                }
+
+                                                sendMail(user.email, originalPassword, senderEmail, mailTransporter);
+                                                return callback();
+                                            })
+                                        }
                                     })
                                 },
                                 function (errors) {
-                                    next(errors.map(function (error) {
-                                        return new Error(error.msg);
-                                    }));
+                                    next(errors);
                                 })
                         })
                     })

@@ -90,7 +90,7 @@ gulp.task('copy', function () {
 });
 
 // Run everything
-gulp.task('default', ['minify-css', 'minify-js']);
+gulp.task('default', ['nodemon']);
 
 // Run server with nodemon
 gulp.task('nodemon',['default', 'watch'], function () {

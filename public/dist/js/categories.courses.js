@@ -30,12 +30,12 @@ $(document).ready(function () {
         bootbox.prompt(
             "Change course name.",
             function (result) {
-
-                post("/categories/courses/update", {
-                    id: a.attr("data-id"),
-                    name: result
-                });
-
+                if (result != null && result != "") {
+                    post("/categories/courses/update", {
+                        id: a.attr("data-id"),
+                        name: result
+                    });
+                }
             });
     })
 });

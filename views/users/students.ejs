@@ -11,7 +11,7 @@
 
     <span id="number-of-pages" hidden><%= numberOfPages %></span>
     <span id="current-role" hidden><%= req.user.role %></span>
-    <span id="current-facultyID" hiddne><%= req.user.faculty.id %></span>
+    <span id="current-facultyID" hidden><%= req.user.faculty.id %></span>
 
     <!-- Navigation -->
     <div id="page-wrapper">
@@ -72,6 +72,17 @@
                                             <input type="email" class="form-control" id="email" name="email">
                                         </div>
                                         <div class="form-group">
+                                            <label>Faculty</label>
+                                            <select class="form-control" name="unit_id" id="faculty_id">
+                                                <% faculties.forEach(function (faculty) { %>
+                                                <option
+                                                        class="faculty-option-item"
+                                                        value="<%= faculty.id %>"><%= faculty.name %></option>
+                                                <% }) %>
+                                            </select>
+                                            <p class="help-block">Course of the new student that you want to add.</p>
+                                        </div>
+                                        <div class="form-group">
                                             <label>Course</label>
                                             <select class="form-control" name="course_id">
                                                 <% courses.forEach(function (course) { %>
@@ -105,8 +116,10 @@
                                 </div>
                                 <div id="menu2" class="tab-pane fade">
                                     <p class="help-block">Create a list of student using a excel(.xlsx) file.</p>
+                                    <p class="help-block">The excel file must be formatted like the one this image. Name of columns do not need to be exactly the same as this image but their order must be fixed in this order.</p>
+                                    <img src="/dist/img/students.excel-example.png" style="max-width:100%;">
                                     <form role="form" method="post" enctype="multipart/form-data"
-                                          action="students/create-xlsx">
+                                          action="students/create-xlsx" style="margin-top: 10px">
                                         <label>Excel file</label>
                                         <input type="file" name="xlsx" accept=".xlsx, .xls" class="custom-file-input"
                                                required>
@@ -130,6 +143,8 @@
                     <th>Faculty</th>
                     <th>Course</th>
                     <th>Program</th>
+                    <th>Thesis Registrable</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody class="table table-body">

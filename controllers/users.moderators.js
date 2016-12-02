@@ -63,6 +63,19 @@ exports.assignModerator = function (req, res) {
         User.findOne({
             officerNumber: req.body.officer_number
         }).exec(function (error, user) {
+
+            if (error) {
+                console.log(error);
+                req.flash('errorMessage', error.message);
+                return res.redirect('/users/moderators');
+            }
+
+            if (user == null) {
+                console.log("User not found.");
+                req.flash('errorMessage', "User not found.");
+                return res.redirect('/users/moderators');
+            }
+
             if (user.role == "moderator" || user.role == "admin") {
                 req.flash('errorMessage', "Can't not assign this user.");
                 return res.redirect('/users/moderators');

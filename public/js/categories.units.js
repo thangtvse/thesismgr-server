@@ -66,10 +66,15 @@ $(document).ready(function () {
         bootbox.prompt(
             "Change course name.",
             function (result) {
-                post("/categories/units/update", {
-                    id: a.attr("data-id"),
-                    name: result
-                });
+
+                console.log("Result: " + result);
+
+                if (result != null && result != "") {
+                    post("/categories/units/update", {
+                        id: a.attr("data-id"),
+                        name: result
+                    });
+                }
             });
     })
 });
