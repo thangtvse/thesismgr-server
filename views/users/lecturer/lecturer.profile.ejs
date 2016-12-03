@@ -1,0 +1,100 @@
+<html>
+<head>
+    <%- include('./lecturer.head.ejs', {title: "Lecturers"}) %>
+<% var lecturer ={
+        "name":"Nguyễn Văn B",
+        "rank":"Tiến sĩ",
+        "unit":"Bộ môn công nghệ phần mềm",
+        "research":"Kiểm thử phần mềm",
+        "subjects":["Tin học cơ sở 1","Lập trình nâng cao","Kiểm thử phần mềm"],
+        "email":"abc@gmail.com",
+        "avatar":"/img/250x250.png"
+    };%>
+</head>
+<body >
+<div id="wrapper">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/admin">Thesis MGR</a>
+        </div>
+        <!-- /.navbar-header -->
+
+        <ul class="nav navbar-top-links navbar-right">
+
+            <!-- /.dropdown -->
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                    <li><a href="/lec/profile"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                    </li>
+                    <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                    </li>
+                </ul>
+                <!-- /.dropdown-user -->
+            </li>
+            <!-- /.dropdown -->
+        </ul>
+        <!-- NAVBAR CODE END -->
+    </nav>
+
+    <div class="container">
+        <section style="padding-bottom: 50px; padding-top: 50px;">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="<%= lecturer.avatar%>" class="img-rounded img-responsive" />
+                    <br />
+                    <br />
+                    <a href="/lec/edit-profile" class="btn btn-success">Cập nhật thông tin</a>
+                    <br /><br/>
+                </div>
+                <div class="col-md-8">
+                    <div class="alert alert-info">
+                        <h2></h2>
+                    </div>
+
+                    <div class="form-group col-md-8">
+                        <h3>Giảng viên: <%= lecturer.name%> </h3>
+                        <label class="strong">Họ và tên:</label></br>
+                        <p><%=lecturer.name%></p>
+                        <label class="strong">Học hàm, học vị:</label></br>
+                        <p><%=lecturer.rank%></p>
+                        <label class="strong">Đơn vị</label></br>
+                        <p><%=lecturer.unit%></p>
+                        <label class="strong">Hướng nghiên cứu:</label></br>
+                        <p><%=lecturer.research%></p>
+                        <label class="strong">Môn giảng dạy:</label></br>
+                        <p>
+                            <% for(var subject=0;subject<lecturer.subjects.length;subject++){%>
+                                <%= lecturer.subjects[subject]%> </br>
+                            <%}%>
+                        </p>
+                        <label class="strong">Email:</label></br>
+                        <p><%=lecturer.email%></p>
+                    </div>
+                </div>
+            </div>
+            <!-- ROW END -->
+        </section>
+        <!-- SECTION END -->
+    </div>
+    <!-- CONATINER END -->
+</div>
+<!-- REQUIRED SCRIPTS FILES -->
+<!-- CORE JQUERY FILE -->
+<script src="\vendor\jquery\jquery.min.js"></script>
+<!-- REQUIRED BOOTSTRAP SCRIPTS -->
+<script src="\vendor\bootstrap\js\bootstrap.min.js"></script>
+</body>
+
+</html>

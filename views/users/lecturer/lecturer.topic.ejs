@@ -4,12 +4,11 @@
 <link href="/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet">
 
 <%- include('./lecturer.head.ejs', {title: "Lecturers"}) %>
-<% var quotation=[{
-    "dimension": "Nguyễn Văn A",
-    "currency": "Thao tác sinh học phân tử cấp độ 1",
-    "quantity": "Tạo và lai giống các sinh vât nước ngọt đang có nguy cơ bị tuyệt chủng và nghiên cứu thông tin mã di truyên của ADN trong bộ nhiễm sắc thể tôm hùm ",
-    "price": "3333321",
-    "factory": "rx"
+<% var topic=[{
+    "name": "Nguyễn Văn A",
+    "topic": "Thao tác sinh học phân tử cấp độ 1",
+    "quote": "Tạo và lai giống các sinh vât nước ngọt đang có nguy cơ bị tuyệt chủng và nghiên cứu thông tin mã di truyên của ADN trong bộ nhiễm sắc thể tôm hùm ",
+    "id": "3333321"
 }];
 var numberOfPages=1;%>
 <body>
@@ -24,18 +23,18 @@ var numberOfPages=1;%>
                     <th class="name">Tên sinh viên</th>
                     <th class="id">MSV</th>
                     <th class="topic">Tên đề tài</th>
-                    <th class="details">Lựa chọn</thclass>
+                    <th class="details">Lựa chọn</th>
                 </tr>
 
-                <% for (var i = 0; i < quotation.length; i++) { %>
-                <tr scope="row">
-                    <td ><%= quotation[i].dimension %> </td>
+                <% for (var i = 0; i < topic.length; i++) { %>
+                <tr class="topic-row" data-value="<%= i %>" scope="row">
+                    <td ><%= topic[i].name %> </td>
                     <td ><a class="tdText name" href="#" data-type="text"
-                           data-placement="right"><%= quotation[i].price %></a></td>
+                           data-placement="right"><%= topic[i].id %></a></td>
                     <td ><a class="tdText" href="#" data-type="text"
-                           data-placement="right"><%= quotation[i].currency %></a></td>
+                           data-placement="right"><%= topic[i].topic %></a></td>
                     <td ><a class="tdText" href="#" data-type="text"
-                           data-placement="right"><%= quotation[i].quantity %></a></td>
+                           data-placement="right"><%= topic[i].quote %></a></td>
                 </tr>
                 <% } %>
             </table>
@@ -68,5 +67,16 @@ var numberOfPages=1;%>
 
 <%- include ./lecturer.script.ejs%>
 <script src="/vendor/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+<script>
+    function rowClick() {
+        var index= $(this).attr('data-value');
+        var userId=1;
+        window.location.href="/lec/topic_details/"+userId+"/<%= status%>/"+index;
+    }
+    $(document).ready( function () {
+        $(".topic-row").click(rowClick);
+    });
+
+</script>
 </body>
 </html>
