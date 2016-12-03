@@ -113,135 +113,55 @@ exports.getAllStudentsAPI = function (req, res) {
 
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
 
-    var findOpts = {
-        role: ['moderator', 'student']
-    };
-    if (req.query.faculty_id) {
-        findOpts.faculty = req.query.faculty_id
-    }
-
     var errors = req.validationErrors();
 
     if (errors) {
         return res.status(400).send(createResponse(false, null, errors[0].msg));
     }
 
-    getModel('user').then(function (User) {
-        getModel('student').then(function (Student) {
+    getModel('student').then(function (Student) {
+        Student.getPopulatedStudentList(page,  req.query.faculty_id, function(error, students) {
+            if (error) {
+                return res.status(400).send(createResponse(false, null, error.message));
+            }
 
-            User.find(findOpts)
-                .sort({
-                    createdAt: 'desc'
-                })
-                .populate('student')
-                .populate('unit')
-                .populate('faculty')
-                .paginate({
-                    page: req.query.page,
-                    limit: numberOfUsersPerPage
-                })
-                .exec(function (error, users) {
-                    if (error) {
-                        return res.send(createResponse(false, {}, error.message));
-                    }
-
-                    var resStudents = [];
-
-                    async.forEachSeries(users, function (user, callback) {
-
-                        if (user.student == null || user.student.length == 0) {
-                            return callback();
-                        }
-
-                        var resStudent = user.toObject();
-
-                        Student.findOne({
-                            id: user.student[0].id
-                        })
-                            .populate('program')
-                            .populate('course')
-                            .exec(function (error, student) {
-
-                                if (error) {
-                                    return callback(error);
-                                }
-
-                                resStudent.student = _.omit(student.toObject(), ['password', 'user']);
-
-                                resStudents.push(resStudent);
-                                return callback();
-                            });
-                    }, function (errors) {
-                        if (errors && errors.length > 0) {
-                            return res.status(400).send(createResponse(false, null, errors[0].msg));
-                        }
-
-                        return res.send(createResponse(true, resStudents, null));
-                    });
-                });
-        });
-    });
-};
-
-/**
- * Search an student by officer number
- * @param req
- * @param res
- * @returns {*}
- */
-exports.searchStudentByOfficerNumberAPI = function (req, res) {
-    req.checkQuery('officer_number', 'Invalid officer number').notEmpty();
-
-    var errors = req.validationErrors();
-
-    if (errors) {
-        return res.status(400).send(createResponse(false, null, errors[0].msg));
-    }
-
-    getModel('user').then(function (User) {
-        User.find({
-            officerNumber: {
-                'contains': req.query.officer_number
-            },
-            role: 'student'
+            return res.send(createResponse(true, students, null));
         })
-            .populate('faculty')
-            .populate('unit')
-            .exec(function (error, students) {
-                if (error) {
-                    return res.send(createResponse(false, {}, error.message));
-                }
-
-                return res.send(createResponse(true, students, null));
-            })
     })
 };
 
 // /**
-//  * Get an user by id and role
-//  * @param role: role of user
+//  * Search an student by officer number
+//  * @param req
+//  * @param res
+//  * @returns {*}
 //  */
-// exports.getUserByID = function (role) {
-//     return function (req, res) {
-//         getModel('user').then(function (User) {
-//             var id = req.params.id;
-//             User.findOne(
-//                 {
-//                     id: id,
-//                     role: role
-//                 })
-//                 .populate('fields')
-//                 .populate('unit')
-//                 .exec(function (err, user) {
-//                     if (err) {
-//                         return res.send(createResponse(false, {}, err.message));
-//                     }
+// exports.searchStudentByOfficerNumberAPI = function (req, res) {
+//     req.checkQuery('officer_number', 'Invalid officer number').notEmpty();
 //
-//                     return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
-//                 });
-//         });
+//     var errors = req.validationErrors();
 //
+//     if (errors) {
+//         return res.status(400).send(createResponse(false, null, errors[0].msg));
 //     }
+//
+//     getModel('user').then(function (User) {
+//         User.find({
+//             officerNumber: {
+//                 'contains': req.query.officer_number
+//             },
+//             role: 'student'
+//         })
+//             .populate('faculty')
+//             .populate('unit')
+//             .exec(function (error, students) {
+//                 if (error) {
+//                     return res.send(createResponse(false, {}, error.message));
+//                 }
+//
+//                 return res.send(createResponse(true, students, null));
+//             })
+//     })
 // };
 
 /**

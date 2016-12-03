@@ -10,7 +10,6 @@ var mailTransportConfig = require('../../config/mail').transportConfig;
 var fs = require('fs');
 var util = require('util');
 var getModel = require('express-waterline').getModels;
-var numberOfUsersPerPage = require('../../config/pagination').numberOfUsersPerPage;
 var randomstring = require('randomstring');
 var paginationConfig = require('../../config/pagination');
 var authHelper = require('../../helpers/auth');
@@ -76,6 +75,7 @@ exports.getAllLecturersAPI = function (req, res) {
     var findOpts = {
         role: ['moderator', 'lecturer']
     };
+
     if (req.query.faculty_id) {
         findOpts.faculty = req.query.faculty_id
     }
@@ -86,62 +86,15 @@ exports.getAllLecturersAPI = function (req, res) {
         return res.status(400).send(createResponse(false, null, errors[0].msg));
     }
 
-    getModel('user').then(function (User) {
-        getModel('lecturer').then(function (Lecturer) {
+    getModel('lecturer').then(function (Lecturer) {
+        Lecturer.getPopulatedLecturerList(req.query.page, function (error, lecturers) {
+            if (error) {
+                return res.send(createResponse(false, null, error.message));
+            }
 
-            User.find(findOpts)
-                .sort({
-                    createdAt: 'desc'
-                })
-                .populate('lecturer')
-                .populate('unit')
-                .populate('faculty')
-                .paginate({
-                    page: req.query.page,
-                    limit: numberOfUsersPerPage
-                })
-                .exec(function (error, users) {
-                    if (error) {
-                        return res.send(createResponse(false, {}, error.message));
-                    }
-
-                    console.log("USERS: " + util.inspect(users));
-
-                    var resLecturers = [];
-
-                    async.forEachSeries(users, function (user, callback) {
-
-                        if (user.lecturer == null || user.lecturer.length == 0) {
-                            return callback();
-                        }
-
-                        var resLecturer = user.toObject();
-
-                        Lecturer.findOne({
-                            id: user.lecturer[0].id
-                        })
-                            .populate('fields')
-                            .exec(function (error, lecturer) {
-
-                                if (error) {
-                                    return callback(error);
-                                }
-
-                                resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
-
-                                resLecturers.push(resLecturer);
-                                return callback();
-                            });
-                    }, function (errors) {
-                        if (errors && errors.length > 0) {
-                            return res.status(400).send(createResponse(false, null, errors[0].msg));
-                        }
-
-                        return res.send(createResponse(true, resLecturers, null));
-                    });
-                });
-        });
-    });
+            return res.send(true, lecturers, null);
+        })
+    })
 };
 
 /**
@@ -156,7 +109,7 @@ exports.searchLecturerByOfficerNumberAPI = function (req, res) {
     var errors = req.validationErrors();
 
     if (errors) {
-        return res.status(400).send(createResponse(false, null, errors[0].msg));
+        return res.status(400).send(createResponse(false, {}, error.message));
     }
 
     getModel('user').then(function (User) {
@@ -170,7 +123,7 @@ exports.searchLecturerByOfficerNumberAPI = function (req, res) {
             .populate('unit')
             .exec(function (error, lecturers) {
                 if (error) {
-                    return res.send(createResponse(false, {}, error.message));
+                    return res.status(400).send(createResponse(false, {}, error.message));
                 }
 
                 return res.send(createResponse(true, lecturers, null));
@@ -192,51 +145,15 @@ exports.getLecturerByIdAPI = function (req, res) {
         return res.status(400).send(createResponse(false, null, errors[0].msg));
     }
 
-    getModel('user').then(function (User) {
-        getModel('lecturer').then(function (Lecturer) {
+    getModel('lecturer').then(function (Lecturer) {
+        Lecturer.getPopulatedLecturerById(req.params.id, function (error, lecturer) {
+            if (error) {
+                return res.send(createResponse(false, null, error.message));
+            }
 
-            User.findOne({
-                id: req.params.id,
-                role: ['lecturer', 'moderator']
-            })
-                .sort({
-                    createdAt: 'desc'
-                })
-                .populate('lecturer')
-                .populate('unit')
-                .populate('faculty')
-                .exec(function (error, user) {
-                    if (error) {
-                        return res.status(400).send(createResponse(false, null, error.message));
-                    }
-
-                    if (user == null) {
-                        return res.status(404).send(createResponse(false, null, "User not found."));
-                    }
-
-                    if (user.lecturer == null || user.lecturer.length == 0) {
-                        return res.status(500).send(createResponse(false, null, "There are some internal errors."));
-                    }
-
-                    var resLecturer = user.toObject();
-
-                    Lecturer.findOne({
-                        id: user.lecturer[0].id
-                    })
-                        .populate('fields')
-                        .exec(function (error, lecturer) {
-
-                            if (error) {
-                                return res.status(400).send(createResponse(false, null, error.message));
-                            }
-
-                            resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
-
-                            return res.send(createResponse(true, resLecturer, null));
-                        });
-                });
-        });
-    });
+            return res.send(true, lecturer, null);
+        })
+    })
 };
 
 /**
@@ -247,33 +164,6 @@ exports.getLecturerByIdAPI = function (req, res) {
 exports.updateLecturerInfoAPI = function (req, res) {
 
 };
-
-// /**
-//  * Get an user by id and role
-//  * @param role: role of user
-//  */
-// exports.getUserByID = function (role) {
-//     return function (req, res) {
-//         getModel('user').then(function (User) {
-//             var id = req.params.id;
-//             User.findOne(
-//                 {
-//                     id: id,
-//                     role: role
-//                 })
-//                 .populate('fields')
-//                 .populate('unit')
-//                 .exec(function (err, user) {
-//                     if (err) {
-//                         return res.send(createResponse(false, {}, err.message));
-//                     }
-//
-//                     return res.send(createResponse(true, null, _.omit(user.toObject(), 'password')));
-//                 });
-//         });
-//
-//     }
-// };
 
 /**
  * Create a Lecturer

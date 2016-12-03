@@ -70,11 +70,11 @@ router.get('/api/students', [
     hasAccess('moderator'),
     studentsCtrl.getAllStudentsAPI
 ]);
-
-router.get('/api/students/search-by-officer-number', [
-    hasAccess('moderator'),
-    studentsCtrl.searchStudentByOfficerNumberAPI
-]);
+//
+// router.get('/api/students/search-by-officer-number', [
+//     hasAccess('moderator'),
+//     studentsCtrl.searchStudentByOfficerNumberAPI
+// ]);
 
 router.post('/students/create', [
     hasAccess('moderator'),

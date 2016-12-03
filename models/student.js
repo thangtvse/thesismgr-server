@@ -3,7 +3,8 @@ var sendMail = require('../helpers/mail').sendMail;
 var _ = require('underscore');
 var stringSimilarity = require('string-similarity');
 var util = require('util');
-
+var paginationConfig = require('../config/pagination');
+var async = require('async');
 
 module.exports = {
     identity: 'student',
@@ -55,48 +56,48 @@ module.exports = {
 
         getModel('unit').then(function (Unit) {
             Unit.getFacultyOfUnitID(unitID, function (error, faculty) {
-               if (error) {
-                   return next(error);
-               }
+                if (error) {
+                    return next(error);
+                }
 
-               getModel('course').then(function (Course) {
-                   Course.findOne({
-                       id: courseID
-                   }).exec(function (error, course) {
+                getModel('course').then(function (Course) {
+                    Course.findOne({
+                        id: courseID
+                    }).exec(function (error, course) {
 
-                       getModel('program').then(function (Program) {
-                           Program.findOne({
-                               id: programID
-                           }).exec(function (error, program) {
+                        getModel('program').then(function (Program) {
+                            Program.findOne({
+                                id: programID
+                            }).exec(function (error, program) {
 
-                               if (course.faculty != program.faculty || course.faculty != faculty.id) {
-                                   return next(new Error("Faculty of unit, course and program do not match."));
-                               }
+                                if (course.faculty != program.faculty || course.faculty != faculty.id) {
+                                    return next(new Error("Faculty of unit, course and program do not match."));
+                                }
 
-                               getModel('user').then(function (User) {
-                                   User.createOne(officerNumber, email, unitID, fullName, 'student', function (error, user, originalPassword) {
-                                       if (error) {
-                                           return next(error, null);
-                                       }
+                                getModel('user').then(function (User) {
+                                    User.createOne(officerNumber, email, unitID, fullName, 'student', function (error, user, originalPassword) {
+                                        if (error) {
+                                            return next(error, null);
+                                        }
 
 
-                                       getModel('student').then(function (Student) {
-                                           Student.create({
-                                               user: user,
-                                               course: courseID,
-                                               program: programID
-                                           }).exec(function (error, student) {
-                                               next(error, student);
-                                               return sendMail(email, originalPassword, senderEmail, mailTransporter);
-                                           })
-                                       })
-                                   })
-                               })
+                                        getModel('student').then(function (Student) {
+                                            Student.create({
+                                                user: user,
+                                                course: courseID,
+                                                program: programID
+                                            }).exec(function (error, student) {
+                                                next(error, student);
+                                                return sendMail(email, originalPassword, senderEmail, mailTransporter);
+                                            })
+                                        })
+                                    })
+                                })
 
-                           })
-                       })
-                   })
-               })
+                            })
+                        })
+                    })
+                })
             })
         });
     },
@@ -186,5 +187,80 @@ module.exports = {
                 });
             })
         });
-    }
+    },
+
+
+    /**
+     * Get a list of populated students with pagination
+     * @param page
+     * @param facultyID
+     * @param next
+     */
+    getPopulatedStudentList: function (page, facultyID, next) {
+
+        var findOpts = {};
+        if (facultyID != null) {
+            findOpts.faculty = facultyID;
+        }
+
+
+        getModel('user').then(function (User) {
+            getModel('student').then(function (Student) {
+
+                User.find(findOpts)
+                    .sort({
+                        createdAt: 'desc'
+                    })
+                    .populate('student')
+                    .populate('unit')
+                    .populate('faculty')
+                    .paginate({
+                        page: page,
+                        limit: paginationConfig.numberOfUsersPerPage
+                    })
+                    .exec(function (error, users) {
+                        if (error) {
+                            return next(error.message);
+                        }
+
+                        var resStudents = [];
+
+                        async.forEachSeries(users, function (user, callback) {
+
+                            if (user.student == null || user.student.length == 0) {
+                                return callback();
+                            }
+
+                            var resStudent = user.toObject();
+
+                            Student.findOne({
+                                id: user.student[0].id
+                            })
+                                .populate('program')
+                                .populate('course')
+                                .exec(function (error, student) {
+
+                                    if (error) {
+                                        return callback(error);
+                                    }
+
+                                    resStudent.student = _.omit(student.toObject(), ['password', 'user']);
+
+                                    resStudents.push(resStudent);
+                                    return callback();
+                                });
+                        }, function (errors) {
+                            if (errors && errors.length > 0) {
+                                return next(errors[0]);
+                            }
+
+                            return next(null, resStudents);
+                        });
+                    });
+            });
+        });
+    },
+
+
+
 };
