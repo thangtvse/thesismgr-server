@@ -26,5 +26,5 @@ router.post('/login', passport.authenticate('admin-login', {
 
 router.use('/users', require('./users'));
 router.use('/categories', require('./categories'));
-router.use("/lec",require('./lecturer.demo'));
+router.use("/lecturer",require('./lecturer.demo'));
 module.exports = router;

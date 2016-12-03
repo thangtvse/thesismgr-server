@@ -22,6 +22,12 @@ router.get('/edit-profile',[
         res.render('./users/lecturer/lecturer.edit_profile.ejs');
     }
 ]);
+
+router.get('/resetPassword',[
+    function (req,res) {
+        res.render('./users/lecturer/lecturer.forgotPassword.ejs');
+    }
+]);
 router.get('/pending',[
     function (req,res) {
         res.render('./users/lecturer/lecturer.pending.ejs');

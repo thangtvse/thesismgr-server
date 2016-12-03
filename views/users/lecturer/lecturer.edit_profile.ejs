@@ -22,7 +22,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/admin">Thesis MGR</a>
+            <a class="navbar-brand" href="/lec">Thesis MGR</a>
         </div>
         <!-- /.navbar-header -->
 
@@ -63,18 +63,24 @@
                     <div class="col-md-8">
                         <div class="alert alert-info">
                             <h2>Vui lòng hoàn thành mẫu dưới đây</h2>
+                            <h3 id="formErr"></h3>
                         </div>
 
                         <div class="form-group col-md-8">
                             <h3>Thông tin giảng viên </h3>
                             <div class="form-group">
                                 <label for="name">Họ và tên:</label>
-                                <input type="text" class="form-control" id="name" name="name">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Nguyễn Văn A">
+                            </div>
+                            <div class="form-group">
+                                <label for="birth">Ngày sinh:</label>
+                                <input type="text" class="form-control" id="birth" name="birth" onkeyup="checkBirthday(this);" placeholder="20-10-1995">
+                                <label id="birthErr"></label>
                             </div>
                             <div class="form-group">
                                 <label for="rank">Học hàm, học vị:</label>
                                 <select class="ui dropdown" name="ramk" form="profile">
-                                    <option></option>
+                                    <option value="0"></option>
                                     <option value="1">Thạc sĩ</option>
                                     <option value="2">Tiến sĩ</option>
                                     <option value="3">Phó giáo sư</option>
@@ -85,7 +91,7 @@
 
                                 <label for="username">Đơn vị:</label>
                                 <select class="ui  selection dropdown" name="unit" form="profile" >
-                                    <option></option>
+                                    <option value="0"></option>
                                     <optgroup label="Công nghệ thông tin">
                                         <option value="1">Công nghệ phần mềm</option>
                                         <option value="2">Khoa học máy tính </option>
@@ -109,10 +115,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="email">Email:</label>
-                                <input type="text" class="form-control" id="email" name="email">
+                                <input type="text" class="form-control" id="email" name="email" onkeyup="checkEmail(this);" placeholder="someone@gmail.com">
+                                <label id="emailErr"></label>
                             </div>
                             <div class="form-group" style="text-align: center">
-                                <input type="submit" class="btn btn-primary" value="Cập nhật">
+                                <input type="button" class="btn btn-primary" value="Cập nhật" onclick="submits(this);">
                             </div>
                         </div>
                     </div>
@@ -130,6 +137,7 @@
 <!-- REQUIRED BOOTSTRAP SCRIPTS -->
 <script src="\vendor\bootstrap\js\bootstrap.min.js"></script>
 <script src="\vendor\UI-Dropdown-master\dropdown.min.js"></script>
+<%-include ./lecturer.edit_profile.script.ejs %>
 </body>
 
 </html>
