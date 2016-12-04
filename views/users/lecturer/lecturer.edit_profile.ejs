@@ -1,7 +1,7 @@
 <html>
 <head>
     <%- include('./lecturer.head.ejs', {title: "Lecturers"}) %>
-    <link href="\vendor\UI-Dropdown-master\dropdown.min.css" rel="stylesheet">
+    <link href="\vendor\Semantic-UI-master\dist\semantic.min.css" rel="stylesheet">
 </head>
 <% var lecturer ={
     "name":"Nguyễn Văn B",
@@ -74,11 +74,47 @@
                             </div>
                             <div class="form-group">
                                 <label for="research">Hướng nghiên cứu:</label>
-                                <input type="text" class="form-control" id="research" name="research">
+                                <!--<input type="text" class="form-control" id="research" name="research">-->
+                                <select class="ui fluid search dropdown" multiple="" form="profile" name="research">
+                                    <option value="">State</option>
+                                    <option value="AL">Alabama</option>
+                                    <option value="AK">Alaska</option>
+                                    <option value="AZ">Arizona</option>
+                                    <option value="AR">Arkansas</option>
+                                    <option value="CA">California</option>
+                                    <option value="CO">Colorado</option>
+                                    <option value="CT">Connecticut</option>
+                                    <option value="DE">Delaware</option>
+                                    <option value="DC">District Of Columbia</option>
+                                    <option value="FL">Florida</option>
+                                    <option value="GA">Georgia</option>
+                                    <option value="HI">Hawaii</option>
+                                    <option value="ID">Idaho</option>
+                                    <option value="IL">Illinois</option>
+                                    <option value="IN">Indiana</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="subjects">Môn giảng dạy:</label>
-                                <input type="text" class="form-control" id="subjects" name="subjects">
+                                <!--<input type="text" class="form-control" id="subjects" name="subjects">-->
+                                <select class="ui fluid search dropdown" multiple="" form="forfile" name="subjects">
+                                    <option value="">State</option>
+                                    <option value="AL">Alabama</option>
+                                    <option value="AK">Alaska</option>
+                                    <option value="AZ">Arizona</option>
+                                    <option value="AR">Arkansas</option>
+                                    <option value="CA">California</option>
+                                    <option value="CO">Colorado</option>
+                                    <option value="CT">Connecticut</option>
+                                    <option value="DE">Delaware</option>
+                                    <option value="DC">District Of Columbia</option>
+                                    <option value="FL">Florida</option>
+                                    <option value="GA">Georgia</option>
+                                    <option value="HI">Hawaii</option>
+                                    <option value="ID">Idaho</option>
+                                    <option value="IL">Illinois</option>
+                                    <option value="IN">Indiana</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="email">Email:</label>
@@ -103,7 +139,7 @@
 <script src="\vendor\jquery\jquery.min.js"></script>
 <!-- REQUIRED BOOTSTRAP SCRIPTS -->
 <script src="\vendor\bootstrap\js\bootstrap.min.js"></script>
-<script src="\vendor\UI-Dropdown-master\dropdown.min.js"></script>
+<script src="\vendor\Semantic-UI-master\dist\semantic.min.js"></script>
 <%-include ./lecturer.edit_profile.script.ejs %>
 </body>
 
