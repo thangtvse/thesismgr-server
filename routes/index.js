@@ -37,7 +37,7 @@ router.post('/login', passport.authenticate('admin-login', {
     failureFlash: true // allow flash messages
 }));
 
-router.use('/categories', require('./categories'));
+
 router.use("/lecturer",require('./lecturer.demo'));
 router.use("/search",require('./search'));
 router.use('/admin', require('./admin.index.js'));

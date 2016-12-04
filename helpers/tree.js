@@ -447,8 +447,8 @@ exports.createTree2 = function (nodes) {
 };
 
 var createNode2 = function (node) {
-    return "<li style='padding-left: 30px;'><a href=\"#\"><i class=\"fa fa-bar-chart-o fa-fw\"></i> "+ node.name +"<span class=\"fa arrow\"></span></a><ul class='nav'>";
+    return "<li style='padding-left: 15px;'><a href=\"#\"><i class=\"fa arrow\"></i> "+ node.name +"<span class=\"fa arrow\"></span></a><ul class='nav'>";
 };
 var createLeaf2 = function (node) {
-    return "<li style='padding-left: 30px;'><a href='#'>" + node.name + "</a><ul>";
+    return "<li style='padding-left: 15px;'><a href='#'>" + node.name + "</a><ul>";
 };
