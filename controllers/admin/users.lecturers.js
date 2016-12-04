@@ -21,8 +21,17 @@ var async = require('async');
  * @param res
  */
 exports.getLecturerListPage = function (req, res) {
+
+    var findOpts = {};
+
+    if (req.user.role != 'admin') {
+        findOpts = {
+            faculty: req.user.faculty.id
+        }
+    }
+
     getModel('lecturer').then(function (Lecturer) {
-        Lecturer.count().exec(function (error, numOfLecturers) {
+        Lecturer.count(findOpts).exec(function (error, numOfLecturers) {
             if (error) {
                 req.flash('errorMessage', error.message);
                 return res.redirect('/admin/users/lecturers');
@@ -238,17 +247,4 @@ exports.createUsingXLSX = function (req, res) {
             return res.redirect('/admin/users/lecturers');
         })
     });
-
-
 };
-
-
-
-getModel('thesis').then(function (Thesis) {
-    Thesis.findOne({
-        lecturer: 1234,
-        status:
-    }).exec(function (error, theses) {
-
-    })
-});

@@ -10,7 +10,6 @@ var mailTransportConfig = require('../../config/mail').transportConfig;
 var fs = require('fs');
 var util = require('util');
 var getModel = require('express-waterline').getModels;
-var numberOfUsersPerPage = require('../../config/pagination').numberOfUsersPerPage;
 var randomstring = require('randomstring');
 var paginationConfig = require('../../config/pagination');
 var authHelper = require('../../helpers/auth');
@@ -337,6 +336,14 @@ exports.enableThesisRegistrableUsingXLSX = function (req, res) {
 
     getModel('student').then(function (Student) {
         Student.enableThesisRegistrableUsingXLSX(req.user.faculty, fileInfo.path, function (errors) {
+
+            // delete file
+            fs.unlink(fileInfo.path, function (err) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+
             if (errors && errors.length > 0) {
 
                 var errorString = "";
