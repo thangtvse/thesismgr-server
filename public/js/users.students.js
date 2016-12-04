@@ -37,62 +37,210 @@ $(document).ready(function () {
         }
     });
 
+
+    // config course and program for add-new-student modal
+    configCourseAndProgram();
+
+    $("#faculty_id").change(function () {
+        configCourseAndProgram();
+    });
+
+    // config course and program for update modal
+    configCourseAndProgramForUpdate();
+
+    $("#update-faculty-id").change(function () {
+        configCourseAndProgramForUpdate();
+    });
+
+    // submit updated info
+    $("#btn-update-submit").click(function (e) {
+        e.preventDefault();
+        updateInfo();
+    })
 });
 
-var success = function (response) {
-    if (response.status == true) {
+/**
+ * Config course and program for add-new-student-modal that fit with faculty
+ */
+var configCourseAndProgram = function () {
+    var facultyID = $("#faculty_id").val();
 
-        console.log(response);
+    var courseSelected = false;
 
-        students[page] = [];
+    $(".course-option-item").each(function (index, element) {
+        if ($(this).attr("data-faculty-id") != facultyID) {
+            $(this).hide();
+            $(this).attr("selected", false);
+        } else {
+            $(this).show();
+            if (courseSelected == false) {
+                $(this).attr("selected", true);
+                courseSelected = true;
+            }
+        }
+    });
 
-        response.data.forEach(function (student) {
-            students[page].push(student);
-        });
+    var programSelected = false;
 
-        setDataToTable((page - 1) * 10, response.data.length);
-
-    } else {
-        $.toast({
-            heading: 'Error',
-            text: response.message,
-            icon: 'error',
-        })
-    }
-};
-
-var error = function (xhr) {
-    $.toast({
-        heading: 'Error',
-        text: "Can't send request",
-        icon: 'error',
+    $(".program-option-item").each(function (index, element) {
+        if ($(this).attr("data-faculty-id") != facultyID) {
+            $(this).hide();
+            $(this).attr("selected", false);
+        } else {
+            $(this).show();
+            if (programSelected == false) {
+                $(this).attr("selected", true);
+                programSelected = true;
+            }
+        }
     })
 };
 
+/**
+ * Config course and program for update modal that fit with faculty
+ */
+var configCourseAndProgramForUpdate = function () {
+    var facultyID = $("#update-faculty-id").val();
+
+    var courseSelected = false;
+
+    $(".update-course-option-item").each(function (index, element) {
+        if ($(this).attr("data-faculty-id") != facultyID) {
+            $(this).hide();
+            $(this).attr("selected", false);
+        } else {
+            $(this).show();
+            if (courseSelected == false) {
+                $(this).attr("selected", true);
+                courseSelected = true;
+            }
+        }
+    });
+
+    var programSelected = false;
+
+    $(".update-program-option-item").each(function (index, element) {
+        if ($(this).attr("data-faculty-id") != facultyID) {
+            $(this).hide();
+            $(this).attr("selected", false);
+        } else {
+            $(this).show();
+            if (programSelected == false) {
+                $(this).attr("selected", true);
+                programSelected = true;
+            }
+        }
+    })
+};
+
+/**
+ * Get data from server
+ */
 var getData = function () {
 
     var data = {
         page: page
     };
 
-    if($("#current-role").text() == "moderator") {
+    if ($("#current-role").text() == "moderator") {
         data.faculty_id = $("#current-facultyID").text();
     }
 
     $.ajax({
-        url: "/users/api/students",
+        url: "/admin/users/api/students",
         method: "GET",
         data: data,
-        success: success,
-        error: error
+        success: function (response) {
+            if (response.status == true) {
+
+                console.log(response);
+
+                students[page] = [];
+
+                response.data.forEach(function (student) {
+                    students[page].push(student);
+                });
+
+                setDataToTable((page - 1) * 10, response.data.length);
+
+            } else {
+                $.toast({
+                    heading: 'Error',
+                    text: response.message,
+                    icon: 'error',
+                })
+            }
+        },
+        error: errorHandler
     });
 };
 
+/**
+ * Update info for current student
+ */
+var updateInfo = function () {
+    $.ajax({
+        url: "/admin/users/api/students/update",
+        method: "POST",
+        data: {
+            officer_number: $("#update-officer-number").val(),
+            email: $("#update-email").val(),
+            faculty_id: $("#update-faculty-id").val(),
+            course_id: $("#update-course-id").val(),
+            program_id: $("#update-program-id").val(),
+            full_name: $("#update-full-name").val(),
+            thesis_registrable: $("#update-thesis-registrble").val() == "true"
+        },
+        success: function (response) {
+
+            console.log(response.data);
+
+            $("#update-student-modal").modal('hide');
+
+            if (response.status == true) {
+
+                for (var i = 0; i <= students[page].length; i++) {
+
+                    if (students[page][i].id == response.data.id) {
+                        // console.log("before");
+                        // console.log(students[page]);
+                        students[page][i] = response.data;
+                        // console.log("after");
+                        // console.log(students[page]);
+                        break;
+                    }
+                }
+                ;
+
+                console.log(students);
+
+                setDataToTable();
+
+            } else {
+                $.toast({
+                    heading: 'Error',
+                    text: response.message,
+                    icon: 'error',
+                })
+            }
+        },
+        error: errorHandler
+    })
+};
+
+/**
+ * Set data to table
+ */
 var setDataToTable = function () {
     $('.table.table-body').children().remove();
 
     students[page].forEach(function (student) {
         if (student.student != null) {
+
+            var registrable = "NO";
+            if (student.student.thesisRegistrable) {
+                registrable = "YES"
+            }
 
             $('#table-students').append('<tr>' +
                 '<td>' + student.officerNumber + '</td>' +
@@ -101,8 +249,38 @@ var setDataToTable = function () {
                 '<td>' + student.faculty.name + '</td>' +
                 '<td>' + student.student.course.name + '</td>' +
                 '<td>' + student.student.program.name + '</td>' +
+                '<td>' + registrable + '</td>' +
+                '<td><a onclick="editStudent(\'' + student.id + '\')">Edit</a></td>' +
                 '</tr>'
             )
         }
     });
+};
+
+/**
+ * Open a modal allows us to update student info
+ * @param studentID
+ */
+var editStudent = function (studentID) {
+
+    var student;
+
+    for (var page in students) {
+        student = $.grep(students[page], function (e) {
+            return e.id == studentID;
+        })[0];
+
+        if (student != null) {
+            break;
+        }
+    }
+
+    $("#update-officer-number").val(student.officerNumber);
+    $("#update-email").val(student.email);
+    $("#update-faculty-id").val(student.faculty.id);
+    $("#update-course-id").val(student.student.course.id);
+    $("#update-program-id").val(student.student.program.id);
+    $("#update-full-name").val(student.fullName);
+    $("#update-thesis-registrble").val(student.student.thesisRegistrable ? "true" : "false");
+    $("#update-student-modal").modal('show');
 };

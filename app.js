@@ -13,8 +13,6 @@ var routes = require('./routes');
 var dbConfig = require('./config/db');
 var db = require('./helpers/db');
 var flash = require('connect-flash');
-var passport = require('passport');
-var session = require('express-session');
 var waterline = require('express-waterline');
 var app = express();
 
@@ -49,14 +47,7 @@ app.use(require('node-sass-middleware')({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // required for passport
-require('./config/passport')(passport);
-app.use(session({
-    secret: 'thesismgr-system-uet-vnu', // session secret
-    resave: true,
-    saveUninitialized: true
-}));
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
+
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 app.use(routes);

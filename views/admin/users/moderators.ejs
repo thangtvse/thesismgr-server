@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/head.ejs', {title: "ThesisMgr"}) %>
+
+<body>
+
+<div id="wrapper">
+
+    <% include ../../partials/admin.navbar.ejs %>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Moderators</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row">
+                <!-- show any messages that come back with authentication -->
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert"
+                        <% if (!(message && message.length > 0)) { %>
+                     hidden
+                        <% } %>
+                >
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong> <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <% faculties.forEach(function (faculty) { %>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <%= faculty.name %>
+                        </div>
+                        <div class="panel-body">
+                            <% moderators.filter(function (moderator) {
+                                return moderator.faculty.id == faculty.id;
+                            }).forEach(function (moderator) { %>
+                            <div class="panel panel-default category-item">
+                                <div class="panel-body">
+                                    <%= moderator.officerNumber %> - <%= moderator.fullName %> - <span
+                                            class="label label-default"><%= moderator.unit.name %></span></h3>
+
+                                </div>
+                            </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <% }) %>
+
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Add a moderator
+                        </div>
+                        <div class="panel-body">
+                            <form role="form" action="/admin/users/moderators/assign" method="post">
+                                <div class="form-group">
+                                    <label>Officer number</label>
+                                    <input class="form-control" id="new-moderator-officer-number" type="text"
+                                           name="officer_number" list="officer-number-search-list" required>
+                                    <datalist id="officer-number-search-list">
+
+                                    </datalist>
+                                    <p class="help-block">Name of the new course that you want to add.</p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Assign moderator</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ../../partials/scripts.ejs %>
+<script type="text/javascript" src="/dist/js/users.moderators.min.js"></script>
+</body>
+
+</html>
+
+
+
+

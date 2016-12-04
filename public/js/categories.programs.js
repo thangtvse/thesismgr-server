@@ -17,7 +17,7 @@ $(document).ready(function () {
             },
             callback: function (result) {
                 if (result == true) {
-                    window.location.href = "/categories/programs/delete?id=" + a.attr("data-id");
+                    window.location.href = "/admin/categories/programs/delete?id=" + a.attr("data-id");
                     e.preventDefault();
                 }
             }
@@ -30,12 +30,12 @@ $(document).ready(function () {
         bootbox.prompt(
             "Change program name.",
             function (result) {
-
-                post("/categories/programs/update", {
-                    id: a.attr("data-id"),
-                    name: result
-                });
-
+                if (result != null && result != "") {
+                    post("/admin/categories/programs/update", {
+                        id: a.attr("data-id"),
+                        name: result
+                    });
+                }
             });
     })
 });

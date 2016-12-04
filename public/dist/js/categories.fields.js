@@ -53,7 +53,7 @@ $(document).ready(function () {
             },
             callback: function (result) {
                 if(result == true) {
-                    window.location.href="/categories/fields/delete?id=" + a.attr("data-id");
+                    window.location.href="/admin/categories/fields/delete?id=" + a.attr("data-id");
                     e.preventDefault();
                 }
             }
@@ -66,12 +66,12 @@ $(document).ready(function () {
         bootbox.prompt(
             "Change course name.",
             function (result) {
-
-                post("/categories/fields/update", {
-                    id: a.attr("data-id"),
-                    name: result
-                });
-
+                if (result != null && result != "") {
+                    post("/admin/categories/fields/update", {
+                        id: a.attr("data-id"),
+                        name: result
+                    });
+                }
             });
     })
 

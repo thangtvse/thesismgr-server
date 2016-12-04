@@ -53,7 +53,7 @@ $(document).ready(function () {
             },
             callback: function (result) {
                 if(result == true) {
-                    window.location.href="/categories/units/delete?id=" + a.attr("data-id");
+                    window.location.href="/admin/categories/units/delete?id=" + a.attr("data-id");
                     e.preventDefault();
                 }
             }
@@ -66,10 +66,15 @@ $(document).ready(function () {
         bootbox.prompt(
             "Change course name.",
             function (result) {
-                post("/categories/units/update", {
-                    id: a.attr("data-id"),
-                    name: result
-                });
+
+                console.log("Result: " + result);
+
+                if (result != null && result != "") {
+                    post("/admin/categories/units/update", {
+                        id: a.attr("data-id"),
+                        name: result
+                    });
+                }
             });
     })
 });

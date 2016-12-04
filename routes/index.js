@@ -1,16 +1,27 @@
 var express = require('express');
 var router = express.Router();
+var expressValidator = require('express-validator');
+var session = require('express-session');
 var adminAuthCtrl = require('../controllers/authentication');
 var passport = require('passport');
 var hasAccess = require('../middlewares/auth').hasAccess;
-var expressValidator = require('express-validator');
+
 
 router.use(expressValidator({
     customValidators: require('../helpers/customValidators')
 }));
 
+router.use(session({
+    secret: 'thesismgr-system-uet-vnu', // session secret
+    resave: true,
+    saveUninitialized: true
+}));
+router.use(passport.initialize());
+router.use(passport.session()); // persistent login sessions
+require('../config/passport')(passport);
+
 router.get('/', [
-    hasAccess('moderator'),
+    hasAccess('student'),
     function (req, res) {
         res.render('index', {
             req: req
@@ -21,7 +32,7 @@ router.get('/', [
 router.get('/login', adminAuthCtrl.getLogin);
 
 router.post('/login', passport.authenticate('admin-login', {
-    successRedirect: '/', // redirect to the secure profile section
+    successRedirect: '/admin', // redirect to the secure profile section
     failureRedirect: '/login', // redirect back to the signup page if there is an error
     failureFlash: true // allow flash messages
 }));
@@ -29,4 +40,8 @@ router.post('/login', passport.authenticate('admin-login', {
 router.use('/categories', require('./categories'));
 router.use("/lecturer",require('./lecturer.demo'));
 router.use("/search",require('./search'));
+router.use('/admin', require('./admin.index.js'));
+router.use('/', require('./public.index'));
+
+
 module.exports = router;

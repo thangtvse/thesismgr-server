@@ -15,7 +15,7 @@ $(document).ready(function () {
 
             if (officerNumber && officerNumber != "") {
                 xhr = $.ajax({
-                    url: "/users/api/lecturers/search-by-officer-number",
+                    url: "/admin/users/api/lecturers/search-by-officer-number",
                     method: "GET",
                     data: {
                         officer_number: officerNumber
@@ -35,12 +35,8 @@ $(document).ready(function () {
                                 icon: 'error',
                             })
                         }
-
-
                     },
-                    error: function (xhr) {
-
-                    }
+                    error: errorHandler
                 })
             }
 

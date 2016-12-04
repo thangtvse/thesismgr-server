@@ -32,6 +32,7 @@ var login = function (officerNumber, password, next) {
 
                 return next(null, result, user);
 
+
             })
         });
     });
@@ -94,8 +95,6 @@ module.exports = {
 
     beforeCreate: function (values, next) {
 
-        console.log(util.inspect(values));
-
         // hash password
         bcrypt.genSalt(10, function (error, salt) {
             if (error) {
@@ -132,7 +131,8 @@ module.exports = {
     },
 
     /**
-     * Create a list of user using xlsx
+     * Create a list of user using xlsx. All user must be in a specified faculty. If this faculty is root unit,
+     * users has not to be in any specified faculty.
      * @param role
      * @param specifiedFaculty
      * @param filePath
@@ -154,11 +154,11 @@ module.exports = {
 
                     // get all unit names
 
-                    var filterdUnits = _.filter(units, function (unit) {
+                    var filteredUnits = _.filter(units, function (unit) {
                         return (unit.name != null);
                     });
 
-                    var unitNames = _.map(filterdUnits, function (unit) {
+                    var unitNames = _.map(filteredUnits, function (unit) {
                         return unit.name;
                     });
 
@@ -201,7 +201,7 @@ module.exports = {
                             return callback(error, email);
                         }
 
-                        var unit = units[indexOfBestMatchUnit];
+                        var unit = filteredUnits[indexOfBestMatchUnit];
 
                         var process = function () {
                             // save new user
@@ -246,7 +246,7 @@ module.exports = {
                             process();
                         }
 
-                    }, 2);
+                    }, 20);
 
                     var responseErrors = [];
 
@@ -267,12 +267,12 @@ module.exports = {
                     workbook.xlsx.readFile(filePath)
                         .then(function () {
                             var worksheet = workbook.getWorksheet("Sheet1");
-                            worksheet.eachRow({includeEmpty: true}, function (row, rowNumber) {
+                            worksheet.eachRow({includeEmpty: false}, function (row, rowNumber) {
 
                                 q.push({
                                     row: row,
                                     rowNumber: rowNumber
-                                }, function (error, email) {
+                                }, function (error) {
                                     if (error) {
                                         responseErrors.push(error);
                                     }
@@ -331,4 +331,25 @@ module.exports = {
             });
         });
     },
+
+    changePassword: function (officerNumber, oldPassword, newPassword, next) {
+        login(officerNumber, oldPassword, function (error, user) {
+            if (error) {
+                return next(error, false, null);
+            }
+
+            if (!user) {
+                return next(new Error("User not found."), false, null);
+            }
+
+            user.password = newPassword;
+            user.save(function (error) {
+                if (error) {
+                    return next(error, false, null);
+                }
+
+                return next(error, true, user);
+            });
+        })
+    }
 };
