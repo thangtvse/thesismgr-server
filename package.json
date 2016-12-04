@@ -1,5 +1,5 @@
 {
-  "name": "ThesisMgr-server",
+  "name": "thesis",
   "version": "0.0.1",
   "private": true,
   "apidoc": {
@@ -52,5 +52,17 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.4",
     "webpack": "^1.13.3"
-  }
+  },
+  "description": "- npm install\r   - npm start (auto generate a new apidoc page and run)",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uendno/thesismgr-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uendno/thesismgr-server/issues"
+  },
+  "homepage": "https://github.com/uendno/thesismgr-server#readme"
 }

@@ -1,0 +1,82 @@
+<!Doctype html>
+<html>
+<meta charset="utf-8"/>
+<link href="/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+<%- include('./lecturer.head.ejs', {title: "Lecturers"}) %>
+<% var topic=[{
+    "name": "Nguyễn Văn A",
+    "topic": "Thao tác sinh học phân tử cấp độ 1",
+    "quote": "Tạo và lai giống các sinh vât nước ngọt đang có nguy cơ bị tuyệt chủng và nghiên cứu thông tin mã di truyên của ADN trong bộ nhiễm sắc thể tôm hùm ",
+    "id": "3333321"
+}];
+var numberOfPages=1;%>
+<body>
+<div id="wrapper">
+
+    <% include ./lecturer.nav.ejs %>
+    <div id="page-wrapper">
+        <!-- Navigation -->
+        <div class="container-fluid">
+            <table class="table table-hover table-striped" id="officer_table">
+                <tr>
+                    <th class="name">Tên sinh viên</th>
+                    <th class="id">MSV</th>
+                    <th class="topic">Tên đề tài</th>
+                    <th class="details">Lựa chọn</th>
+                </tr>
+
+                <% for (var i = 0; i < topic.length; i++) { %>
+                <tr class="topic-row" data-value="<%= i %>" scope="row">
+                    <td ><%= topic[i].name %> </td>
+                    <td ><a class="tdText name" href="#" data-type="text"
+                           data-placement="right"><%= topic[i].id %></a></td>
+                    <td ><a class="tdText" href="#" data-type="text"
+                           data-placement="right"><%= topic[i].topic %></a></td>
+                    <td ><a class="tdText" href="#" data-type="text"
+                           data-placement="right"><%= topic[i].quote %></a></td>
+                </tr>
+                <% } %>
+            </table>
+            <div style="text-align: center">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li>
+                            <a href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <% for (var i = 0; i < numberOfPages; i++) {
+                            console.log("page: " + (i + 1) + " of " + numberOfPages) %>
+                        <li><a class="page-indicator" href="#<%=i+1%>"><%= i + 1 %></a></li>
+                        <% } %>
+
+                        <li>
+                            <a href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ./lecturer.script.ejs%>
+<script src="/vendor/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+<script>
+    function rowClick() {
+        var index= $(this).attr('data-value');
+        var userId=1;
+        window.location.href="/lecturer/topic_details/"+userId+"/<%= status%>/"+index;
+    }
+    $(document).ready( function () {
+        $(".topic-row").click(rowClick);
+    });
+
+</script>
+</body>
+</html>
