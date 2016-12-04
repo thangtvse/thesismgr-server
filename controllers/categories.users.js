@@ -1,15 +1,50 @@
 var getModel = require('express-waterline').getModels;
 var treeHelper = require('../helpers/tree');
 var util = require('util');
+var async = require('async');
 
-exports.getView = function (type) {
+exports.getView =function() {
     return function (req, res) {
-        getModel(type).then(function (Field) {
+        var data = {};
+        data['title'] = "Filter";
+        async.parallel([
+            function (callback) {
+                getTree("unit", function (error, tree) {
+                    if (error) {
+                        return callback(error);
+                    }
+                    data['units'] = tree;
+                    return callback();
+                })
+            },
+            function (callback) {
+                getTree("field", function (error, tree) {
+                    if (error) {
+                        return callback(error);
+                    }
+                    data['fields'] = tree;
+                    return callback();
+                })
+            }
+        ], function (errors) {
+            if (errors && errors.length > 0) {
+                req.flash("errorMessage", errors[0].message);
+                return res.redirect("./index");
+            }
+
+            return res.render("./search/categories.filter.ejs",data)
+
+        });
+    };
+};
+
+
+var getTree = function (type, next) {
+    getModel(type).then(
+        function (Field) {
             Field.find().exec(function (error, fields) {
                 if (error) {
-                    console.log(error);
-                    req.flash('errorMessage', error.message);
-                    return res.redirect('/categories/' + type + 's');
+                    return next(error);
                 }
 
                 var sortedFields = treeHelper.sortNodeByLeft(fields);
@@ -22,21 +57,8 @@ exports.getView = function (type) {
                         return true;
                     }
                 });
-
-                var kHierarchy ="hierarchy";
-                var kCategories = type + "s";
-                console.log(kHierarchy);
-
-                var data = {};
-                data[kHierarchy] = treeHelper.createTree2(sortedFields);
-                data[kCategories] = filteredFields;
-                data['message'] =  req.flash('errorMessage');
-                data['title'] = type+"s";
-                data.req = req;
-
-                return res.render('./search/categories.filter.ejs', data);
-
+                return next(null, treeHelper.createTree2(sortedFields));
             })
-        })
-    }
+        }
+    )
 };

@@ -13,6 +13,6 @@ router.get("/",[
     }
 ]);
 router.get("/a",[
-    filterCtrl.getView("field")
+    filterCtrl.getView()
 ]);
 module.exports=router;
