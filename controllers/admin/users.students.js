@@ -120,7 +120,7 @@ exports.getAllStudentsAPI = function (req, res) {
     }
 
     getModel('student').then(function (Student) {
-        Student.getPopulatedStudentList(page,  req.query.faculty_id, function(error, students) {
+        Student.getPopulatedStudentList(req.query.page, req.query.faculty_id, function (error, students) {
             if (error) {
                 return res.status(400).send(createResponse(false, null, error.message));
             }
@@ -221,8 +221,6 @@ exports.createUsingXLSX = function (req, res) {
     // check received file
     var fileInfo = req.file;
 
-    console.log(fileInfo);
-
     if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         req.flash('errorMessage', 'Invalid file type');
         return res.redirect('/admin/users/students');
@@ -241,15 +239,12 @@ exports.createUsingXLSX = function (req, res) {
 
             if (errors && errors.length > 0) {
 
-                console.log("CreateXLSX ERROR: ");
-                errors.forEach(function (error) {
-                    console.log(error.message);
+                var errorString = "";
+                _.forEach(errors, function (error) {
+                    errorString = errorString.concat(error.message + "\n");
                 });
 
-                req.flash('errorMessage', 'There are some error: ' + errors.map(function (error) {
-                        return error.message;
-                    }).toString());
-                // return res.status(500).send(createResponse(false, errors, 'There are some error.'));
+                req.flash('errorMessage', 'There are some errors:\n' + errorString);
             }
 
             return res.redirect('/admin/users/students');
@@ -257,4 +252,102 @@ exports.createUsingXLSX = function (req, res) {
     });
 
 
+};
+
+/**
+ * Update student info
+ * @param req
+ * @param res
+ * @returns {*}
+ */
+exports.updateStudentAPI = function (req, res) {
+
+
+    req.checkBody('officer_number', 'Invalid officer number').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+    var process = function () {
+        var updateOpts = {
+            email: req.body.email,
+            faculty: req.body.faculty_id,
+            course: req.body.course_id,
+            program: req.body.program_id,
+            fullName: req.body.full_name,
+            thesisRegistrable: req.body.thesis_registrable
+        };
+
+
+        getModel('student').then(function (Student) {
+            Student.updateInfo(req.body.officer_number, updateOpts, function (error, updatedStudent) {
+                if (error) {
+                    return res.status(400).send(createResponse(false, null, error.message));
+                }
+
+                return res.send(createResponse(true, updatedStudent, null));
+            })
+        })
+    };
+
+    if (req.user.role == "admin") {
+        return process();
+    } else {
+        getModel("user").then(function (User) {
+            User.findOne({
+                officerNumber: req.body.officer_number
+            }).exec(function (error, user) {
+                if (error) {
+                    return res.status(400).send(createResponse(false, null, error.message));
+                }
+
+                if (!user) {
+                    return res.status(400).send(createResponse(false, null, "User not found."));
+                }
+
+                if (user.faculty != req.user.faculty) {
+                    return res.status(400).send(createResponse(false, null, "You have no permission for editting this user."));
+                }
+
+                return process();
+            })
+        })
+    }
+};
+
+/**
+ * Enable thesis registrable for a list of students using xlsx
+ * @param req
+ * @param res
+ */
+exports.enableThesisRegistrableUsingXLSX = function (req, res) {
+
+    // check received file
+    var fileInfo = req.file;
+
+    if (fileInfo == null || fileInfo.mimetype != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+        req.flash('errorMessage', 'Invalid file type');
+        return res.redirect('/admin/users/students');
+    }
+
+
+
+    getModel('student').then(function (Student) {
+        Student.enableThesisRegistrableUsingXLSX(req.user.faculty, fileInfo.path, function (errors) {
+            if (errors && errors.length > 0) {
+
+                var errorString = "";
+                _.forEach(errors, function (error) {
+                    errorString = errorString.concat(error.message + "\n");
+                });
+
+                req.flash('errorMessage', 'There are some errors:\n' + errorString);
+            }
+
+            return res.redirect('/admin/users/students');
+        })
+    })
 };

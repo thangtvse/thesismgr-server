@@ -28,9 +28,16 @@
 
             <div class="row">
                 <!-- show any messages that come back with authentication -->
-                <% if (message != null && message.length > 0) { %>
-                <div class="alert alert-danger"><%= message %></div>
-                <% } %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert"
+                        <% if (!(message && message.length > 0)) { %>
+                     hidden
+                        <% } %>
+                >
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong> <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
             </div>
 
 
@@ -68,7 +75,7 @@
                                                    name="officer_number">
                                         </div>
                                         <div class="form-group">
-                                            <label for="email">User Name:</label>
+                                            <label for="email">Email:</label>
                                             <input type="email" class="form-control" id="email" name="email">
                                         </div>
                                         <div class="form-group">

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node ./bin/www",
-    "build": "apidoc -i routes/ -o apidoc/ && node ./bin/www"
+    "install": "npm install"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",

@@ -72,14 +72,6 @@ exports.getAllLecturersAPI = function (req, res) {
 
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
 
-    var findOpts = {
-        role: ['moderator', 'lecturer']
-    };
-
-    if (req.query.faculty_id) {
-        findOpts.faculty = req.query.faculty_id
-    }
-
     var errors = req.validationErrors();
 
     if (errors) {
@@ -87,12 +79,12 @@ exports.getAllLecturersAPI = function (req, res) {
     }
 
     getModel('lecturer').then(function (Lecturer) {
-        Lecturer.getPopulatedLecturerList(req.query.page, function (error, lecturers) {
+        Lecturer.getPopulatedLecturerList(req.query.page, req.query.faculty_id, function (error, lecturers) {
             if (error) {
                 return res.send(createResponse(false, null, error.message));
             }
 
-            return res.send(true, lecturers, null);
+            return res.send(createResponse(true, lecturers, null));
         })
     })
 };
@@ -109,52 +101,44 @@ exports.searchLecturerByOfficerNumberAPI = function (req, res) {
     var errors = req.validationErrors();
 
     if (errors) {
-        return res.status(400).send(createResponse(false, {}, error.message));
-    }
-
-    getModel('user').then(function (User) {
-        User.find({
-            officerNumber: {
-                'contains': req.query.officer_number
-            },
-            role: 'lecturer'
-        })
-            .populate('faculty')
-            .populate('unit')
-            .exec(function (error, lecturers) {
-                if (error) {
-                    return res.status(400).send(createResponse(false, {}, error.message));
-                }
-
-                return res.send(createResponse(true, lecturers, null));
-            })
-    })
-};
-
-/**
- * Get a lecturer info by id
- * @param req
- * @param res
- * @returns {*}
- */
-exports.getLecturerByIdAPI = function (req, res) {
-
-    var errors = req.validationErrors();
-
-    if (errors) {
-        return res.status(400).send(createResponse(false, null, errors[0].msg));
+        return res.status(400).send(createResponse(false, {}, errors[0].msg));
     }
 
     getModel('lecturer').then(function (Lecturer) {
-        Lecturer.getPopulatedLecturerById(req.params.id, function (error, lecturer) {
+        Lecturer.searchPopulatedLecturerByOfficerNumber(req.query.officer_number, function (error, lecturers) {
             if (error) {
-                return res.send(createResponse(false, null, error.message));
+                return res.status(400).send(createResponse(false, {}, error.message));
             }
 
-            return res.send(true, lecturer, null);
+            return res.send(createResponse(true, lecturers, null));
         })
     })
 };
+
+// /**
+//  * Get a lecturer info by id
+//  * @param req
+//  * @param res
+//  * @returns {*}
+//  */
+// exports.getLecturerByIdOfficerNumber = function (req, res) {
+//
+//     var errors = req.validationErrors();
+//
+//     if (errors) {
+//         return res.status(400).send(createResponse(false, null, errors[0].msg));
+//     }
+//
+//     getModel('lecturer').then(function (Lecturer) {
+//         Lecturer.getPopulatedLecturerById(req.params.id, function (error, lecturer) {
+//             if (error) {
+//                 return res.send(createResponse(false, null, error.message));
+//             }
+//
+//             return res.send(true, lecturer, null);
+//         })
+//     })
+// };
 
 /**
  * Update lecturer info
@@ -257,3 +241,14 @@ exports.createUsingXLSX = function (req, res) {
 
 
 };
+
+
+
+getModel('thesis').then(function (Thesis) {
+    Thesis.findOne({
+        lecturer: 1234,
+        status:
+    }).exec(function (error, theses) {
+
+    })
+});

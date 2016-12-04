@@ -87,4 +87,15 @@ router.post('/students/create-xlsx', [
     studentsCtrl.createUsingXLSX
 ]);
 
+router.post('/api/students/update', [
+    hasAccess('moderator'),
+    studentsCtrl.updateStudentAPI
+]);
+
+router.post('/students/upload_registrable_students_xlsx',[
+    hasAccess('moderator'),
+    upload.single('xlsx'),
+    studentsCtrl.enableThesisRegistrableUsingXLSX
+]);
+
 module.exports = router;

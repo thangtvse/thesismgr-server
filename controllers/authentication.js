@@ -1,6 +1,7 @@
 var passport = require('passport');
 
 exports.getLogin = function (req, res) {
+
     res.render('login',{ message: req.flash('loginMessage')});
 };
 

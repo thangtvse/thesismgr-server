@@ -75,7 +75,7 @@ $(document).ready(function () {
 var success = function (response) {
     if (response.status == true) {
 
-        console.log(response);
+        console.log("response: " + response);
 
         lecturers[page] = [];
 
@@ -94,21 +94,13 @@ var success = function (response) {
     }
 };
 
-var error = function (xhr) {
-    $.toast({
-        heading: 'Error',
-        text: "Can't send request",
-        icon: 'error',
-    })
-};
-
 var getData = function () {
 
     var data = {
         page: page
     };
 
-    if($("#current-role").text() == "moderator") {
+    if ($("#current-role").text() == "moderator") {
         data.faculty_id = $("#current-facultyID").text();
     }
 
@@ -117,7 +109,7 @@ var getData = function () {
         method: "GET",
         data: data,
         success: success,
-        error: error
+        error: errorHandler
     });
 };
 

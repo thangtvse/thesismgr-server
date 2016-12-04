@@ -5,6 +5,8 @@ var stringSimilarity = require('string-similarity');
 var util = require('util');
 var paginationConfig = require('../config/pagination');
 var async = require('async');
+var objectUtil = require('../helpers/object');
+var Excel = require('exceljs');
 
 module.exports = {
     identity: 'student',
@@ -103,7 +105,7 @@ module.exports = {
     },
 
     /**
-     * Create a list of students by using xlsx
+     * Create a list of students by using xlsx. If sepcifiedFaculty is not null, all user must be in this faculty
      * @param specifiedFaculty
      * @param filePath
      * @param mailTransporter
@@ -261,6 +263,217 @@ module.exports = {
         });
     },
 
+    getPopulatedStudentByOfficerNumber: function (officerNumber, next) {
+        getModel('user').then(function (User) {
+            getModel('student').then(function (Student) {
+
+                User.findOne({
+                    officerNumber: officerNumber,
+                    role: ['student']
+                })
+                    .sort({
+                        createdAt: 'desc'
+                    })
+                    .populate('student')
+                    .populate('unit')
+                    .populate('faculty')
+                    .exec(function (error, user) {
+                        if (error) {
+                            return next(error.message);
+                        }
+
+                        if (user == null) {
+                            return next(new Error("User not found."));
+                        }
+
+                        if (user.student == null || user.student.length == 0) {
+                            return next(new Error("There are some internal errors."));
+                        }
+
+                        var resStudent = user.toObject();
+
+                        Student.findOne({
+                            id: user.student[0].id
+                        })
+                            .populate('program')
+                            .populate('course')
+                            .exec(function (error, student) {
+
+                                if (error) {
+                                    return next(error.message);
+                                }
+
+                                resStudent.student = _.omit(student.toObject(), ['password', 'user']);
+
+                                return next(null, resStudent);
+                            });
+                    });
+            });
+        });
+    },
+
+    /**
+     * Update student info
+     * @param officerNumber
+     * @param updateOpts
+     * @param next
+     */
+    updateInfo: function (officerNumber, updateOpts, next) {
+        var userUpdateOpts = objectUtil.compactObject({
+            email: updateOpts.email,
+            faculty: updateOpts.faculty,
+            unit: updateOpts.faculty,
+            fullName: updateOpts.fullName
+        });
+
+        var studentUpdateOpts = objectUtil.compactObject({
+            course: updateOpts.course,
+            program: updateOpts.program,
+            thesisRegistrable: updateOpts.thesisRegistrable
+        });
+
+        getModel('user').then(function (User) {
+            getModel('student').then(function (Student) {
+                User.findOne({
+                    officerNumber: officerNumber,
+                })
+                    .populate('student')
+                    .exec(function (error, user) {
+                        if (error) {
+                            return next(error);
+                        }
+
+                        for (var key in userUpdateOpts) {
+                            user[key] = userUpdateOpts[key];
+                        }
+
+                        async.parallel([
+                            function (callback) {
+                                user.save(function (error) {
+                                    callback(error);
+                                })
+                            },
+                            function (callback) {
+                                if (user.student == null || user.student.length == 0) {
+                                    return callback(new Error("There are some internal errors."));
+                                }
+
+                                Student.findOne({
+                                    id: user.student[0].id
+                                })
+                                    .populate('program')
+                                    .populate('course')
+                                    .exec(function (error, student) {
+
+                                        if (error) {
+                                            return callback(error.message);
+                                        }
+
+                                        for (var key in studentUpdateOpts) {
+                                            student[key] = studentUpdateOpts[key];
+                                        }
+
+                                        student.save(function (error) {
+                                            return callback(error);
+                                        });
+                                    });
+                            }
+                        ], function (errors) {
+                            if (errors && errors.length > 0) {
+                                return next(errors[0]);
+                            }
+
+                            Student.getPopulatedStudentByOfficerNumber(officerNumber, next);
+                        });
+                    });
+            });
+        })
+    },
 
 
+    /**
+     * Make a list of students become registrable using XLSX file. All user must be in a specified faculty. If this faculty is root unit,
+     * users has not to be in any specified faculty.
+     * @param specifiedFaculty
+     * @param filePath
+     * @param next
+     */
+    enableThesisRegistrableUsingXLSX: function (specifiedFaculty, filePath, next) {
+        var q = async.queue(function (task, callback) {
+            var row = task.row;
+
+            if (row._number == 1) {
+                return callback();
+            }
+
+            // File format: No., Officer Number,....
+            var values = row.values;
+
+            var officerNumber = values[2];
+
+            getModel("user").then(function (User) {
+                User.findOne({
+                    officerNumber: "" + officerNumber,
+                    role: 'student'
+                })
+                    .populate('student')
+                    .exec(function (error, user) {
+                        if (error) {
+                            return callback(error);
+                        }
+
+                        if (!user) {
+                            return callback(new Error("User " + officerNumber + " not found."));
+                        }
+
+                        if (specifiedFaculty.left != 1 && user.faculty != specifiedFaculty.id) {
+                            return callback(new Error("You have no permission for editing user " + officerNumber));
+                        }
+
+                        user.student[0].thesisRegistrable = true;
+                        user.student[0].save(function (error) {
+                            if (error) {
+                                return callback(error);
+                            }
+
+                            callback();
+                        })
+                    })
+            })
+        }, 20);
+
+
+        var responseErrors = [];
+
+        q.drain = function () {
+
+            if (responseErrors.length > 0) {
+
+                return next(responseErrors);
+
+            } else {
+                return next([]);
+            }
+
+        };
+
+        // read xlsx file
+        var workbook = new Excel.Workbook();
+        workbook.xlsx.readFile(filePath)
+            .then(function () {
+                var worksheet = workbook.getWorksheet("Sheet1");
+                worksheet.eachRow({includeEmpty: false}, function (row, rowNumber) {
+
+                    q.push({
+                        row: row,
+                        rowNumber: rowNumber
+                    }, function (error) {
+                        if (error) {
+                            responseErrors.push(error);
+                        }
+                    })
+                })
+            })
+
+    }
 };

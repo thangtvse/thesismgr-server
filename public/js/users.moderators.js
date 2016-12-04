@@ -35,12 +35,8 @@ $(document).ready(function () {
                                 icon: 'error',
                             })
                         }
-
-
                     },
-                    error: function (xhr) {
-
-                    }
+                    error: errorHandler
                 })
             }
 

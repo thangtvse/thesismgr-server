@@ -94,7 +94,7 @@ exports.post = function (type) {
                     return res.redirect('/admin/categories/' + type + 's');
                 }
 
-                return res.redirect("admin/categories/" + type + "s");
+                return res.redirect("/admin/categories/" + type + "s");
             })
         })
     }

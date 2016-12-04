@@ -2,6 +2,7 @@ var getModel = require('express-waterline').getModels;
 var sendMail = require('../helpers/mail').sendMail;
 var paginationConfig = require('../config/pagination');
 var async = require('async');
+var _ = require('underscore');
 
 module.exports = {
     identity: 'lecturer',
@@ -101,6 +102,7 @@ module.exports = {
      * @param next
      */
     getPopulatedLecturerList: function (page, facultyID, next) {
+
         var findOpts = {};
         if (facultyID != null) {
             findOpts.faculty = facultyID;
@@ -164,15 +166,70 @@ module.exports = {
 
     /**
      * Get a populated lecturers by id
-     * @param id
+     * @param officerNumber
      * @param next
      */
-    getPopulatedLecturerById: function (id, next) {
+    getPopulatedLecturerByOfficerNumber: function (officerNumber, next) {
         getModel('user').then(function (User) {
             getModel('lecturer').then(function (Lecturer) {
 
                 User.findOne({
-                    id: id,
+                    officerNumber: officerNumber,
+                    role: ['lecturer', 'moderator']
+                })
+                    .sort({
+                        createdAt: 'desc'
+                    })
+                    .populate('lecturer')
+                    .populate('unit')
+                    .populate('faculty')
+                    .exec(function (error, user) {
+                        if (error) {
+                            return next(error.message);
+                        }
+
+                        if (user == null) {
+                            return next("User not found.");
+                        }
+
+                        if (user.lecturer == null || user.lecturer.length == 0) {
+                            return next("There are some internal errors.");
+                        }
+
+                        var resLecturer = user.toObject();
+
+                        Lecturer.findOne({
+                            id: user.lecturer[0].id
+                        })
+                            .populate('fields')
+                            .exec(function (error, lecturer) {
+
+                                if (error) {
+                                    return next(error.message);
+                                }
+
+                                resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
+
+                                return next(null, resLecturer);
+                            });
+                    });
+            });
+        });
+    },
+
+    /**
+     * Get a populated lecturers by id
+     * @param officerNumber
+     * @param next
+     */
+    searchPopulatedLecturerByOfficerNumber: function (officerNumber, next) {
+        getModel('user').then(function (User) {
+            getModel('lecturer').then(function (Lecturer) {
+
+                User.findOne({
+                    officerNumber: {
+                        'contains': officerNumber
+                    },
                     role: ['lecturer', 'moderator']
                 })
                     .sort({

@@ -1,12 +1,12 @@
-$(function() {
+$(function () {
     $('#side-menu').metisMenu();
 });
 
 //Loads the correct sidebar on window load,
 //collapses the sidebar on window resize.
 // Sets the min-height of #page-wrapper to window size
-$(function() {
-    $(window).bind("load resize", function() {
+$(function () {
+    $(window).bind("load resize", function () {
         var topOffset = 50;
         var width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
         if (width < 768) {
@@ -29,7 +29,7 @@ $(function() {
     // var element = $('ul.nav a').filter(function() {
     //     return this.href == url;
     // }).addClass('active').parent().parent().addClass('in').parent();
-    var element = $('ul.nav a').filter(function() {
+    var element = $('ul.nav a').filter(function () {
         return this.href == url;
     }).addClass('active').parent();
 
@@ -53,8 +53,8 @@ function post(path, params, method) {
     form.setAttribute("method", method);
     form.setAttribute("action", path);
 
-    for(var key in params) {
-        if(params.hasOwnProperty(key)) {
+    for (var key in params) {
+        if (params.hasOwnProperty(key)) {
             var hiddenField = document.createElement("input");
             hiddenField.setAttribute("type", "hidden");
             hiddenField.setAttribute("name", key);
@@ -66,4 +66,17 @@ function post(path, params, method) {
 
     document.body.appendChild(form);
     form.submit();
+}
+
+function errorHandler(xhr) {
+    console.log(xhr);
+
+    var jsonResponse = xhr.responseJSON;
+
+    console.log(jsonResponse);
+
+    if (jsonResponse && jsonResponse.status == false && jsonResponse.message) {
+        $("#error-alert").alert();
+        $("#error-alert-message").html(jsonResponse.message);
+    }
 }
