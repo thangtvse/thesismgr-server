@@ -22,10 +22,13 @@ module.exports = function (passport) {
     passport.deserializeUser(function (id, done) {
         console.log('deserializeUser...');
         getModels('user').then(function (User) {
-            User.findOne({id: id}, function (err, user) {
-                console.log(user);
-                done(err, user);
-            });
+            User.findOne({id: id})
+                .populate('unit')
+                .populate('faculty')
+                .exec(function (err, user) {
+                    console.log(user);
+                    done(err, user);
+                });
         });
     });
 
@@ -36,19 +39,22 @@ module.exports = function (passport) {
 
     passport.use('admin-login', new LocalStrategy({
 
-            usernameField: 'email',
+            usernameField: 'officer_number',
             passwordField: 'password',
             passReqToCallback: true // allows us to pass back the entire request to the callback
         },
-        function (req, email, password, done) {
+        function (req, officerNumber, password, done) {
+
+            console.log(officerNumber + " " + password);
+
             getModels('user').then(function (User) {
-                User.adminLogin(email, password, function (err, result, user) {
+                User.adminLogin(officerNumber, password, function (err, result, user) {
                     if (err) {
                         return done(err, false, req.flash('loginMessage', 'Sorry. There are some errors.'));
                     }
 
                     if (result == false) {
-                        return done(null, false, req.flash('loginMessage', 'Wrong username or password.'));
+                        return done(null, false, req.flash('loginMessage', 'Wrong officer number or password.'));
                     }
 
                     return done(null, user);

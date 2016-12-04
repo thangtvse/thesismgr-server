@@ -7,40 +7,94 @@ var express = require('express');
 var router = express.Router();
 var hasAccess = require('../middlewares/auth').hasAccess;
 var util = require('util');
-var categoriesCtrl = require('../controllers/categories');
-
+var hierarchicalCategoriesCtrl = require('../controllers/categories.hierarchy');
+var listCategoriesCtrl = require('../controllers/categories.list');
 // router.get('/search', fieldsCtrl.searchField);
 
 // Fields ========================
 router.get('/fields', [
     hasAccess('admin'),
-    categoriesCtrl.getView('field')
+    hierarchicalCategoriesCtrl.getView('field')
 ]);
 
 router.post('/fields', [
     hasAccess('admin'),
-    categoriesCtrl.post('field')
+    hierarchicalCategoriesCtrl.post('field')
 ]);
 
 router.get('/fields/delete',[
   hasAccess('admin'),
-    categoriesCtrl.delete('field')
+    hierarchicalCategoriesCtrl.delete('field')
 ]);
 
-// Offices =========================
-router.get('/offices', [
+router.post('/fields/update',[
     hasAccess('admin'),
-    categoriesCtrl.getView('office')
+    hierarchicalCategoriesCtrl.update('field')
 ]);
 
-router.post('/offices', [
+// Units =========================
+router.get('/units', [
     hasAccess('admin'),
-    categoriesCtrl.post('office')
+    hierarchicalCategoriesCtrl.getView('unit')
 ]);
 
-router.get('/offices/delete',[
+router.post('/units', [
     hasAccess('admin'),
-    categoriesCtrl.delete('office')
+    hierarchicalCategoriesCtrl.post('unit')
 ]);
+
+router.get('/units/delete',[
+    hasAccess('admin'),
+    hierarchicalCategoriesCtrl.delete('unit')
+]);
+
+router.post('/units/update',[
+    hasAccess('admin'),
+    hierarchicalCategoriesCtrl.update('unit')
+]);
+
+// Courses ===========================
+router.get('/courses', [
+    hasAccess('moderator'),
+    listCategoriesCtrl.getView('course')
+]);
+
+router.post('/courses', [
+    hasAccess('moderator'),
+    listCategoriesCtrl.post('course')
+]);
+
+router.get('/courses/delete',[
+    hasAccess('moderator'),
+    listCategoriesCtrl.delete('course')
+]);
+
+router.post('/courses/update',[
+    hasAccess('moderator'),
+    listCategoriesCtrl.update('course')
+]);
+
+
+// Programs ============================
+router.get('/programs', [
+    hasAccess('moderator'),
+    listCategoriesCtrl.getView('program')
+]);
+
+router.post('/programs', [
+    hasAccess('moderator'),
+    listCategoriesCtrl.post('program')
+]);
+
+router.get('/programs/delete',[
+    hasAccess('moderator'),
+    listCategoriesCtrl.delete('program')
+]);
+
+router.post('/programs/update',[
+    hasAccess('moderator'),
+    listCategoriesCtrl.update('program')
+]);
+
 
 module.exports = router;

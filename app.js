@@ -20,13 +20,15 @@ var app = express();
 
 // connect database
 // db.connectDatabase(dbURI);
-// db.createRootUserIfNeeded(rootUsername, rootPassword);
+// db.createRootUserIfNeeded(rootEmail, rootPassword);
 
 // app.use(waterline.init(dbConfig));
 waterline.init(dbConfig);
-db.createRootUserIfNeeded('admin@gmail.com', 'nopassword');
-db.createRootFieldIfNeeded();
-db.createRootOfficeIfNeeded();
+db.initDB(function (error) {
+    if (error) {
+        console.log(error);
+    }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

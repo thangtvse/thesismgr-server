@@ -9,14 +9,13 @@ var util = require('util');
 var async = require("async");
 
 /**
- * Find ancestors and descendants for an office node
- * @param office
+ * Find ancestors and descendants for an unit node
+ * @param unit
  * @param next
  */
-exports.findAncestorsAndDescendantsForOffice = function (office, next) {
-
-    getModel('office').then(function (Office) {
-        return findAncestorsAndDescendants(Office, office, next);
+exports.findAncestorsAndDescendantsForUnit = function (unit, next) {
+    getModel('unit').then(function (Unit) {
+        return findAncestorsAndDescendants(Unit, unit, next);
     });
 };
 
@@ -39,6 +38,7 @@ exports.findAncestorsAndDescendantsForField = function (field, next) {
  * @param next
  */
 var findAncestorsAndDescendants = function (Model, node, next) {
+
     Model.find({
         left: {
             '<': node.left
@@ -46,7 +46,7 @@ var findAncestorsAndDescendants = function (Model, node, next) {
         right: {
             '>': node.right
         }
-    }).exec(function (error, descendants) {
+    }).exec(function (error, ancestors) {
 
         if (error) {
             return next(error, null, null);
@@ -59,7 +59,7 @@ var findAncestorsAndDescendants = function (Model, node, next) {
             right: {
                 '<': node.right
             }
-        }).exec(function (error, ancestors) {
+        }).exec(function (error, descendants) {
             if (error) {
                 return next(error, null, null);
             }
@@ -199,7 +199,6 @@ exports.beforeCreateANode = function (Model, values, next) {
     })
 };
 
-
 exports.afterDestroyANode = function (Model, left, right, next) {
     // find all descendants
 
@@ -311,7 +310,11 @@ exports.afterDestroyANode = function (Model, left, right, next) {
 
 var createNode = function (node) {
 
-    return "<li style='list-style-type: none'><div class=\"panel panel-default\" style='margin-bottom: 4px; position: relative;'><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
+    if (node.type != null) {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item type-" + node.type + "\"><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
+    } else {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item\"><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
+    }
 
 };
 
@@ -320,11 +323,11 @@ var createLeaf = function (node) {
 };
 
 var editButton = function (node) {
-    return "<a style='position: absolute; right: 60px' href=\"#\" data-action=\"edit\" data-id=\"" + node.id + "\" class=\"category-hierarchy edit\">  Edit </a>"
+    return "<a style='position: absolute; right: 60px' href=\"#\" data-action=\"edit\" data-id=\"" + node.id + "\" class=\"category-item edit\">  Edit </a>"
 };
 
 var deleteButton = function (node) {
-    return "<a style='position: absolute; right: 10px;' href=\"#\" data-action=\"delete\" data-id=\"" + node.id + "\" class=\"category-hierarchy delete\">Delete </a>"
+    return "<a style='position: absolute; right: 10px;' href=\"#\" data-action=\"delete\" data-id=\"" + node.id + "\" class=\"category-item delete\">Delete </a>"
 };
 
 exports.createTree = function (nodes) {

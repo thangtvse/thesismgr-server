@@ -6,7 +6,7 @@ var path = require('path');
 var mysqlAdapter = require('sails-mysql');
 // module.exports = {
 //     dbURI: "mongodb://localhost:27017/thesis_mgr",
-//     root_username: "admin@gmail.com",
+//     root_email: "admin@gmail.com",
 //     root_password: "nopassword"
 // };
 

@@ -29,10 +29,10 @@ module.exports = {
         });
     },
 
-    isUsernameAvailable: function (username) {
+    isEmailAvailable: function (email) {
         return new Promise(function (resolve, reject) {
             getModel('user').then(function (User) {
-                User.findOne({username: username})
+                User.findOne({email: email})
                     .then(function (user) {
                         if (!user) {
                             resolve();
@@ -49,15 +49,15 @@ module.exports = {
         });
     },
 
-    isOfficeIDAvailable: function (officeID) {
+    isUnitIDAvailable: function (unitID) {
         return new Promise(function (resolve, reject) {
-            getModel('office').then(function (Office) {
-                Office.findOne({id: officeID})
-                    .then(function (office) {
-                        if (office) {
+            getModel('unit').then(function (Unit) {
+                Unit.findOne({id: unitID})
+                    .then(function (unit) {
+                        if (unit) {
                             resolve();
                         } else {
-                            reject(office)
+                            reject(unit)
                         }
                     })
                     .catch(function (error) {
@@ -78,6 +78,26 @@ module.exports = {
                             resovle;
                         } else {
                             reject(field)
+                        }
+                    })
+                    .catch(function (error) {
+                        if (error) {
+                            reject(error);
+                        }
+                    })
+            })
+        })
+    },
+
+    isFacultyIDAvailable: function (facultyID) {
+        return new Promise(function (resolve, reject) {
+            getModel('unit').then(function (Unit) {
+                Unit.findOne({id: facultyID})
+                    .then(function (unit) {
+                        if (unit && unit.type == 'faculty') {
+                            resolve();
+                        } else {
+                            reject(unit)
                         }
                     })
                     .catch(function (error) {

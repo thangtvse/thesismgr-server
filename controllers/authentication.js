@@ -5,14 +5,17 @@ exports.getLogin = function (req, res) {
 };
 
 exports.postLogin = function (req, res) {
-    req.checkBody('username', 'Invalid username').notEmpty().isEmail();
+    req.checkBody('email', 'Invalid email').notEmpty().isEmail();
     req.checkBody('password', 'Invalid password').notEmpty();
+
+    console.log(req);
 
     var errors = req.validationErrors();
     if (errors) {
         console.log(errors);
 
-        return req.flash('loginMessage', errors[0].msg);
+        req.flash('loginMessage', errors[0].msg);
+        return res.redirect('/login');
     }
 
     passport.authenticate('admin-login', {
