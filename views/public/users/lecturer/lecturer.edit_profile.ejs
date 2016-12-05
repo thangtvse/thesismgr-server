@@ -14,7 +14,7 @@
 };%>
 <body >
 <div id="wrapper">
-    <% include ./lecturer.nav.ejs %>
+    <% include lecturer.nav.ejs %>
 
     <div class="container">
         <form id="profile" method="post" >
@@ -139,8 +139,12 @@
 <script src="\vendor\jquery\jquery.min.js"></script>
 <!-- REQUIRED BOOTSTRAP SCRIPTS -->
 <script src="\vendor\bootstrap\js\bootstrap.min.js"></script>
+
 <script src="\vendor\Semantic-UI-master\dist\semantic.min.js"></script>
 <%-include ./lecturer.edit_profile.script.ejs %>
+<script src="\vendor\UI-Dropdown-master\dropdown.min.js"></script>
+<%-include lecturer.edit_profile.script.ejs %>
+
 </body>
 
 </html>

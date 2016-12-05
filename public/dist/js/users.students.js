@@ -250,7 +250,7 @@ var setDataToTable = function () {
                 '<td>' + student.student.course.name + '</td>' +
                 '<td>' + student.student.program.name + '</td>' +
                 '<td>' + registrable + '</td>' +
-                '<td><a onclick="editStudent(\'' + student.id + '\')">Edit</a></td>' +
+                '<td><a onclick="editStudent(event,\'' + student.id + '\')">Edit</a></td>' +
                 '</tr>'
             )
         }
@@ -261,7 +261,8 @@ var setDataToTable = function () {
  * Open a modal allows us to update student info
  * @param studentID
  */
-var editStudent = function (studentID) {
+var editStudent = function (e, studentID) {
+    e.preventDefault();
 
     var student;
 

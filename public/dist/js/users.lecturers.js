@@ -86,11 +86,7 @@ var success = function (response) {
         setDataToTable((page - 1) * 10, response.data.length);
 
     } else {
-        $.toast({
-            heading: 'Error',
-            text: response.message,
-            icon: 'error',
-        })
+       showError(response.message)
     }
 };
 

@@ -7,11 +7,14 @@ var rename = require("gulp-rename");
 var uglify = require('gulp-uglify');
 var pkg = require('./package.json');
 var nodemon = require('gulp-nodemon');
+var sourcemaps = require('gulp-sourcemaps');
 
 // Compile LESS files from /less into /css
 gulp.task('less', function () {
     return gulp.src('public/less/sb-admin-2.less')
+        .pipe(sourcemaps.init())
         .pipe(less())
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest('public/dist/css'))
         .pipe(browserSync.reload({
             stream: true
@@ -21,8 +24,10 @@ gulp.task('less', function () {
 // Minify compiled CSS
 gulp.task('minify-css', ['less'], function () {
     return gulp.src('public/dist/css/sb-admin-2.css')
+        .pipe(sourcemaps.init())
         .pipe(cleanCSS({compatibility: 'ie8'}))
         .pipe(rename({suffix: '.min'}))
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest('public/dist/css'))
         .pipe(browserSync.reload({
             stream: true
@@ -41,8 +46,10 @@ gulp.task('js', function () {
 // Minify JS
 gulp.task('minify-js', ['js'], function () {
     return gulp.src('public/js/*.js')
+        .pipe(sourcemaps.init())
         .pipe(uglify())
         .pipe(rename({suffix: '.min'}))
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest('public/dist/js'))
         .pipe(browserSync.reload({
             stream: true
@@ -93,7 +100,7 @@ gulp.task('copy', function () {
 gulp.task('default', ['minify-css', 'minify-js', 'watch']);
 
 // Run server with nodemon
-gulp.task('nodemon',['default', 'watch'], function () {
+gulp.task('nodemon', ['default', 'watch'], function () {
     nodemon({
         script: './bin/www',
         ext: 'js',

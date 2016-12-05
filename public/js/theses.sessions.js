@@ -1,4 +1,8 @@
-var lecturers = {};
+/**
+ * Created by tranvietthang on 12/4/16.
+ */
+
+var sessions = {};
 var hash = window.location.hash;
 var page = 1;
 var numberOfPages = $("#number-of-pages").text();
@@ -25,7 +29,7 @@ $(document).ready(function () {
             page = currentPage;
             window.location.hash = "#page-" + page;
             console.log(page);
-            if (lecturers[page] == null) {
+            if (sessions[page] == null) {
                 getData();
             } else {
                 setDataToTable();
@@ -75,18 +79,18 @@ $(document).ready(function () {
 var success = function (response) {
     if (response.status == true) {
 
-        console.log("response: " + response);
+        console.log(response);
 
-        lecturers[page] = [];
+        sessions[page] = [];
 
-        response.data.forEach(function (lecturer) {
-            lecturers[page].push(lecturer);
+        response.data.forEach(function (session) {
+            sessions[page].push(session);
         });
 
         setDataToTable((page - 1) * 10, response.data.length);
 
     } else {
-       showError(response.message)
+        showError(response.message)
     }
 };
 
@@ -101,7 +105,7 @@ var getData = function () {
     }
 
     $.ajax({
-        url: "/admin/users/api/lecturers",
+        url: "/admin/theses/api/sessions",
         method: "GET",
         data: data,
         success: success,
@@ -112,23 +116,56 @@ var getData = function () {
 var setDataToTable = function () {
     $('.table.table-body').children().remove();
 
-    lecturers[page].forEach(function (lecturer) {
-        if (lecturer.lecturer != null) {
-            var fieldsHtml = "";
+    sessions[page].forEach(function (session) {
 
-            lecturer.lecturer.fields.forEach(function (field) {
-                fieldsHtml.append("<span class='label label-primary'>" + field.name + "</span>");
-            });
+        $('#table-sessions').append('<tr>' +
+            '<td>' + session.name + '</td>' +
+            '<td>' + formatDate(session.from) + '</td>' +
+            '<td>' + formatDate(session.to) + '</td>' +
+            '<td>' + session.faculty.name + '</td>' +
+            '<td>' + '</td>' +
+            '<td><a href="#" onclick="notify(event, \'' + session.id + '\')">Send Notifications</a></td>' +
+            '</tr>'
+        )
+    });
+};
 
-            $('#table-lecturers').append('<tr>' +
-                '<td>' + lecturer.officerNumber + '</td>' +
-                '<td>' + lecturer.fullName + '</td>' +
-                '<td>' + lecturer.email + '</td>' +
-                '<td>' + lecturer.unit.name + '</td>' +
-                '<td>' + lecturer.faculty.name + '</td>' +
-                '<td>' + fieldsHtml + '</td>' +
-                '</tr>'
-            )
+var notify = function (e, sessionID) {
+    e.preventDefault();
+
+    bootbox.confirm({
+        message: "Send email for all thesis-registrable students about this session?",
+        buttons: {
+            confirm: {
+                label: 'Yes',
+                className: 'btn-success'
+            },
+            cancel: {
+                label: 'No',
+                className: 'btn-danger'
+            }
+        },
+        callback: function (result) {
+            if (result == true) {
+
+                $.ajax({
+                    url: "/admin/theses/api/sessions/notify",
+                    method: "POST",
+                    data: {
+                        session_id: sessionID
+                    },
+                    success: function (response) {
+                        if (response.status == true) {
+
+                            console.log(response);
+
+                        } else {
+                            showError(response.message)
+                        }
+                    },
+                    error: errorHandler
+                });
+            }
         }
     });
 };

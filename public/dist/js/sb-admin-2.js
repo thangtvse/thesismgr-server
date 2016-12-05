@@ -76,7 +76,16 @@ function errorHandler(xhr) {
     console.log(jsonResponse);
 
     if (jsonResponse && jsonResponse.status == false && jsonResponse.message) {
-        $("#error-alert").alert();
-        $("#error-alert-message").html(jsonResponse.message);
+        showError(jsonResponse.message);
     }
+}
+
+function showError(message) {
+    $("#error-alert").alert();
+    $("#error-alert-message").html(message);
+}
+
+function formatDate(dateString) {
+    var date = new Date(dateString);
+    return date.getUTCDate() + "/" + (date.getUTCMonth() + 1) + "/" + date.getUTCFullYear();
 }
