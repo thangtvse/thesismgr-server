@@ -120,7 +120,12 @@ module.exports = {
 
     getPopulatedThesisList: function (page, opts, next) {
         var thesisOpts = objectUtil.compactObject({
-            faculty: opts.faculty
+            faculty: opts.faculty,
+            id: opts.id,
+            status: opts.status,
+            lecturer: opts.lecturer,
+            student: opts.student,
+            session: opts.session
         });
 
         getModel('thesis').then(function (Thesis) {
@@ -186,8 +191,120 @@ module.exports = {
                             return next(errors[0]);
                         }
 
-                        return next (null, resTheses);
+                        return next(null, resTheses);
                     });
+
+                })
+        })
+    },
+
+    getAllRequestForAdmin: function (page, next) {
+
+        var statuses = thesisStatus.filter(function (status) {
+            if (status.responder.indexOf("admin") == -1) {
+                return false;
+            } else {
+                return true
+            }
+        });
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: statuses
+            }, next);
+        })
+    },
+
+    getAllRequestForModerator: function (page, facultyID, next) {
+
+        var statuses = thesisStatus.filter(function (status) {
+            if (status.responder.indexOf("moderator") == -1) {
+                return false;
+            } else {
+                return true
+            }
+        });
+
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: statuses,
+                faculty: facultyID
+            }, next);
+        })
+    },
+
+    getAllRequestForLecturer: function (page, user, next) {
+
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        var statuses = thesisStatus.filter(function (status) {
+            if (status.responder.indexOf("lecturer") == -1 || status.responder.indexOf("secretary") == -1) {
+                return false;
+            } else {
+                return true
+            }
+        });
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: statuses,
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
+    getAllRequestForStudent: function (page, user, next) {
+
+
+        if (!user.student || user.student.length == 0) {
+            return next(new Error("This user is not a student."));
+        }
+
+        var statuses = thesisStatus.filter(function (status) {
+            if (status.responder.indexOf("student") == -1) {
+                return false;
+            } else {
+                return true
+            }
+        });
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: statuses,
+                or: {
+                    lecturer: user.student[0].id
+                }
+            }, next);
+        })
+    },
+
+    getAllRequestForASecretary: function (page, user, next) {
+
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        getModel('lecturer').then(function (Lecturer) {
+            Lecturer.findOne({
+                id: user.lecturer[0].id
+            })
+                .populate('councils')
+                .exec(function (error, councils) {
+                    if (error) {
+                        return next(error);
+                    }
+
+                    var resThese = [];
+                    getModel('council').then(function (Council) {
+                        async.forEach(councils, function (council, callback) {
+                            Council.findOne({
+                                id: council.id
+                            }).populate('theses')
+                        })
+                    })
 
                 })
         })
