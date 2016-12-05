@@ -157,7 +157,10 @@ var notify = function (e, sessionID) {
                     success: function (response) {
                         if (response.status == true) {
 
-                            console.log(response);
+                            bootbox.alert({
+                                message: "Send notifications successfully!",
+                                size: 'small'
+                            });
 
                         } else {
                             showError(response.message)

@@ -80,7 +80,13 @@
                                 <div class="form-group">
                                     <label>Faculty</label>
                                     <select class="form-control" name="faculty_id" id="faculty_id" required>
-                                        <% faculties.forEach(function (faculty) { %>
+                                        <% if (req.user.role != 'admin') {
+                                            faculties = faculties.filter(function (faculty) {
+                                                return faculty.id == req.user.faculty.id;
+                                            });
+                                        }
+
+                                        faculties.forEach(function (faculty) { %>
                                         <option
                                                 class="faculty-option-item"
                                                 value="<%= faculty.id %>"><%= faculty.name %></option>

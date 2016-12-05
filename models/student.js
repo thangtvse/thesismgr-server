@@ -45,7 +45,7 @@ module.exports = {
      * Creaete one Student
      * @param officerNumber
      * @param email
-     * @param unitID
+     * @param facultyID
      * @param fullName
      * @param courseID
      * @param programID
@@ -53,55 +53,47 @@ module.exports = {
      * @param mailTransporter
      * @param next {function (Error, Student)}
      */
-    createOne: function (officerNumber, email, unitID, fullName, courseID, programID, senderEmail, mailTransporter, next) {
+    createOne: function (officerNumber, email, facultyID, fullName, courseID, programID, senderEmail, mailTransporter, next) {
 
+        getModel('course').then(function (Course) {
+            Course.findOne({
+                id: courseID
+            }).exec(function (error, course) {
 
-        getModel('unit').then(function (Unit) {
-            Unit.getFacultyOfUnitID(unitID, function (error, faculty) {
-                if (error) {
-                    return next(error);
-                }
+                getModel('program').then(function (Program) {
+                    Program.findOne({
+                        id: programID
+                    }).exec(function (error, program) {
 
-                getModel('course').then(function (Course) {
-                    Course.findOne({
-                        id: courseID
-                    }).exec(function (error, course) {
+                        if (course.faculty != program.faculty || course.faculty != facultyID) {
+                            return next(new Error("Faculty of unit, course and program do not match."));
+                        }
 
-                        getModel('program').then(function (Program) {
-                            Program.findOne({
-                                id: programID
-                            }).exec(function (error, program) {
-
-                                if (course.faculty != program.faculty || course.faculty != faculty.id) {
-                                    return next(new Error("Faculty of unit, course and program do not match."));
+                        getModel('user').then(function (User) {
+                            User.createOne(officerNumber, email, facultyID, fullName, 'student', function (error, user, originalPassword) {
+                                if (error) {
+                                    return next(error, null);
                                 }
 
-                                getModel('user').then(function (User) {
-                                    User.createOne(officerNumber, email, unitID, fullName, 'student', function (error, user, originalPassword) {
-                                        if (error) {
-                                            return next(error, null);
-                                        }
 
-
-                                        getModel('student').then(function (Student) {
-                                            Student.create({
-                                                user: user,
-                                                course: courseID,
-                                                program: programID
-                                            }).exec(function (error, student) {
-                                                next(error, student);
-                                                return sendMail(email, originalPassword, senderEmail, mailTransporter);
-                                            })
-                                        })
+                                getModel('student').then(function (Student) {
+                                    Student.create({
+                                        user: user,
+                                        course: courseID,
+                                        program: programID
+                                    }).exec(function (error, student) {
+                                        next(error, student);
+                                        return sendMail(email, originalPassword, senderEmail, mailTransporter);
                                     })
                                 })
-
                             })
                         })
+
                     })
                 })
             })
-        });
+        })
+
     },
 
     /**

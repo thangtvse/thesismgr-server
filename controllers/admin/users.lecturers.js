@@ -88,7 +88,7 @@ exports.getAllLecturersAPI = function (req, res) {
     }
 
     getModel('lecturer').then(function (Lecturer) {
-        Lecturer.getPopulatedLecturerList(req.query.page, req.query.faculty_id, function (error, lecturers) {
+        Lecturer.getPopulatedLecturerList(req.query.page, {faculty: req.query.faculty_id}, function (error, lecturers) {
             if (error) {
                 return res.send(createResponse(false, null, error.message));
             }
@@ -149,14 +149,14 @@ exports.searchLecturerByOfficerNumberAPI = function (req, res) {
 //     })
 // };
 
-/**
- * Update lecturer info
- * @param req
- * @param res
- */
-exports.updateLecturerInfoAPI = function (req, res) {
-
-};
+// /**
+//  * Update lecturer info
+//  * @param req
+//  * @param res
+//  */
+// exports.updateLecturerInfoAPI = function (req, res) {
+//
+// };
 
 /**
  * Create a Lecturer
@@ -220,7 +220,6 @@ exports.createUsingXLSX = function (req, res) {
         return res.redirect('/admin/users/lecturers');
     }
 
-
     getModel('lecturer').then(function (Lecturer) {
         Lecturer.createUsingXLSX(req.user.faculty, fileInfo.path, mailTransporter, 'uendno@gmail.com', function (errors) {
 
@@ -248,11 +247,3 @@ exports.createUsingXLSX = function (req, res) {
         })
     });
 };
-
-// getModel('thesis').then(function (Thesis) {
-//     Thesis.findOne({
-//         lecturer: 1234,
-//     }).exec(function (error, theses) {
-//
-//     })
-// });

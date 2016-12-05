@@ -3,6 +3,8 @@ var sendMail = require('../helpers/mail').sendMail;
 var paginationConfig = require('../config/pagination');
 var async = require('async');
 var _ = require('underscore');
+var objectUtil = require('../helpers/object');
+
 
 module.exports = {
     identity: 'lecturer',
@@ -98,20 +100,34 @@ module.exports = {
     /**
      * Get a list of populated lecturers with pagination
      * @param page
-     * @param facultyID
+     * @param opts
      * @param next
      */
-    getPopulatedLecturerList: function (page, facultyID, next) {
+    getPopulatedLecturerList: function (page, opts, next) {
 
-        var findOpts = {};
-        if (facultyID != null) {
-            findOpts.faculty = facultyID;
+        var userOpts = objectUtil.compactObject({
+            email: opts.email,
+            faculty: opts.faculty,
+            unit: opts.faculty,
+            officerNumber: opts.officerNumber
+        });
+
+        if (opts.fullName) {
+            userOpts.slugFullName = {
+                'contains': opts.fullName
+            }
         }
+
+        userOpts.role = ['lecturer', 'moderator'];
+
+        var lecturerOpts = objectUtil.compactObject({
+            fields: opts.fields
+        });
 
         getModel('user').then(function (User) {
             getModel('lecturer').then(function (Lecturer) {
 
-                User.find(findOpts)
+                User.find(userOpts)
                     .sort({
                         createdAt: 'desc'
                     })
@@ -124,7 +140,79 @@ module.exports = {
                     })
                     .exec(function (error, users) {
                         if (error) {
-                           return next(error);
+                            return next(error);
+                        }
+
+                        var resLecturers = [];
+
+                        async.forEachSeries(users, function (user, callback) {
+
+                            if (user.lecturer == null || user.lecturer.length == 0) {
+                                return callback();
+                            }
+
+                            var resLecturer = user.toObject();
+
+                            Lecturer.findOne({
+                                id: user.lecturer[0].id
+                            })
+                                .populate('fields')
+                                .exec(function (error, lecturer) {
+
+                                    if (error) {
+                                        return callback(error);
+                                    }
+
+                                    if (lecturerOpts.fields) {
+                                        _.forEach(lecturer.fields, function (field) {
+                                            if (lecturerOpts.fields.indexOf(field.id) != -1) {
+                                                resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
+                                                resLecturers.push(resLecturer);
+                                            }
+                                        });
+                                    } else {
+                                        resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
+                                        resLecturers.push(resLecturer);
+                                    }
+
+                                    return callback();
+                                });
+                        }, function (errors) {
+                            if (errors && errors.length > 0) {
+                                return next(errors[0]);
+                            }
+
+                            return next(null, resLecturers);
+                        });
+                    });
+            });
+        });
+    },
+
+    /**
+     * Get a populated lecturers by id
+     * @param officerNumber
+     * @param next
+     */
+    searchPopulatedLecturerByOfficerNumber: function (officerNumber, next) {
+        getModel('user').then(function (User) {
+            getModel('lecturer').then(function (Lecturer) {
+
+                User.find({
+                    officerNumber: {
+                        'contains': officerNumber
+                    },
+                    role: ['lecturer', 'moderator']
+                })
+                    .sort({
+                        createdAt: 'desc'
+                    })
+                    .populate('lecturer')
+                    .populate('unit')
+                    .populate('faculty')
+                    .exec(function (error, users) {
+                        if (error) {
+                            return next(error);
                         }
 
                         var resLecturers = [];
@@ -157,118 +245,10 @@ module.exports = {
                                 return next(errors[0]);
                             }
 
-                           return next(null, resLecturers);
+                            return next(null, resLecturers);
                         });
                     });
             });
         });
     },
-
-    /**
-     * Get a populated lecturers by id
-     * @param officerNumber
-     * @param next
-     */
-    getPopulatedLecturerByOfficerNumber: function (officerNumber, next) {
-        getModel('user').then(function (User) {
-            getModel('lecturer').then(function (Lecturer) {
-
-                User.findOne({
-                    officerNumber: officerNumber,
-                    role: ['lecturer', 'moderator']
-                })
-                    .sort({
-                        createdAt: 'desc'
-                    })
-                    .populate('lecturer')
-                    .populate('unit')
-                    .populate('faculty')
-                    .exec(function (error, user) {
-                        if (error) {
-                            return next(error.message);
-                        }
-
-                        if (user == null) {
-                            return next("User not found.");
-                        }
-
-                        if (user.lecturer == null || user.lecturer.length == 0) {
-                            return next("There are some internal errors.");
-                        }
-
-                        var resLecturer = user.toObject();
-
-                        Lecturer.findOne({
-                            id: user.lecturer[0].id
-                        })
-                            .populate('fields')
-                            .exec(function (error, lecturer) {
-
-                                if (error) {
-                                    return next(error.message);
-                                }
-
-                                resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
-
-                                return next(null, resLecturer);
-                            });
-                    });
-            });
-        });
-    },
-
-    /**
-     * Get a populated lecturers by id
-     * @param officerNumber
-     * @param next
-     */
-    searchPopulatedLecturerByOfficerNumber: function (officerNumber, next) {
-        getModel('user').then(function (User) {
-            getModel('lecturer').then(function (Lecturer) {
-
-                User.findOne({
-                    officerNumber: {
-                        'contains': officerNumber
-                    },
-                    role: ['lecturer', 'moderator']
-                })
-                    .sort({
-                        createdAt: 'desc'
-                    })
-                    .populate('lecturer')
-                    .populate('unit')
-                    .populate('faculty')
-                    .exec(function (error, user) {
-                        if (error) {
-                            return next(error.message);
-                        }
-
-                        if (user == null) {
-                            return next("User not found.");
-                        }
-
-                        if (user.lecturer == null || user.lecturer.length == 0) {
-                            return next("There are some internal errors.");
-                        }
-
-                        var resLecturer = user.toObject();
-
-                        Lecturer.findOne({
-                            id: user.lecturer[0].id
-                        })
-                            .populate('fields')
-                            .exec(function (error, lecturer) {
-
-                                if (error) {
-                                    return next(error.message);
-                                }
-
-                                resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
-
-                                return next(null, resLecturer);
-                            });
-                    });
-            });
-        });
-    }
 };

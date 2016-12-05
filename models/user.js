@@ -10,7 +10,8 @@ var stringSimilarity = require('string-similarity');
 var async = require('async');
 var util = require('util');
 var _ = require('underscore');
-var treeHelper = require('../helpers/tree');
+var slug = require('vietnamese-slug');
+
 
 var login = function (officerNumber, password, next) {
 
@@ -32,12 +33,61 @@ var login = function (officerNumber, password, next) {
 
                 return next(null, result, user);
 
-
             })
         });
     });
 };
 
+var hashPassword = function (password, next) {
+    // hash password
+    bcrypt.genSalt(10, function (error, salt) {
+        if (error) {
+            console.log(error);
+            return next(error);
+        }
+
+        bcrypt.hash(password, salt, null, function (error, hash) {
+            if (error) {
+                console.log(error);
+                return next(error);
+            }
+
+            next(null, hash);
+        });
+    });
+};
+
+var beforeSave = function (values, next) {
+    var functionArray = [];
+
+    if (values.password) {
+        functionArray.push(function (callback) {
+            hashPassword(values.password, function (error, hash) {
+                if (error) {
+                    return callback(error);
+                }
+
+                values.password = hash;
+                return callback();
+            })
+        })
+    }
+
+    if (values.fullName) {
+        functionArray.push(function (callback) {
+            values.slugFullName = slug(values.fullName);
+            return callback();
+        })
+    }
+
+    async.parallel(functionArray, function (errors) {
+        if (errors && errors.length > 0) {
+            return next(errors[0]);
+        }
+
+        return next();
+    })
+};
 
 module.exports = {
     identity: 'user',
@@ -90,33 +140,19 @@ module.exports = {
             collection: 'student',
             via: 'user'
         }
-
     },
 
     beforeCreate: function (values, next) {
+        return beforeSave(values, next);
+    },
 
-        // hash password
-        bcrypt.genSalt(10, function (error, salt) {
-            if (error) {
-                console.log(error);
-                return next(error);
-            }
-
-            bcrypt.hash(values.password, salt, null, function (error, hash) {
-                if (error) {
-                    console.log(error);
-                    return next(error);
-                }
-
-                values.password = hash;
-                next();
-            });
-        });
+    beforeUpdate: function (values, next) {
+        return beforeSave(values, next);
     },
 
     /**
      * Login with admin account
-     * @param email
+     * @param officerNumber
      * @param password
      * @param next
      */

@@ -33,5 +33,26 @@ module.exports = {
         getModel('field').then(function (Field) {
             treeHelper.beforeCreateANode(Field, values, next);
         })
+    },
+
+    getAllFields: function (next) {
+
+        getModel('field').then(function (Field) {
+            Field.find().exec(function (error, fields) {
+                if (error) {
+                    return next(error);
+                }
+
+                var filteredFields = fields.filter(function (field) {
+                    if (field.left == 1) {
+                        return false
+                    } else {
+                        return true
+                    }
+                });
+
+                return next(error, filteredFields);
+            })
+        });
     }
 };

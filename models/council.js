@@ -6,6 +6,11 @@ module.exports = {
     autoPK: true,
     autoCreatedAt: true,
     attributes: {
+        name: {
+            type: 'string',
+            required: true,
+            unique: true
+        },
         members: {
             collection: 'lecturer',
             via: 'councils'
