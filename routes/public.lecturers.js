@@ -1,10 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var adminAuthCtrl = require('../controllers/authentication');
-var passport = require('passport');
 var hasAccess = require('../middlewares/auth').hasAccess;
-var expressValidator = require('express-validator');
-
+var LecturersCtrl = require('../controllers/public/users.lecturer');
 
 
 router.get('/',[
@@ -54,4 +51,11 @@ router.get('/topic_details/:userId/:status/:id',[
         });
     }
 ]);
+
+
+router.get('/api/get_lecturers', [
+    hasAccess('student'),
+    LecturersCtrl.getAllLecturersAPI
+]);
+
 module.exports = router;
