@@ -25,6 +25,8 @@ module.exports = function (passport) {
             User.findOne({id: id})
                 .populate('unit')
                 .populate('faculty')
+                .populate('student')
+                .populate('lecturer')
                 .exec(function (err, user) {
                     console.log(user);
                     done(err, user);

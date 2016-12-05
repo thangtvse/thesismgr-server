@@ -21,8 +21,17 @@ var async = require('async');
  * @param res
  */
 exports.getStudentListPage = function (req, res) {
+
+    var findOpts = {};
+
+    if (req.user.role != 'admin') {
+        findOpts = {
+            faculty: req.user.faculty.id
+        }
+    }
+
     getModel('student').then(function (Student) {
-        Student.count().exec(function (error, numOfStudents) {
+        Student.count(findOpts).exec(function (error, numOfStudents) {
             if (error) {
                 req.flash('errorMessage', error.message);
                 return res.redirect('/admin/users/students');
@@ -174,7 +183,7 @@ exports.createStudent = function (req, res) {
     req.checkBody('officer_number', 'Invalid officer number.').notEmpty().isOfficerNumberAvailable();
     req.checkBody('email', 'Invalid email').notEmpty().isEmail();
     req.checkBody('email', 'Email taken').isEmailAvailable();
-    req.checkBody('unit_id', 'Invalid unit ID').notEmpty().isUnitIDAvailable();
+    req.checkBody('faculty_id', 'Invalid unit ID').notEmpty().isFacultyIDAvailable();
     req.checkBody('course_id', 'Invalid course ID').notEmpty();
     req.checkBody('program_id', 'Invalid program ID').notEmpty();
     req.checkBody('full_name', 'Invalid full name').notEmpty();
@@ -186,14 +195,14 @@ exports.createStudent = function (req, res) {
             authHelper.checkUnitForProcess(req, res, req.body.unit_id, function (req, res) {
                 var officerNumber = req.body.officer_number;
                 var email = req.body.email;
-                var unitID = req.body.unit_id;
+                var facultyID = req.body.faculty_id;
                 var fullName = req.body.full_name;
                 var programID = req.body.program_id;
                 var courseID = req.body.course_id;
 
                 getModel('student').then(function (Student) {
                     var mailTransporter = nodemailer.createTransport(mailTransportConfig);
-                    Student.createOne(officerNumber, email, unitID, fullName, courseID, programID, 'uendno@gmail.com', mailTransporter, function (error, newStudent) {
+                    Student.createOne(officerNumber, email, facultyID, fullName, courseID, programID, 'uendno@gmail.com', mailTransporter, function (error, newStudent) {
 
                         if (error) {
                             req.flash('errorMessage', error.message);

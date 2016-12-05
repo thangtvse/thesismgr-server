@@ -114,37 +114,39 @@ exports.createSession = function (req, res) {
     req.sanitizeBody('from').toDate();
     req.sanitizeBody('to').toDate();
     req.checkBody('to', 'Invalid end date').gte(req.body.from);
-    req.checkBody('faculty_id', 'Invalid faculty ID').notEmpty();
+    req.checkBody('faculty_id', 'Invalid faculty ID').notEmpty().isFacultyIDAvailable();
 
-    var errors = req.validationErrors();
+    req.asyncValidationErrors()
+        .then(function () {
+            authHelper.checkFacultyForProcess(req, res, req.body.faculty_id, function () {
+                getModel('session').then(function (Session) {
+                    Session.create({
+                        name: req.body.name,
+                        from: req.body.from,
+                        to: req.body.to,
+                        faculty: req.body.faculty_id
+                    }).exec(function (error, session) {
+                        if (error) {
+                            req.flash('errorMessage', error.message);
+                            return res.redirect('/admin/theses/sessions');
+                        }
 
-    if (errors) {
-        req.flash('errorMessage', errors[0].msg);
-        return res.redirect('/admin/theses/sessions');
-    }
+                        if (!session) {
+                            req.flash('errorMessage', "Create session unsuccessfully.");
+                            return res.redirect('/admin/theses/sessions');
+                        }
 
-    authHelper.checkFacultyForProcess(req, res, req.body.faculty_id, function () {
-        getModel('session').then(function (Session) {
-            Session.create({
-                name: req.body.name,
-                from: req.body.from,
-                to: req.body.to,
-                faculty: req.body.faculty_id
-            }).exec(function (error, session) {
-                if (error) {
-                    req.flash('errorMessage', error.message);
-                    return res.redirect('/admin/theses/sessions');
-                }
-
-                if (!session) {
-                    req.flash('errorMessage', "Create session unsuccessfully.");
-                    return res.redirect('/admin/theses/sessions');
-                }
-
-                return res.redirect('/admin/theses/sessions');
+                        return res.redirect('/admin/theses/sessions');
+                    })
+                })
             })
         })
-    })
+        .catch(function (errors) {
+            req.flash('errorMessage', errors[0].msg);
+            return res.redirect('/admin/theses/sessions');
+        });
+
+
 };
 
 /**

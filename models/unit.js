@@ -92,10 +92,37 @@ module.exports = {
                     return next(error);
                 }
 
-               return Unit.getFacultyOfUnit(unit, next);
+                return Unit.getFacultyOfUnit(unit, next);
             })
         });
 
 
+    },
+
+    /**
+     * Get all units of a faculty
+     * @param facultyID
+     * @param next
+     */
+    getAllFaculty: function (next) {
+        getModel('unit').then(function (Unit) {
+            Unit.find({
+                type: 'faculty'
+            }).exec(function (error, units) {
+                if (error) {
+                    return next(error);
+                }
+
+                var filteredUnits = units.filter(function (unit) {
+                    if (unit.left == 1) {
+                        return false
+                    } else {
+                        return true
+                    }
+                });
+
+                return next(null, filteredUnits);
+            })
+        });
     }
 };
