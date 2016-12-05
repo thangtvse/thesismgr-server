@@ -39,3 +39,5 @@ jspm_packages
 
 # IDE
 .idea
+public/dist/css/sb-admin-2.css
+public/dist/css/sb-admin-2.min.css

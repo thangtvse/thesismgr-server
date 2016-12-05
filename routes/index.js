@@ -38,7 +38,6 @@ router.post('/login', passport.authenticate('admin-login', {
 }));
 
 
-router.use("/lecturer",require('./lecturer.demo'));
 router.use("/search",require('./search'));
 router.use('/admin', require('./admin.index.js'));
 router.use('/', require('./public.index'));
