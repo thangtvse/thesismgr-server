@@ -388,3 +388,67 @@ exports.createTree = function (nodes) {
 
     return htmlString;
 };
+
+exports.createTree2 = function (nodes) {
+
+    var htmlNodes = [];
+    for (var i = 0; i < nodes.length; i++) {
+
+        htmlNodes[i] = "";
+        if (i == 0) {
+            // first node
+            // htmlNodes[i] = htmlNodes[i].concat("<ul>");
+        } else {
+
+            for (var j = i - 1; j >= 0; j--) {
+
+                if (nodes[i].left > nodes[j].left && nodes[i].left < nodes[j].right) {
+                    // if current node is a child of this node
+
+                    var numOfChild = 0;
+
+                    nodes.forEach(function (node) {
+                        if (node.left > nodes[i].left && node.right < nodes[i].right) {
+                            numOfChild++;
+                        }
+                    });
+
+                    if (numOfChild > 0) {
+                        htmlNodes[i] = htmlNodes[i].concat(createNode2(nodes[i]));
+                    } else {
+                        htmlNodes[i] = htmlNodes[i].concat(createLeaf2(nodes[i]));
+                    }
+
+                    break;
+                } else {
+                    // if current node is not a child of this node, close the <ul> tag of this node
+                    if (htmlNodes[j].indexOf("</ul>") == -1) {
+                        htmlNodes[i] = htmlNodes[i].concat("</ul></li>");
+                    }
+                }
+            }
+        }
+    }
+
+    var htmlString = "";
+    htmlNodes.forEach(function (htmlNode) {
+        htmlString = htmlString.concat(htmlNode);
+    });
+
+
+    htmlString = sanitizeHtml(htmlString, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['input', 'label']),
+        allowedAttributes: false
+    });
+
+    htmlString = htmlString.replace(new RegExp("<ul></ul>", 'g'), "");
+
+    return htmlString;
+};
+
+var createNode2 = function (node) {
+    return "<li style='padding-left: 15px;'><a href=\"#\"><i class=\"fa arrow\"></i> "+ node.name +"<span class=\"fa arrow\"></span></a><ul class='nav'>";
+};
+var createLeaf2 = function (node) {
+    return "<li style='padding-left: 15px;'><a href='#'>" + node.name + "</a><ul>";
+};
