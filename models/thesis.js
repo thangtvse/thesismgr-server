@@ -358,6 +358,27 @@ module.exports = {
         })
     },
 
+    getAllStudentTheseForLecturer: function (page, user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        var statuses = thesisStatus.filter(function (status) {
+            if (status.responder.indexOf("lecturer") == -1 || status.responder.indexOf("secretary") == -1) {
+                return false;
+            } else {
+                return true
+            }
+        });
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: statuses,
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
     /**
      * Get number of requests for a student
      * @param page

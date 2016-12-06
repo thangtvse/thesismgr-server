@@ -54,8 +54,13 @@ router.get('/topic_details/:userId/:status/:id',[
 
 
 router.get('/api/get_lecturers', [
-    hasAccess('student'),
+    hasAccess('lecturer'),
     LecturersCtrl.getAllLecturersAPI
+]);
+
+router.get('/api/change_password', [
+    hasAccess('lecturer'),
+    LecturersCtrl.changePasswordAPI
 ]);
 
 module.exports = router;
