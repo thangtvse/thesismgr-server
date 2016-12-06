@@ -28,7 +28,7 @@ exports.getAllLecturersAPI = function (req, res) {
     }
 
     getModel('lecturer').then(function (Lecturer) {
-        Lecturer.getPopulatedLecturerList(req.query.page, {faculty: opts}, function (error, lecturers) {
+        Lecturer.getPopulatedLecturerList(req.query.page, opts, function (error, lecturers) {
             if (error) {
                 return res.send(createResponse(false, null, error.message));
             }
