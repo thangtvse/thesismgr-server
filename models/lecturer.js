@@ -23,6 +23,10 @@ module.exports = {
             via: 'lecturer'
         },
 
+        rank: {
+            type: 'string'
+        },
+
         fields: {
             collection: 'field'
         },
@@ -108,7 +112,7 @@ module.exports = {
         var userOpts = objectUtil.compactObject({
             email: opts.email,
             faculty: opts.faculty,
-            unit: opts.faculty,
+            unit: opts.unit,
             officerNumber: opts.officerNumber
         });
 
@@ -157,6 +161,7 @@ module.exports = {
                                 id: user.lecturer[0].id
                             })
                                 .populate('fields')
+                                .populate('studentTheses')
                                 .exec(function (error, lecturer) {
 
                                     if (error) {

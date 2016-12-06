@@ -5,6 +5,12 @@ $(function () {
 //Loads the correct sidebar on window load,
 //collapses the sidebar on window resize.
 // Sets the min-height of #page-wrapper to window size
+
+$('.nav-unit-item').click(function (e) {
+    window.location = $(this).attr('href');
+    e.stopPropagation();
+});
+
 $(function () {
     $(window).bind("load resize", function () {
         var topOffset = 50;
@@ -30,7 +36,7 @@ $(function () {
     //     return this.href == url;
     // }).addClass('active').parent().parent().addClass('in').parent();
     var element = $('ul.nav a').filter(function () {
-        return this.href == url;
+        return (this.href == url) || ($(this).attr("data-href") == url);
     }).addClass('active').parent();
 
     $(".navbar-default.sidebar").removeAttr("hidden");
@@ -43,6 +49,8 @@ $(function () {
         }
     }
 });
+
+
 
 function post(path, params, method) {
     method = method || "post"; // Set method to post by default if not specified.
