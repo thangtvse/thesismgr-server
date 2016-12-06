@@ -8,8 +8,7 @@
     "sampleUrl": "http://localhost:3000"
   },
   "scripts": {
-    "start": "node ./bin/www",
-    "install": "npm install"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
