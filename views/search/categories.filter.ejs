@@ -33,8 +33,6 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link href="/vendor/dynamic-table/jquery.dynatable.css" rel="stylesheet">
-    <script src="/vendor/dynamic-table/jquery.dynatable.js"></script>
 </head>
 <body>
 <div id="wrapper">
@@ -111,12 +109,73 @@
 
     <!-- Navigation -->
     <div id="page-wrapper">
+        <table class="table table-striped" id="table-lecturers">
+            <thead>
+            <tr class="table table-header">
+                <th>Officer Number</th>
+                <th>Full name</th>
+                <th>Email</th>
+                <th>Unit</th>
+                <th>Faculty</th>
+                <th>Fields</th>
+            </tr>
+            </thead>
+            <tbody class="table table-body">
 
+            </tbody>
     </div>
 </div>
 <!-- /#wrapper -->
 
 <%- include ./search.script.ejs%>
+<script>
+    var page=1;
+    var getData = function () {
 
+        var data = {
+            page: page
+        };
+
+        if ($("#current-role").text() == "moderator") {
+            data.faculty_id = $("#current-facultyID").text();
+        }
+
+        $.ajax({
+            url: "/lecturer/api/get_lecturers",
+            method: "GET",
+            data: data,
+            success: success,
+            error: errorHandler
+        });
+    };
+
+    function success (res) {
+        console.log(res);
+    }
+    var setDataToTable = function () {
+        $('.table.table-body').children().remove();
+
+        lecturers[page].forEach(function (lecturer) {
+            if (lecturer.lecturer != null) {
+                var fieldsHtml = "";
+
+                lecturer.lecturer.fields.forEach(function (field) {
+                    fieldsHtml.append("<span class='label label-primary'>" + field.name + "</span>");
+                });
+
+                $('#table-lecturers').append('<tr>' +
+                    '<td>' + lecturer.officerNumber + '</td>' +
+                    '<td>' + lecturer.fullName + '</td>' +
+                    '<td>' + lecturer.email + '</td>' +
+                    '<td>' + lecturer.unit.name + '</td>' +
+                    '<td>' + lecturer.faculty.name + '</td>' +
+                    '<td>' + fieldsHtml + '</td>' +
+                    '</tr>'
+                )
+            }
+        });
+    };
+
+</script>
 </body>
 </html>

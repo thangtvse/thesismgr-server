@@ -19,24 +19,18 @@ var numberOfPages=1;%>
         <!-- Navigation -->
         <div class="container-fluid">
             <table class="table table-hover table-striped" id="officer_table">
-                <tr>
-                    <th class="name">Tên sinh viên</th>
-                    <th class="id">MSV</th>
-                    <th class="topic">Tên đề tài</th>
-                    <th class="details">Lựa chọn</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th class="name">Tên sinh viên</th>
+                        <th class="id">MSV</th>
+                        <th class="topic">Tên đề tài</th>
+                        <th class="details">Lựa chọn</th>
+                    </tr>
+                </thead>
+                <tbody>
 
-                <% for (var i = 0; i < topic.length; i++) { %>
-                <tr class="topic-row" data-value="<%= i %>" scope="row">
-                    <td ><%= topic[i].name %> </td>
-                    <td ><a class="tdText name" href="#" data-type="text"
-                           data-placement="right"><%= topic[i].id %></a></td>
-                    <td ><a class="tdText" href="#" data-type="text"
-                           data-placement="right"><%= topic[i].topic %></a></td>
-                    <td ><a class="tdText" href="#" data-type="text"
-                           data-placement="right"><%= topic[i].quote %></a></td>
-                </tr>
-                <% } %>
+                </tbody>
+
             </table>
             <div style="text-align: center">
                 <nav aria-label="Page navigation">
@@ -76,6 +70,8 @@ var numberOfPages=1;%>
     $(document).ready( function () {
         $(".topic-row").click(rowClick);
     });
+
+    $.get('/')
 
 </script>
 </body>

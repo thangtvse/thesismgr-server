@@ -54,7 +54,7 @@ router.get('/topic_details/:userId/:status/:id',[
 
 
 router.get('/api/get_lecturers', [
-    hasAccess('student'),
+    // hasAccess('student'),
     LecturersCtrl.getAllLecturersAPI
 ]);
 
