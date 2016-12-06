@@ -363,14 +363,6 @@ module.exports = {
             return next(new Error("This user is not a lecturer."));
         }
 
-        var statuses = thesisStatus.filter(function (status) {
-            if (status.responder.indexOf("lecturer") == -1 || status.responder.indexOf("secretary") == -1) {
-                return false;
-            } else {
-                return true
-            }
-        });
-
         getModel('thesis').then(function (Thesis) {
             return Thesis.getPopulatedThesisList(page, {
                 status: statuses,

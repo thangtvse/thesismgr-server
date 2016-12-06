@@ -1,4 +1,4 @@
-var getModel = require('express-waterline');
+var getModel = require('express-waterline').getModels;
 var createResponse = require('../../helpers/response').createRes;
 
 
@@ -21,8 +21,11 @@ exports.getAllLecturersAPI = function (req, res) {
         unit: req.query.unit,
         officerNumber: req.query.officer_number,
         fullName: req.query.full_name,
-        fields: JSON.parse(req.query.fields)
     };
+
+    if (req.query.fields) {
+        opts.fields = JSON.parse(req.query.fields)
+    }
 
     getModel('lecturer').then(function (Lecturer) {
         Lecturer.getPopulatedLecturerList(req.query.page, {faculty: opts}, function (error, lecturers) {
