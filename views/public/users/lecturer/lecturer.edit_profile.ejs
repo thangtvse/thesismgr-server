@@ -1,22 +1,4 @@
-<html>
-<head>
-    <%- include('./lecturer.head.ejs', {title: "Lecturers"}) %>
-    <link href="\vendor\Semantic-UI-master\dist\semantic.min.css" rel="stylesheet">
-</head>
-<% var lecturer ={
-    "name":"Nguyễn Văn B",
-    "rank":"Tiến sĩ",
-    "unit":"Bộ môn công nghệ phần mềm",
-    "research":"Kiểm thử phần mềm",
-    "subjects":["Tin học cơ sở 1","Lập trình nâng cao","Kiểm thử phần mềm"],
-    "email":"abc@gmail.com",
-    "avatar":"/img/250x250.png"
-};%>
-<body >
-<div id="wrapper">
-    <% include ./lecturer.nav.ejs %>
-
-    <div class="container">
+<link href="\vendor\Semantic-UI-master\dist\semantic.min.css" rel="stylesheet">
         <form id="profile" method="post" >
             <section style="padding-bottom: 50px; padding-top: 50px;">
                 <div class="row">
@@ -131,22 +113,6 @@
             </section>
             <!-- SECTION END -->
         </form>
-    </div>
-    <!-- CONATINER END -->
-</div>
-<!-- REQUIRED SCRIPTS FILES -->
-<!-- CORE JQUERY FILE -->
-<script src="\vendor\jquery\jquery.min.js"></script>
-<!-- REQUIRED BOOTSTRAP SCRIPTS -->
-<script src="\vendor\bootstrap\js\bootstrap.min.js"></script>
 
-<script src="\vendor\Semantic-UI-master\dist\semantic.min.js"></script>
-<%-include ./lecturer.edit_profile.script.ejs %>
-<script src="\vendor\UI-Dropdown-master\dropdown.min.js"></script>
-<%-include lecturer.edit_profile.script.ejs %>
 
-<script src="\vendor\Semantic-UI-master\dist\semantic.min.js"></script>
-<%-include ./lecturer.edit_profile.script.ejs %>
-</body>
 
-</html>

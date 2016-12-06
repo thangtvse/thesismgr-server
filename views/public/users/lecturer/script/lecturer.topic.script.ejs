@@ -1,0 +1,14 @@
+<script src="/vendor/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+<script>
+    function rowClick() {
+        var index= $(this).attr('data-value');
+        var userId=1;
+        window.location.href="/lecturer/topic_details/"+userId+"/<%= status%>/"+index;
+    }
+    $(document).ready( function () {
+        $(".topic-row").click(rowClick);
+    });
+
+//    $.get('/')
+
+</script>

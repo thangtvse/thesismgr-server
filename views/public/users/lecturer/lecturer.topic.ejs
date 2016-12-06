@@ -1,22 +1,3 @@
-<!Doctype html>
-<html>
-<meta charset="utf-8"/>
-<link href="/vendor/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet">
-
-<%- include('./lecturer.head.ejs', {title: "Lecturers"}) %>
-<% var topic=[{
-    "name": "Nguyễn Văn A",
-    "topic": "Thao tác sinh học phân tử cấp độ 1",
-    "quote": "Tạo và lai giống các sinh vât nước ngọt đang có nguy cơ bị tuyệt chủng và nghiên cứu thông tin mã di truyên của ADN trong bộ nhiễm sắc thể tôm hùm ",
-    "id": "3333321"
-}];
-var numberOfPages=1;%>
-<body>
-<div id="wrapper">
-
-    <% include lecturer.nav.ejs %>
-    <div id="page-wrapper">
-        <!-- Navigation -->
         <div class="container-fluid">
             <table class="table table-hover table-striped" id="officer_table">
                 <thead>
@@ -28,7 +9,12 @@ var numberOfPages=1;%>
                     </tr>
                 </thead>
                 <tbody>
-
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                 </tbody>
 
             </table>
@@ -55,24 +41,6 @@ var numberOfPages=1;%>
                 </nav>
             </div>
         </div>
-    </div>
-</div>
 <!-- /#wrapper -->
 
-<%- include lecturer.script.ejs%>
-<script src="/vendor/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
-<script>
-    function rowClick() {
-        var index= $(this).attr('data-value');
-        var userId=1;
-        window.location.href="/lecturer/topic_details/"+userId+"/<%= status%>/"+index;
-    }
-    $(document).ready( function () {
-        $(".topic-row").click(rowClick);
-    });
 
-    $.get('/')
-
-</script>
-</body>
-</html>
