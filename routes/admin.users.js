@@ -4,7 +4,7 @@
  */
 var express = require('express');
 var router = express.Router();
-var User = require('../models/User');
+var User = require('../models/user');
 var moderatorsCtrl = require('../controllers/admin/users.moderators.js');
 var lecturersCtrl = require('../controllers/admin/users.lecturers.js');
 var studentsCtrl = require('../controllers/admin/users.students.js');
