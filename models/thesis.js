@@ -358,6 +358,19 @@ module.exports = {
         })
     },
 
+    getAllStudentTheseForLecturer: function (page, user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: statuses,
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
     /**
      * Get number of requests for a student
      * @param page

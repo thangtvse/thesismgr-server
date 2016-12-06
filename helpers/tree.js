@@ -389,7 +389,7 @@ exports.createTree = function (nodes) {
     return htmlString;
 };
 
-exports.createTree2 = function (nodes) {
+exports.createNavTree = function (type, nodes) {
 
     var htmlNodes = [];
     for (var i = 0; i < nodes.length; i++) {
@@ -397,7 +397,7 @@ exports.createTree2 = function (nodes) {
         htmlNodes[i] = "";
         if (i == 0) {
             // first node
-            // htmlNodes[i] = htmlNodes[i].concat("<ul>");
+
         } else {
 
             for (var j = i - 1; j >= 0; j--) {
@@ -414,9 +414,9 @@ exports.createTree2 = function (nodes) {
                     });
 
                     if (numOfChild > 0) {
-                        htmlNodes[i] = htmlNodes[i].concat(createNode2(nodes[i]));
+                        htmlNodes[i] = htmlNodes[i].concat(createNavNode(type, nodes[i]));
                     } else {
-                        htmlNodes[i] = htmlNodes[i].concat(createLeaf2(nodes[i]));
+                        htmlNodes[i] = htmlNodes[i].concat(createNavLeaf(type, nodes[i]));
                     }
 
                     break;
@@ -446,9 +446,9 @@ exports.createTree2 = function (nodes) {
     return htmlString;
 };
 
-var createNode2 = function (node) {
-    return "<li style='padding-left: 15px;'><a href=\"#\" data-id='"+node.id+"' onclick='getData();'><i class=\"fa arrow\"></i> "+ node.name +"<span class=\"fa \"></span></a><ul class='nav'>";
+var createNavNode = function (type, node) {
+    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.slugName + "\" data-id='" + node.id + "'><i class=\"fa arrow\"></i><div class='nav-" + type + "-item' data-href=\"/" + type + "s/" + node.slugName + "\" style='margin-right: 20px'>" + node.name + "</div><span class=\"fa \"></span></a><ul class='nav'>";
 };
-var createLeaf2 = function (node) {
-    return "<li style='padding-left: 15px;'><a href='#' data-id='"+node.id+"'><i class=\"fa minus\"></i>" + node.name + "</a><ul>";
+var createNavLeaf = function (type, node) {
+    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.slugName + "\" data-id='" + node.id + "'>" + node.name + "</a><ul>";
 };

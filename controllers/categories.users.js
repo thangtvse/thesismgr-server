@@ -32,33 +32,11 @@ exports.getView =function() {
                 return res.redirect("./index");
             }
 
-            return res.render("./search/categories.filter.ejs",data)
+            return res.render("./public/search/categories.filter.ejs",data)
 
         });
     };
 };
 
 
-var getTree = function (type, next) {
-    getModel(type).then(
-        function (Field) {
-            Field.find().exec(function (error, fields) {
-                if (error) {
-                    return next(error);
-                }
 
-                var sortedFields = treeHelper.sortNodeByLeft(fields);
-
-
-                var filteredFields = sortedFields.filter(function (field) {
-                    if (field.left == 1) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                });
-                return next(null, treeHelper.createTree2(sortedFields));
-            })
-        }
-    )
-};

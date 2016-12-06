@@ -1,5 +1,7 @@
 var getModel = require('express-waterline').getModels;
 var treeHelper = require('../helpers/tree');
+var slug = require('vietnamese-slug');
+
 module.exports = {
     identity: 'field',
     connection: 'default',
@@ -9,6 +11,11 @@ module.exports = {
         name: {
             type: 'string',
             required: true
+        },
+
+        slugName: {
+            type: 'string',
+            unique: true
         },
 
         parent: {
@@ -31,8 +38,21 @@ module.exports = {
 
     beforeCreate: function (values, next) {
         getModel('field').then(function (Field) {
-            treeHelper.beforeCreateANode(Field, values, next);
+            treeHelper.beforeCreateANode(Field, values, function (error) {
+                if (values.name) {
+                    values.slugName = slug(values.name);
+                }
+                next(error);
+            });
         })
+    },
+
+    beforeUpdate: function (values, next) {
+
+        if (values.name) {
+            values.slugName = slug(values.name);
+        }
+        next();
     },
 
     getAllFields: function (next) {

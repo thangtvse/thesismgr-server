@@ -2,6 +2,7 @@ var getModel = require('express-waterline').getModels;
 var beforeCreateANode = require('../helpers/tree').beforeCreateANode;
 var treeHelper = require('../helpers/tree');
 var util = require('util');
+var slug = require('vietnamese-slug');
 
 module.exports = {
     identity: 'unit',
@@ -12,6 +13,11 @@ module.exports = {
         name: {
             type: 'string',
             required: true
+        },
+
+        slugName: {
+            type: 'string',
+            unique: true
         },
 
         parent: {
@@ -39,8 +45,22 @@ module.exports = {
     },
     beforeCreate: function (values, next) {
         getModel('unit').then(function (Unit) {
-            beforeCreateANode(Unit, values, next);
+            beforeCreateANode(Unit, values, function (error) {
+                if (values.name) {
+                    values.slugName = slug(values.name);
+                }
+                next(error);
+            });
         })
+    },
+
+    beforeUpdate: function (values, next) {
+
+        if (values.name) {
+            values.slugName = slug(values.name);
+        }
+        next();
+
     },
 
     /**
@@ -72,7 +92,8 @@ module.exports = {
                 }
             });
         })
-    },
+    }
+    ,
 
 
     /**
@@ -97,7 +118,8 @@ module.exports = {
         });
 
 
-    },
+    }
+    ,
 
     /**
      * Get all units of a faculty
@@ -125,4 +147,5 @@ module.exports = {
             })
         });
     }
-};
+}
+;
