@@ -40,6 +40,6 @@ router.post('/login', passport.authenticate('admin-login', {
 router.use("/search",require('./search'));
 router.use('/admin', require('./admin.index.js'));
 router.use('/', require('./public.index'));
-
+router.use("/student",require('./student.index'));
 
 module.exports = router;
