@@ -248,14 +248,3 @@ exports.createUsingXLSX = function (req, res) {
     });
 };
 
-
-
-
-// getModel('thesis').then(function (Thesis) {
-//     Thesis.findOne({
-//         lecturer: 1234,
-//     }).exec(function (error, theses) {
-//
-//     })
-// });
-

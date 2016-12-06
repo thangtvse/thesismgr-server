@@ -17,7 +17,7 @@ exports.getAllLecturersAPI = function (req, res) {
 
     var opts = {
         faculty: req.query.faculty_id,
-        email : req.query.email,
+        email: req.query.email,
         unit: req.query.unit,
         officerNumber: req.query.officer_number,
         fullName: req.query.full_name,
@@ -38,7 +38,8 @@ exports.getAllLecturersAPI = function (req, res) {
     })
 };
 
-exports.changePasswordAPI= function (req, res) {
+
+exports.changePasswordAPI = function (req, res) {
     req.checkBody("old_password", "Invalid old password.").notEmpty();
     req.checkBody("new_password", "Invalid new password.").notEmpty();
 
@@ -59,3 +60,25 @@ exports.changePasswordAPI= function (req, res) {
     })
 
 };
+
+exports.getAllThesesAPI = function (req, res) {
+    req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+
+    getModel('thesis').then(function (Thesis) {
+        Thesis.getAllRequestForLecturer(req.query.page, req.user, function (error, theses) {
+            if (error) {
+                return res.send(createResponse(false, null, error.message));
+            }
+
+            return res.send(createResponse(true, theses, null));
+        })
+    })
+};
+
