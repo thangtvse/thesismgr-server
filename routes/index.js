@@ -42,7 +42,7 @@ router.get('/500', function (req, res) {
 
 
 router.use('/admin', require('./admin.index.js'));
-router.use("/student",require('./student.index'));
+router.use("/student",require('./public.student.js'));
 router.use('/', require('./public.index'));
 
 
