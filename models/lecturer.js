@@ -4,7 +4,7 @@ var paginationConfig = require('../config/pagination');
 var async = require('async');
 var _ = require('underscore');
 var objectUtil = require('../helpers/object');
-
+var slug = require('vietnamese-slug');
 
 module.exports = {
     identity: 'lecturer',
@@ -28,7 +28,13 @@ module.exports = {
         },
 
         fields: {
-            collection: 'field'
+            collection: 'field',
+            via: 'lecturers'
+        },
+
+        topics: {
+            collection: 'topic',
+            via: 'lecturer'
         },
 
         councils: {
@@ -118,7 +124,7 @@ module.exports = {
 
         if (opts.fullName) {
             userOpts.slugFullName = {
-                'contains': opts.fullName
+                'contains': slug(opts.fullName, ' ')
             }
         }
 
@@ -161,7 +167,7 @@ module.exports = {
                                 id: user.lecturer[0].id
                             })
                                 .populate('fields')
-                                .populate('studentTheses')
+                                .populate('topics')
                                 .exec(function (error, lecturer) {
 
                                     if (error) {
@@ -234,6 +240,7 @@ module.exports = {
                                 id: user.lecturer[0].id
                             })
                                 .populate('fields')
+                                .populate('topics')
                                 .exec(function (error, lecturer) {
 
                                     if (error) {
@@ -256,4 +263,91 @@ module.exports = {
             });
         });
     },
+
+    /**
+     * Get number of page when searching lecturer by name
+     * @param text
+     * @param next
+     */
+    getNumberOfPagesOnSearchingLecturerByName: function (text, next) {
+        getModel('user').then(function (User) {
+            User.count({
+                slugFullName: {
+                    'contains': slug(text, ' ')
+                },
+                role: ['moderator', 'lecturer']
+            }).exec(function (error, numberOfLecturers) {
+                if (error) {
+                    return next(error);
+                }
+
+                var numberOfPages;
+                if (numberOfLecturers % paginationConfig.numberOfUsersPerPage == 0) {
+                    numberOfPages = Math.floor(numberOfLecturers / paginationConfig.numberOfUsersPerPage);
+                } else {
+                    numberOfPages = Math.floor(numberOfLecturers / paginationConfig.numberOfUsersPerPage) + 1;
+                }
+
+                return next(null, numberOfPages)
+            })
+        })
+    },
+
+    updateProfile: function (officerNumber, opts, next) {
+        var userUpdateOpts = objectUtil.compactObject({
+            email: opts.email,
+            unit: opts.unit,
+            fullName: opts.fullName
+        });
+
+        var lecturerOpts = objectUtil.compactObject({
+            fields: opts.fields,
+            rank: opts.rank
+        });
+
+        getModel('user').then(function (User) {
+            User.update({
+                officerNumber: officerNumber,
+                role: ['lecturer', 'moderator']
+            }, userUpdateOpts, function (error, updated) {
+                if (error) {
+                    return next(error);
+                }
+
+                if (!updated) {
+                    return next(new Error('Lecturer not found.'));
+                }
+
+                User.findOne({
+                    officerNumber: officerNumber
+                }).populate('lecturer').exec(function (error, user) {
+
+                    if (error) {
+                        return next(error);
+                    }
+
+                    if (!user.lecturer || user.lecturer.length == 0) {
+                        return next(new Error('Lecturer not found.'));
+                    }
+
+                    getModel('lecturer').then(function (Lecturer) {
+                        Lecturer.update({
+                            id: user.lecturer[0].id
+                        },
+                        lecturerOpts).exec(function (error, updated) {
+                            if (error) {
+                                return next(error);
+                            }
+
+                            if (!updated) {
+                                return next(new Error('Lecturer not found.'));
+                            }
+
+                            return next();
+                        })
+                    })
+                })
+            })
+        })
+    }
 };

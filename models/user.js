@@ -13,7 +13,7 @@ var _ = require('underscore');
 var slug = require('vietnamese-slug');
 
 
-var login = function (officerNumber, password, next) {
+var loginFunction = function (officerNumber, password, next) {
 
     getModel('user').then(function (User) {
         User.findOne({officerNumber: officerNumber}, function (error, user) {
@@ -75,8 +75,24 @@ var beforeSave = function (values, next) {
 
     if (values.fullName) {
         functionArray.push(function (callback) {
-            values.slugFullName = slug(values.fullName);
+            values.slugFullName = slug(values.fullName, ' ');
             return callback();
+        })
+    }
+
+    if (values.unit) {
+        functionArray.push(function (callback) {
+            getModel('unit').then(function (Unit) {
+
+                Unit.getFacultyOfUnitID(values.unit, function (error, faculty) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    values.faculty = faculty.id;
+                    return callback();
+                });
+            })
         })
     }
 
@@ -156,12 +172,8 @@ module.exports = {
      * @param password
      * @param next
      */
-    adminLogin: function (officerNumber, password, next) {
-        login(officerNumber, password, function (error, result, user) {
-            if (user && user.role != 'admin' && user.role != 'moderator') {
-                return next(null, false);
-            }
-
+    login: function (officerNumber, password, next) {
+        loginFunction(officerNumber, password, function (error, result, user) {
             return next(error, result, user);
         })
     },
@@ -172,8 +184,6 @@ module.exports = {
      * @param role
      * @param specifiedFaculty
      * @param filePath
-     * @param mailTransporter
-     * @param senderEmail
      * @param afterCreateAnUser
      * @param next
      */
@@ -242,27 +252,19 @@ module.exports = {
                         var process = function () {
                             // save new user
 
-                            Unit.getFacultyOfUnit(unit, function (error, faculty) {
+                            User.create({
+                                officerNumber: values[2],
+                                email: email,
+                                password: password,
+                                unit: unit.id,
+                                fullName: values[3],
+                                role: role
+                            }).exec(function (error, newUser) {
                                 if (error) {
                                     return callback(error, email);
                                 }
 
-                                User.create({
-                                    officerNumber: values[2],
-                                    email: email,
-                                    password: password,
-                                    unit: unit,
-                                    faculty: faculty,
-                                    fullName: values[3],
-                                    role: role
-                                }).exec(function (error, newUser) {
-                                    if (error) {
-                                        return callback(error, email);
-                                    }
-
-                                    return afterCreateAnUser(values, newUser, password, callback);
-
-                                });
+                                return afterCreateAnUser(values, newUser, password, callback);
 
                             });
                         };
@@ -325,57 +327,38 @@ module.exports = {
      * Create one user
      * @param officerNumber
      * @param email
-     * @param password
      * @param unitID
      * @param fullName
      * @param role
-     * @param senderEmail
-     * @param mailTransporter
      * @param next
      */
     createOne: function (officerNumber, email, unitID, fullName, role, next) {
         getModel('user').then(function (User) {
 
-
             var password = randomstring.generate(10);
 
-            //get Faculty
-            getModel('unit').then(function (Unit) {
-
-                Unit.getFacultyOfUnitID(unitID, function (error, faculty) {
-
-
-                    if (error) {
-                        console.log(error);
-                        return next(error);
-                    }
-
-
-                    User.create({
-                        officerNumber: officerNumber,
-                        email: email,
-                        password: password,
-                        unit: unitID,
-                        faculty: faculty,
-                        fullName: fullName,
-                        role: role
-                    }).exec(function (error, newUser) {
-                        console.log(util.inspect(newUser));
-                        return next(error, newUser, password);
-                    });
-                })
+            User.create({
+                officerNumber: officerNumber,
+                email: email,
+                password: password,
+                unit: unitID,
+                fullName: fullName,
+                role: role
+            }).exec(function (error, newUser) {
+                console.log(util.inspect(newUser));
+                return next(error, newUser, password);
             });
         });
     },
 
     changePassword: function (officerNumber, oldPassword, newPassword, next) {
-        login(officerNumber, oldPassword, function (error, user) {
+        loginFunction(officerNumber, oldPassword, function (error, result) {
             if (error) {
-                return next(error, false, null);
+                return next(error, null);
             }
 
-            if (!user) {
-                return next(new Error("User not found."), false, null);
+            if (result == false) {
+                return next(new Error("Wrong password!"), null);
             }
 
             user.password = newPassword;
@@ -384,7 +367,7 @@ module.exports = {
                     return next(error, false, null);
                 }
 
-                return next(error, true, user);
+                return next(error, user);
             });
         })
     }

@@ -51,7 +51,6 @@ $(function () {
 });
 
 
-
 function post(path, params, method) {
     method = method || "post"; // Set method to post by default if not specified.
 
@@ -89,8 +88,17 @@ function errorHandler(xhr) {
 }
 
 function showError(message) {
-    $("#error-alert").alert();
-    $("#error-alert-message").html(message);
+
+    var html = "<div class='alert alert-danger alert-dismissable fade in' role='alert' id='error-alert'>" +
+        "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+        "<span aria-hidden='true'>&times;</span> " +
+        "</button> " +
+        "<strong>Error!</strong>" +
+        "<p id='error-alert-message' style='white-space:pre-wrap;'>" + message + "</p>" +
+        "</div>";
+
+
+    $(".alert-container").append(html);
 }
 
 function formatDate(dateString) {

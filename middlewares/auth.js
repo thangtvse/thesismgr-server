@@ -7,10 +7,19 @@ var roles = require('../config/roles');
 exports.hasAccess = function (accessLevel) {
     return function (req, res, next) {
 
+        var redirectUrl;
+
+        if (accessLevel == 'student' || accessLevel == 'lecturer' || accessLevel == 'public') {
+            redirectUrl = '/login';
+        } else {
+            redirectUrl = '/admin/login';
+        }
+
+
         if (req.isAuthenticated() && roles[accessLevel].indexOf(req.user.role) > -1) {
             return next();
         } else {
-            return res.redirect('/login');
+            return res.redirect(redirectUrl);
         }
 
     }

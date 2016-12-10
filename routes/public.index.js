@@ -1,30 +1,65 @@
 var express = require('express');
 var router = express.Router();
 var navMiddleware = require('../middlewares/nav');
-var BrowseAPICtrl  = require('../controllers/public/browse.api');
+var BrowseAPICtrl = require('../controllers/public/browse.api');
+var hasAccess = require('../middlewares/auth').hasAccess;
+var Passport = require('passport').Passport,
+    passport = new Passport();
+var session = require('express-session');
+var authCtrl = require('../controllers/authentication');
+
 /**
  * Middleware for getting units and fields tree
  */
+// ===========================================================
+// LOGIN =====================================================
+// ===========================================================
+router.use(session({
+    secret: 'thesismgr-public', // session secret
+    resave: false,
+    saveUninitialized: false
+}));
+router.use(passport.initialize());
+router.use(passport.session()); // persistent login sessions
+require('../config/passport')(passport);
+router.get('/login', authCtrl.getLogin);
+router.post('/login', passport.authenticate('login', {
+    successRedirect: '/home',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
 
-router.use(navMiddleware.getNavTree);
-
-router.get('/api/get_lecturers', [
-    // hasAccess('student'),
-    BrowseAPICtrl.getAllLecturersAPI
-]);
 
 router.get('/api/get_lecturers_in_unit', [
-    // hasAccess('student'),
+    hasAccess('public'),
     BrowseAPICtrl.getAllLecturersInAUintAPI
 ]);
+
+router.get('/api/get_lecturers_in_field', [
+    hasAccess('public'),
+    BrowseAPICtrl.getAllLecturersInAFieldAPI
+]);
+
+router.get('/api/search-lecturer', [
+    hasAccess('public'),
+    BrowseAPICtrl.searchLecturerByNameAPI
+]);
+
+router.get('/api/search-topic', [
+    hasAccess('public'),
+    BrowseAPICtrl.searchTopicByNameAPI
+]);
+
 
 router.use('/units', require('./public.browse.units'));
 router.use('/fields', require('./public.browse.fields'));
 router.use('/lecturers', require('./public.browse.lecturers'));
-router.use('/lecturer', require('./public.lecturer.js'));
-
-router.use('/', function (req, res) {
-    res.render('./public/index', {req: req});
-});
+router.use('/home', [
+    hasAccess('public'),
+    function (req, res) {
+        res.render('./public/index', {req: req});
+    }
+]);
+router.use('/profile', require('./public.profile'));
 
 module.exports = router;

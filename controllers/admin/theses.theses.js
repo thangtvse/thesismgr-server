@@ -35,7 +35,7 @@ exports.getView = function (req, res) {
         },
         function (callback) {
             getModel('unit').then(function (Unit) {
-                Unit.getAllFaculty(function (error, results) {
+                Unit.getAllFaculties(function (error, results) {
                     if (error) {
                         return callback(error);
                     }

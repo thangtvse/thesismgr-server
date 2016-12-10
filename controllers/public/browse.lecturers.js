@@ -14,11 +14,37 @@ exports.viewALecturer = function (req, res) {
                 return res.redirect('/404');
             }
 
-            return res.render('./public/browse/lecturer_details', {
-                req: req,
-                lecturer: lecturers[0],
-                message: req.flash("errorMessage")
+            getModel('topic').then(function (Topic) {
+                Topic.find({
+                    lecturer: lecturers[0].lecturer.id
+                })
+                    .sort({
+                        createdAt: 'desc'
+                    })
+                    .populate('fields')
+                    .exec(function (error, results) {
+                        if (error) {
+                            return res.redirect('/400');
+                        }
+
+                        return res.render('./public/browse/lecturer_details.ejs', {
+                            req: req,
+                            profile: lecturers[0],
+                            topics: results,
+                            message: req.flash("errorMessage")
+                        });
+                    })
             });
+
+
+
         })
+    })
+};
+
+exports.getView = function (req, res) {
+    return res.render('./public/browse/lecturers', {
+        req: req,
+        message: req.flash("errorMessage")
     })
 };

@@ -21,14 +21,14 @@ module.exports = {
             required: true
         },
 
-        topic: {
+        title: {
             type: 'string',
             required: true
         },
 
         fields: {
             collection: 'field',
-            via: 'lecturers'
+            via: 'theses'
         },
 
         description: {

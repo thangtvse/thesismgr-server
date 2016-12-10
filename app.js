@@ -28,6 +28,8 @@ db.initDB(function (error) {
     }
 });
 
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -45,8 +47,6 @@ app.use(require('node-sass-middleware')({
     sourceMap: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-// required for passport
 
 app.use(flash()); // use connect-flash for flash messages stored in session
 

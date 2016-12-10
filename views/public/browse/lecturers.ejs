@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <form class="top_search" id="search-form">
+                        <div class="input-group">
+                            <input id="search-box" type="text" class="form-control" placeholder="Search for...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default"><i class="fa fa-search" aria-hidden="true"></i></button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4 text-center">
+                    <form>
+                        <label class="radio-inline">
+                            <input id="name-radio" type="radio" name="search-type" value="lecturer-name" checked> Theo tên
+                            giảng viên<br>
+                        </label>
+                        <label class="radio-inline">
+                            <input id="topic-radio" type="radio" name="search-type" value="topic-name"> Theo chủ đề nghiên
+                            cứu<br>
+                        </label>
+                    </form>
+                </div>
+            </div>
+
+            <div id="list" class="row" style="margin-top: 36px">
+            </div>
+
+            <nav aria-label="Page navigation" style="text-align: center;">
+                <ul id="pagination" class="pagination"></ul>
+            </nav>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+<script type="text/javascript" src="/dist/js/public.browse.lecturers.min.js"></script>
+</body>
+</html>
+
+

@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<%- include('../partials/head.ejs', {title: "ThesisMgr"}) %>
+<%- include('../partials/public.head.ejs', {title: "ThesisMgr"}) %>
 
-<body>
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
 
-<div id="wrapper">
+        <%- include('../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
 
-    <%- include('../partials/public.navbar.ejs'), {
-    req: req
-    }
-    %>
+        <!-- page content -->
+        <div class="right_col" role="main">
 
-    <!-- Navigation -->
 
-    <div id="page-wrapper">
+            <ol class="breadcrumb">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Library</a></li>
+                <li></li>
+                <div class="dropdown" style="display: inline">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">HTML</a></li>
+                        <li><a href="#">CSS</a></li>
+                        <li><a href="#">JavaScript</a></li>
+                    </ul>
+                </div>
+            </ol>
 
-        <div class="container-fluid">
-            This is index haha
+
+
+
         </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../partials/public.footer.ejs') %>
+        <!-- /footer content -->
     </div>
-
-
 </div>
-<!-- /#wrapper -->
 
-<%- include ../partials/scripts.ejs %>
+<%- include('../partials/public.scripts.ejs') %>
 
 </body>
-
 </html>
 
 

@@ -1,7 +1,7 @@
 <!Doctype html>
 <html>
 <meta charset="utf-8"/>
-<%- include('../../partials/head.ejs', {title: "Lecturers"}) %>
+<%- include('../../partials/admin.head.ejs', {title: "Lecturers"}) %>
 
 
 <body>
@@ -26,18 +26,19 @@
                 <!-- /.col-lg-12 -->
             </div>
 
-            <div class="row">
+            <div class="row alert-container">
                 <!-- show any messages that come back with authentication -->
-                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert"
-                        <% if (!(message && message.length > 0)) { %>
-                     hidden
-                        <% } %>
-                >
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <strong>Error!</strong> <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
                 </div>
+                <% } %>
+
             </div>
 
 
@@ -164,7 +165,7 @@
 </div>
 <!-- /#wrapper -->
 
-<%- include ../../partials/scripts.ejs %>
+<%- include ../../partials/admin.scripts.ejs %>
 <script type="text/javascript" src="/dist/js/admin.users.lecturers.min.js"></script>
 </body>
 </html>

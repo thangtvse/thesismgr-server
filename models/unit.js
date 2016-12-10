@@ -20,6 +20,11 @@ module.exports = {
             unique: true
         },
 
+        urlName: {
+            type: 'string',
+            unique: true
+        },
+
         parent: {
             model: 'unit'
         },
@@ -47,7 +52,8 @@ module.exports = {
         getModel('unit').then(function (Unit) {
             beforeCreateANode(Unit, values, function (error) {
                 if (values.name) {
-                    values.slugName = slug(values.name);
+                    values.slugName = slug(values.name, ' ');
+                    values.urlName = slug(values.name, '-');
                 }
                 next(error);
             });
@@ -57,7 +63,8 @@ module.exports = {
     beforeUpdate: function (values, next) {
 
         if (values.name) {
-            values.slugName = slug(values.name);
+            values.slugName = slug(values.name, ' ');
+            values.urlName = slug(values.name, '-');
         }
         next();
 
@@ -126,7 +133,7 @@ module.exports = {
      * @param facultyID
      * @param next
      */
-    getAllFaculty: function (next) {
+    getAllFaculties: function (next) {
         getModel('unit').then(function (Unit) {
             Unit.find({
                 type: 'faculty'
@@ -146,6 +153,26 @@ module.exports = {
                 return next(null, filteredUnits);
             })
         });
+    },
+
+    getAllUnits: function (next) {
+        getModel('unit').then(function (Unit) {
+            Unit.find().exec(function (error, units) {
+                if (error) {
+                    return next(error);
+                }
+
+                var filteredUnits = units.filter(function (unit) {
+                    if (unit.left == 1) {
+                        return false
+                    } else {
+                        return true
+                    }
+                });
+
+                return next(null, filteredUnits);
+            })
+        })
     }
 }
 ;

@@ -1,9 +1,16 @@
 var express = require('express');
 var router = express.Router();
-var browseUnitsCtrl = require('../controllers/public/browse.units');
+var browseFieldsCtrl = require('../controllers/public/browse.fields');
+var hasAccess = require('../middlewares/auth').hasAccess;
 
 router.get("/:slug", [
-    browseUnitsCtrl.getView
+    hasAccess('public'),
+    browseFieldsCtrl.getFieldView
+]);
+
+router.get("/", [
+    hasAccess('public'),
+    browseFieldsCtrl.getView
 ]);
 
 module.exports = router;

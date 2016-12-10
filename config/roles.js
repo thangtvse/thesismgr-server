@@ -7,6 +7,6 @@ module.exports = {
     admin: ['admin'],
     moderator: ['admin', 'moderator'],
     public: ['lecturer', 'student'],
-    lecturer: ['lecturer'],
+    lecturer: ['lecturer', 'moderator'],
     student: ['student']
 };

@@ -18,6 +18,11 @@ module.exports = {
             unique: true
         },
 
+        urlName: {
+            type: 'string',
+            unique: true
+        },
+
         parent: {
             model: 'field'
         },
@@ -33,6 +38,16 @@ module.exports = {
         lecturers: {
             collection: 'lecturer',
             via: 'fields'
+        },
+
+        theses: {
+            collection: 'thesis',
+            via: 'fields'
+        },
+
+        topics: {
+            collection: 'topic',
+            via: 'fields'
         }
     },
 
@@ -40,7 +55,8 @@ module.exports = {
         getModel('field').then(function (Field) {
             treeHelper.beforeCreateANode(Field, values, function (error) {
                 if (values.name) {
-                    values.slugName = slug(values.name);
+                    values.slugName = slug(values.name, ' ');
+                    values.urlName = slug(values.name, '-');
                 }
                 next(error);
             });
@@ -50,7 +66,8 @@ module.exports = {
     beforeUpdate: function (values, next) {
 
         if (values.name) {
-            values.slugName = slug(values.name);
+            values.slugName = slug(values.name, ' ');
+            values.urlName = slug(values.name, '-');
         }
         next();
     },

@@ -3,9 +3,6 @@ var getModels = require('express-waterline').getModels;
 
 module.exports = function (passport) {
 
-
-
-
     // =========================================================================
     // passport session setup ==================================================
     // =========================================================================
@@ -36,7 +33,34 @@ module.exports = function (passport) {
 
 
     // =========================================================================
-    // ADMIN LOGIN =============================================================
+    // LOGIN =============================================================
+    // =========================================================================
+
+    passport.use('login', new LocalStrategy({
+            usernameField: 'officer_number',
+            passwordField: 'password',
+            passReqToCallback: true // allows us to pass back the entire request to the callback
+        },
+        function (req, officerNumber, password, done) {
+
+            getModels('user').then(function (User) {
+                User.login(officerNumber, password, function (err, result, user) {
+                    if (err) {
+                        return done(err, false, req.flash('loginMessage', 'Sorry. There are some errors.'));
+                    }
+
+                    if (result == false || ['student', 'lecturer', 'moderator'].indexOf(user.role) == -1) {
+                        return done(null, false, req.flash('loginMessage', 'Wrong officer number or password.'));
+                    }
+
+                    return done(null, user);
+                });
+            });
+        }));
+
+
+    // =========================================================================
+    // ADMIN LOGIN=============================================================
     // =========================================================================
 
     passport.use('admin-login', new LocalStrategy({
@@ -47,15 +71,13 @@ module.exports = function (passport) {
         },
         function (req, officerNumber, password, done) {
 
-            console.log(officerNumber + " " + password);
-
             getModels('user').then(function (User) {
-                User.adminLogin(officerNumber, password, function (err, result, user) {
+                User.login(officerNumber, password, function (err, result, user) {
                     if (err) {
                         return done(err, false, req.flash('loginMessage', 'Sorry. There are some errors.'));
                     }
 
-                    if (result == false) {
+                    if (result == false || ['admin', 'moderator'].indexOf(user.role) == -1) {
                         return done(null, false, req.flash('loginMessage', 'Wrong officer number or password.'));
                     }
 

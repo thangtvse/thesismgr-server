@@ -35,7 +35,7 @@ exports.getView = function (type) {
                 console.log(kHierarchy);
 
                 var data = {};
-                data[kHierarchy] = treeHelper.createTree(sortedFields);
+                data[kHierarchy] = treeHelper.createTreeWithEditAndDeleteButtons(sortedFields);
                 data[kCategories] = filteredFields;
                 data['message'] =  req.flash('errorMessage');
                 data.req = req;

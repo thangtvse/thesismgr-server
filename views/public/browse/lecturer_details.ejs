@@ -1,118 +1,135 @@
-<!Doctype html>
-<html>
-<meta charset="utf-8"/>
-<%- include('../../partials/head.ejs', {title: "Lecturers"}) %>
-<body>
-<div id="wrapper">
+<!DOCTYPE html>
+<html lang="en">
 
-    <% include ../../partials/public.navbar.ejs %>
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
 
-    <!-- Navigation -->
-    <div id="page-wrapper">
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
 
-        <div class="container-fluid">
-            <!-- show any messages that come back with authentication -->
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
 
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header"><%= lecturer.fullName %></h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
+        <!-- page content -->
+        <div class="right_col" role="main">
 
             <div class="row">
-                <!-- show any messages that come back with authentication -->
-                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert"
-                        <% if (!(message && message.length > 0)) { %>
-                     hidden
-                        <% } %>
-                >
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <strong>Error!</strong>
-                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Thông tin
-                        </div>
-                        <div class="panel-body">
-                            <div class="list-group">
-                                <div class="list-group-item">
-                                    Họ và tên
-                                    <span class="pull-right text-muted small"><em><%= lecturer.fullName %></em>
-                                    </span>
-                                </div>
-                                <div class="list-group-item">
-                                    Mã giảng viên
-                                    <span class="pull-right text-muted small"><em><%= lecturer.officerNumber %></em>
-                                    </span>
-                                </div>
-                                <div class="list-group-item">
-                                    Đơn vị
-                                    <span class="pull-right text-muted small"><em><%= lecturer.unit.name %></em>
-                                    </span>
-                                </div>
-                                <div class="list-group-item">
-                                    Khoa
-                                    <span class="pull-right text-muted small"><em><%= lecturer.faculty.name %></em>
-                                    </span>
-                                </div>
-                            </div>
-                            <p style="margin-left: 15px"><strong>Các lĩnh vực nghiên cứu:</strong></p>
-                            <% lecturer.lecturer.fields.forEach(function (field) { %>
-                            <h4><span class="label label-primary"><%= field.name %></span></h4>
-                            <% }) %>
-                        </div>
+                <div class="clearfix" style="margin: 20px"></div>
 
+                <div class="row alert-container">
+                    <!-- show any messages that come back with authentication -->
+
+                    <% if (message && message.length > 0) { %>
+                    <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Error!</strong>
+                        <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
                     </div>
+                    <% } %>
+
                 </div>
-                <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Đang hướng dẫn
+                <div class="col-md-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h4>Giảng viên: <%= profile.fullName %> </h4>
                         </div>
-                        <div class="panel-body">
-                            <div class="panel-group" id="accordion">
+                        <div class="x_content">
 
-                                <% lecturer.lecturer.studentTheses.forEach(function (thesis) {
+                            <div class="col-lg-4 col-md-6">
 
-                                if (thesis.status != 1 && thesis.status != 2){ %>
+                                <img src="http://www.lovemarks.com/wp-content/uploads/profile-avatars/default-avatar-plaid-shirt-guy.png"
+                                     class="img-thumbnail" alt="Cinque Terre">
+
+                                <div class="list-group" style="margin-top: 20px">
+                                    <div class="list-group-item">
+                                        Họ và tên
+                                        <span class="pull-right text-muted small"><em><%= profile.fullName %></em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Mã giảng viên
+                                        <span class="pull-right text-muted small"><em>123</em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Học hàm / Học vị
+                                        <span class="pull-right text-muted small"><em><%= profile.rank %></em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Đơn vị
+                                        <span class="pull-right text-muted small"><em><%= profile.unit.name %></em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Khoa
+                                        <span class="pull-right text-muted small"><em><%= profile.faculty.name %> </em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Email
+                                        <span class="pull-right text-muted small"><em> <%= profile.email %></em></span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-lg-8 col-md-6">
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
-                                               aria-expanded="false" class="collapsed"><%= thesis.name %></a>
-                                        </h4>
+                                        Các lĩnh vực nghiên cứu
                                     </div>
-                                    <div id="collapseOne" class="panel-collapse collapse" aria-expanded="false"
-                                         style="height: 0px;">
-                                        <div class="panel-body">
-                                            <%= thesis.description %>
+                                    <div class="panel-body">
+                                        <% profile.lecturer.fields.forEach(function (field) { %>
+                                        <h5><%= field.name %></h5>
+                                        <% }) %>
+                                    </div>
+
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Các chủ đề nghiên cứu
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="topics">
+                                            <% topics.forEach(function (topic) { %>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h5><%= topic.title %></h5>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <p><%= topic.description %></p>
+                                                </div>
+                                                <div class="panel-footer">
+                                                    <% topic.fields.forEach(function (field, index) { %>
+                                                    <% if (index != (topic.fields.length - 1)) { %>
+                                                    <%= field.name + ", " %>
+                                                    <% } else { %>
+                                                    <%= field.name %>
+                                                    <% }
+                                                    }) %>
+                                                </div>
+                                            </div>
+                                            <% }) %>
                                         </div>
                                     </div>
                                 </div>
-
-                                <% }
-                                }) %>
-
                             </div>
                         </div>
+
                     </div>
                 </div>
+
             </div>
         </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
     </div>
 </div>
-<!-- /#wrapper -->
 
-<%- include ../../partials/scripts.ejs %>
-<script type="text/javascript" src="/dist/js/public.browse.min.js"></script>
+<%- include('../../partials/public.scripts.ejs') %>
+
 </body>
 </html>
-

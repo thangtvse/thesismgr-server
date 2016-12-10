@@ -124,40 +124,6 @@ exports.searchLecturerByOfficerNumberAPI = function (req, res) {
     })
 };
 
-// /**
-//  * Get a lecturer info by id
-//  * @param req
-//  * @param res
-//  * @returns {*}
-//  */
-// exports.getLecturerByIdOfficerNumber = function (req, res) {
-//
-//     var errors = req.validationErrors();
-//
-//     if (errors) {
-//         return res.status(400).send(createResponse(false, null, errors[0].msg));
-//     }
-//
-//     getModel('lecturer').then(function (Lecturer) {
-//         Lecturer.getPopulatedLecturerById(req.params.id, function (error, lecturer) {
-//             if (error) {
-//                 return res.send(createResponse(false, null, error.message));
-//             }
-//
-//             return res.send(true, lecturer, null);
-//         })
-//     })
-// };
-
-// /**
-//  * Update lecturer info
-//  * @param req
-//  * @param res
-//  */
-// exports.updateLecturerInfoAPI = function (req, res) {
-//
-// };
-
 /**
  * Create a Lecturer
  */

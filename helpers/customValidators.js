@@ -4,7 +4,7 @@
  */
 
 var getModel = require('express-waterline').getModels;
-
+var async = require('async');
 
 module.exports = {
 
@@ -105,6 +105,41 @@ module.exports = {
                             reject(error);
                         }
                     })
+            })
+        })
+    },
+
+    isFieldArrayStringAvailable: function (string) {
+
+        return new Promise(function (resolve, reject) {
+            var fieldIDs;
+
+            try {
+                fieldIDs = JSON.parse(string);
+            } catch(error) {
+                return reject(error);
+            }
+
+            async.forEach(fieldIDs, function (id, callback) {
+                getModel('field').then(function (Field) {
+                    Field.findOne({_id: id})
+                        .then(function (field) {
+                            if (field) {
+                                return callback();
+                            } else {
+                                return callback(new Error ("Field not found."));
+                            }
+                        })
+                        .catch(function (error) {
+                            return callback(error);
+                        })
+                })
+            }, function (errors) {
+                if (errors && errors.length > 0) {
+                    return reject(errors[0]);
+                }
+
+                return resolve();
             })
         })
     },

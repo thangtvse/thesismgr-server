@@ -308,19 +308,23 @@ exports.afterDestroyANode = function (Model, left, right, next) {
     })
 };
 
-var createNode = function (node) {
+var createNodeWithEditAndDeleteButton = function (node) {
 
     if (node.type != null) {
         return "<li style='list-style-type: none'><div class=\"panel panel-default category-item type-" + node.type + "\"><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
     } else {
         return "<li style='list-style-type: none'><div class=\"panel panel-default category-item\"><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
     }
-
 };
 
-var createLeaf = function (node) {
-    return createNode(node);
-};
+var createNode = function (node) {
+    if (node.type != null) {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item type-" + node.type + "\"><div class=\"panel-body\">" + "<a href='/units/" + node.urlName + "'>" + node.name + "</a></div></div><ul>";
+    } else {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item\"><div class=\"panel-body\">" + "<a href='/units/" + node.urlName + "'>" + node.name + "</a></div></div><ul>";
+    }
+}
+
 
 var editButton = function (node) {
     return "<a style='position: absolute; right: 60px' href=\"#\" data-action=\"edit\" data-id=\"" + node.id + "\" class=\"category-item edit\">  Edit </a>"
@@ -330,8 +334,7 @@ var deleteButton = function (node) {
     return "<a style='position: absolute; right: 10px;' href=\"#\" data-action=\"delete\" data-id=\"" + node.id + "\" class=\"category-item delete\">Delete </a>"
 };
 
-exports.createTree = function (nodes) {
-
+var createTree = function (nodes, createModeHtml, createLeafHtml) {
     var htmlNodes = [];
 
     for (var i = 0; i < nodes.length; i++) {
@@ -357,9 +360,9 @@ exports.createTree = function (nodes) {
                     });
 
                     if (numOfChild > 0) {
-                        htmlNodes[i] = htmlNodes[i].concat(createNode(nodes[i]));
+                        htmlNodes[i] = htmlNodes[i].concat(createModeHtml(nodes[i]));
                     } else {
-                        htmlNodes[i] = htmlNodes[i].concat(createLeaf(nodes[i]));
+                        htmlNodes[i] = htmlNodes[i].concat(createLeafHtml(nodes[i]));
                     }
 
                     break;
@@ -387,6 +390,26 @@ exports.createTree = function (nodes) {
     htmlString = htmlString.replace(new RegExp("<ul></ul>", 'g'), "");
 
     return htmlString;
+}
+
+
+var createNavNode = function (type, node) {
+    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.urlName + "\" data-id='" + node.id + "'><i class=\"fa arrow\"></i><div class='nav-" + type + "-item' data-href=\"/" + type + "s/" + node.urlName + "\" style='margin-right: 20px'>" + node.name + "</div><span class=\"fa \"></span></a><ul class='nav'>";
+};
+var createNavLeaf = function (type, node) {
+    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.urlName + "\" data-id='" + node.id + "'>" + node.name + "</a><ul>";
+};
+
+var createNodeWithLectuersButton = function (node) {
+    return "<li style='list-style-type: none'><div class=\"panel panel-default category-item\"><div class=\"panel-body\">" + "<a href='/fields/" + node.urlName + "'>" + node.name + "</a><a class='pull-right' href='/fields/" + node.urlName + "'>Các giảng viên</a></div></div><ul>";
+};
+
+/**
+ * Create a tree with delete and edit buttons in each item for admin dashboard
+ * @param nodes
+ */
+exports.createTreeWithEditAndDeleteButtons = function (nodes) {
+    return createTree(nodes, createNodeWithEditAndDeleteButton, createNodeWithEditAndDeleteButton)
 };
 
 exports.createNavTree = function (type, nodes) {
@@ -446,9 +469,11 @@ exports.createNavTree = function (type, nodes) {
     return htmlString;
 };
 
-var createNavNode = function (type, node) {
-    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.slugName + "\" data-id='" + node.id + "'><i class=\"fa arrow\"></i><div class='nav-" + type + "-item' data-href=\"/" + type + "s/" + node.slugName + "\" style='margin-right: 20px'>" + node.name + "</div><span class=\"fa \"></span></a><ul class='nav'>";
+
+exports.createUnitTreeNoButton = function (nodes) {
+    return createTree(nodes, createNode, createNode);
 };
-var createNavLeaf = function (type, node) {
-    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.slugName + "\" data-id='" + node.id + "'>" + node.name + "</a><ul>";
+
+exports.createFieldTreeWithLecturersButton = function (nodes) {
+    return createTree(nodes, createNodeWithLectuersButton, createNodeWithLectuersButton)
 };
