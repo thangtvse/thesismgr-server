@@ -1,0 +1,41 @@
+<script src="\vendor\Semantic-UI-master\dist\semantic.min.js"></script>
+<script>
+    //regular Expression
+    var emailExp= /[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}/igm;
+    var birthExp=/^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/igm;
+
+    //init ouput error element
+    var emailErr =document.getElementById('emailErr');
+    var birthErr= document.getElementById('birthErr');
+    var formErr=document.getElementById("formErr");
+    emailErr.style.color ="red";
+    birthErr.style.color="red";
+    formErr.style.color="red";
+
+    //init check variable
+    var email_match=false;
+    var birth_match=false;
+
+    //email keyup event
+    function checkEmail(e) {
+        email_match=(e.value!=null) && emailExp.test(e.value);
+        if(!email_match) emailErr.innerHTML="Email không hợp lệ";
+        else emailErr.innerHTML="";
+    }
+    //birthday keyup event
+    function checkBirthday(e) {
+        birth_match=(e.value!=null) && birthExp.test(e.value);
+        if(birth_match) birthErr.innerHTML="";
+        else birthErr.innerHTML="Ngày sinh không hợp lệ";
+    }
+
+    //form submit event
+    var form = document.getElementById("profile")
+    function submits (e){
+        var check= email_match && birth_match;
+        if(check) formErr.innerHTML="OK";
+        else formErr.innerHTML="Vui lòng kiểm tra lại thông tin";
+    }
+
+    $('.ui.dropdown').dropdown();
+</script>

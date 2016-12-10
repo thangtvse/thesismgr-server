@@ -1,0 +1,10 @@
+<script>
+    function goback() {
+        parent.history.back();
+        return false;
+    }
+    $(document).ready( function () {
+        $(".backBtn").click(goback);
+    });
+
+</script>

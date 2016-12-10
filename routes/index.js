@@ -20,10 +20,13 @@ router.get('/500', function (req, res) {
 });
 
 router.use('/admin', require('./admin.index.js'));
+router.use("/student",require('./public.student.js'));
 router.use('/', require('./public.index'));
+
 
 router.get('*', function (req, res) {
     res.render('./partials/404')
 });
+
 
 module.exports = router;

@@ -1,0 +1,51 @@
+<script src="/vendor/Semantic-UI-master/dist/semantic.min.js"></script>
+<script src="/vendor/bootstrap-wysiwyg/external/jquery.hotkeys.js"></script>
+<script src="/vendor/bootstrap-wysiwyg/external/google-code-prettify/prettify.js"></script>
+<script src="/vendor/bootstrap-wysiwyg/bootstrap-wysiwyg.js"></script>
+<script type='text/javascript'>
+    $('#editor').wysiwyg({
+        fileUploadError: showErrorAlert
+    });
+
+    function showErrorAlert(reason, detail) {
+        var msg = '';
+        if (reason === 'unsupported-file-type') {
+            msg = "Unsupported format " + detail;
+        } else {
+            console.log("error uploading file", reason, detail);
+        }
+        $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+            '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
+    }
+
+    if ("onwebkitspeechchange" in document.createElement("input")) {
+        var editorOffset = $('#editor').offset();
+
+        $('.voiceBtn').css('position', 'absolute').offset({
+            top: editorOffset.top,
+            left: editorOffset.left + $('#editor').innerWidth() - 35
+        });
+    } else {
+        $('.voiceBtn').hide();
+    }
+
+    $(document).ready(function() {
+
+        function initToolbarBootstrapBindings() {
+            if ("onwebkitspeechchange" in document.createElement("input")) {
+                var editorOffset = $('#editor').offset();
+
+                $('.voiceBtn').css('position', 'absolute').offset({
+                    top: editorOffset.top,
+                    left: editorOffset.left + $('#editor').innerWidth() - 35
+                });
+            } else {
+                $('.voiceBtn').hide();
+            }
+        }
+
+
+        initToolbarBootstrapBindings();
+    });
+    $('.ui.dropdown').dropdown();
+</script>

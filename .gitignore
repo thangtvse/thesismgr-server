@@ -39,11 +39,4 @@ jspm_packages
 
 # IDE
 .idea
-<<<<<<< HEAD
-public/dist/css/sb-admin-2.css
-public/dist/css/sb-admin-2.min.css
-=======
-
-*.css
-*.min.js
->>>>>>> df4ccc99c15f0a3d4a3bdf0cbffd233d98d11ad6
+public/dist
