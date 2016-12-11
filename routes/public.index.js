@@ -7,6 +7,7 @@ var Passport = require('passport').Passport,
     passport = new Passport();
 var session = require('express-session');
 var authCtrl = require('../controllers/authentication');
+var jwtAuth = require('../middlewares/auth').jwtAuth;
 
 /**
  * Middleware for getting units and fields tree
@@ -15,7 +16,7 @@ var authCtrl = require('../controllers/authentication');
 // LOGIN =====================================================
 // ===========================================================
 router.use(session({
-    secret: 'thesismgr-public', // session secret
+    secret: require('../config/auth').passportPublicLoginSecret, // session secret
     resave: false,
     saveUninitialized: false
 }));
@@ -50,6 +51,15 @@ router.get('/api/search-topic', [
     BrowseAPICtrl.searchTopicByNameAPI
 ]);
 
+router.get('/change-password-first-time', [
+    jwtAuth,
+    authCtrl.getFirstTimeChangePasswordView
+]);
+
+router.post('/change-password-first-time', [
+    jwtAuth,
+    authCtrl.firstTimeChangePassword
+]);
 
 router.use('/units', require('./public.browse.units'));
 router.use('/fields', require('./public.browse.fields'));

@@ -61,6 +61,8 @@ $("input[name='search-type']").click(function () {
 
 var getData = function (text) {
 
+    NProgress.start();
+
     if (type == "lecturer-name") {
         $.ajax({
             method: 'GET',
@@ -70,7 +72,8 @@ var getData = function (text) {
                 page: page
             },
             success: function (response) {
-                console.log(response);
+
+                NProgress.done();
 
                 if (response.status == true) {
 
@@ -96,8 +99,7 @@ var getData = function (text) {
             },
             success: function (response) {
 
-                console.log("response:");
-                console.log(response);
+                NProgress.done();
 
                 if (response.status == true) {
 

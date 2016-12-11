@@ -39,6 +39,13 @@ $(document).ready(function () {
     $("#field-ids").val(fieldIDs);
     $('.selectpicker').selectpicker('refresh');
 
+
+    console.log($("#current-facultyID").text());
+
+    // set faculty and unit data
+    $("#faculty-id").val($("#current-faculty-id").text());
+    $("#unit-id").val($("#current-unit-id").text());
+
     // on form submit
     $("#info-form").submit(function (e) {
         e.preventDefault();
@@ -47,16 +54,21 @@ $(document).ready(function () {
         data = {
             full_name: $("#full-name").val(),
             rank: $("#rank").val(),
-            unit: $("#unit-id").val(),
+            unit_id: $("#unit-id").val(),
             fields: JSON.stringify($("#field-ids").val()),
             email: $("#email").val()
         };
+
+        NProgress.start();
 
         $.ajax({
             type: "POST",
             url: "/profile/api/update-profile",
             data: data,
             success: function (response) {
+
+                NProgress.done();
+
                 if (response.status == true) {
                     swal(
                         'Success!',
@@ -88,12 +100,17 @@ $(document).ready(function () {
             fields: JSON.stringify($("#topic-field-ids").val()),
         };
 
+        NProgress.start();
+
         $.ajax({
             type: "POST",
             url: "/profile/api/add-topic",
             data: data,
             success: function (response) {
+                NProgress.done();
+
                 if (response.status == true) {
+                    NProgress.done();
 
                     var fieldsHTML = "";
 

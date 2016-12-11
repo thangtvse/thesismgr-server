@@ -116,8 +116,11 @@ var setDataToTable = function () {
         if (lecturer.lecturer != null) {
             var fieldsHtml = "";
 
-            lecturer.lecturer.fields.forEach(function (field) {
-                fieldsHtml.append("<span class='label label-primary'>" + field.name + "</span>");
+            lecturer.lecturer.fields.forEach(function (field, index) {
+                fieldsHtml = fieldsHtml.concat(field.name);
+                if (index != (lecturer.lecturer.fields.length - 1)) {
+                    fieldsHtml = fieldsHtml.concat(', ');
+                }
             });
 
             $('#table-lecturers').append('<tr>' +

@@ -1,5 +1,3 @@
-var getModel = require('express-waterline').getModels;
-var treeHelper = require('../helpers/tree');
 var util = require('util');
 var async = require('async');
 

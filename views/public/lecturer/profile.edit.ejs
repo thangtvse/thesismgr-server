@@ -10,6 +10,8 @@
         <!-- /top navigation -->
 
         <span id="current-field-ids" hidden><%= JSON.stringify(profile.lecturer.fields) %></span>
+        <span id="current-faculty-id" hidden><%= profile.faculty.id %></span>
+        <span id="current-unit-id" hidden><%= profile.unit.id %></span>
 
         <!-- page content -->
         <div class="right_col" role="main">
@@ -52,7 +54,7 @@
                                     <div role="tabpanel" class="tab-pane fade active in" id="tab_content1"
                                          aria-labelledby="info-tab">
                                         <form class="form-horizontal form-label-left"
-                                              action="/profile/api/update-profile" method="POST" id="form">
+                                              action="/profile/api/update-profile" method="POST" id="info-form">
 
                                             <div class="form-group">
                                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Họ

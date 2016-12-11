@@ -4,8 +4,6 @@ function checkStrength(password) {
 
     //if the password length is less than 6, return message.
     if (password.length < 6) {
-        $('#result').removeClass()
-        $('#result').addClass('short')
         return 'Too short'
     }
 
@@ -30,18 +28,12 @@ function checkStrength(password) {
 
     //if value is less than 2
     if (strength < 2) {
-        $('#result').removeClass()
-        $('#result').addClass('weak')
         return 'Weak'
     }
     else if (strength == 2) {
-        $('#result').removeClass()
-        $('#result').addClass('good')
         return 'Good'
     }
     else {
-        $('#result').removeClass()
-        $('#result').addClass('strong')
         return 'Strong'
     }
 }
@@ -83,32 +75,8 @@ $(document).ready(function () {
     });
 
     $("#form").submit(function (e) {
-        e.preventDefault();
-        NProgress.start();
-        if (check && match) {
-            $.ajax({
-                url: "/profile/api/change-password",
-                type: "POST",
-                data: {
-                    old_password: $("#old-password").val(),
-                    new_password: $("#new-password").val()
-                },
-                success: function (response) {
-
-                    NProgress.done();
-
-                    if (response.status == true) {
-                        swal(
-                            'Success!',
-                            'Your password has been updated.',
-                            'success'
-                        )
-                    } else {
-                        showError(response.message)
-                    }
-                },
-                error: errorHandler
-            })
+        if (!(check && match)) {
+            e.preventDefault();
         }
     })
 });

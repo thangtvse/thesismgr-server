@@ -155,6 +155,11 @@ module.exports = {
         student: {
             collection: 'student',
             via: 'user'
+        },
+
+        activated: {
+            type : "boolean",
+            defaultsTo : false
         }
     },
 
@@ -352,7 +357,7 @@ module.exports = {
     },
 
     changePassword: function (officerNumber, oldPassword, newPassword, next) {
-        loginFunction(officerNumber, oldPassword, function (error, result) {
+        loginFunction(officerNumber, oldPassword, function (error, result, user) {
             if (error) {
                 return next(error, null);
             }
@@ -369,6 +374,28 @@ module.exports = {
 
                 return next(error, user);
             });
+        })
+    },
+
+    changePasswordFirstTime: function (officerNumber, newPassword, next) {
+        getModel('user').then(function (User) {
+            User.update({
+                officerNumber: officerNumber,
+                activated: false
+            }, {
+                activated: true,
+                password: newPassword
+            }).exec(function (error, users) {
+                if (error) {
+                    return next(error);
+                }
+
+                if (!users || users.length == 0) {
+                    return next(new Error("User not found."));
+                }
+
+                return next();
+            })
         })
     }
 };

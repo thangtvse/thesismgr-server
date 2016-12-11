@@ -1,17 +1,31 @@
+var jwt = require('jsonwebtoken');
+var hostConfig = require('../config/host');
+
 /**
  * Send invitation mail
  * @param email
  * @param password
+ * @param officerNumber
  * @param senderEmail
  * @param mailTransporter
  */
-exports.sendMail = function (email, password, senderEmail, mailTransporter) {
+exports.sendMail = function (email, password, officerNumber, senderEmail, mailTransporter) {
     // setup e-mail data with unicode symbols
+
+    var token = jwt.sign({
+        data: {
+            officerNumber: officerNumber,
+            password: password
+        }
+    }, require('../config/auth').jwtSecret, {
+        expiresIn: '7d'
+    });
+
     var mailOptions = {
         from: '"ThesisMgr System 👥" <' + senderEmail + '>', // sender address
         to: email, // list of receivers
         subject: 'Invitation Mail', // Subject line
-        text: 'email: ' + email + "\n" + "password: " + password // plaintext body
+        text: hostConfig.domain + ":" + hostConfig.port + "/change-password-first-time" + "?token=" + token // plaintext body
         //  html: '<b>Hello world 🐴</b>' // html body
     };
 

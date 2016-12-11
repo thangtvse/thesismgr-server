@@ -83,7 +83,7 @@ module.exports = {
                                         program: programID
                                     }).exec(function (error, student) {
                                         next(error, student);
-                                        return sendMail(email, originalPassword, senderEmail, mailTransporter);
+                                        return sendMail(email, originalPassword, officerNumber, senderEmail, mailTransporter);
                                     })
                                 })
                             })
@@ -167,7 +167,7 @@ module.exports = {
                                                     return callback(error);
                                                 }
 
-                                                sendMail(user.email, originalPassword, senderEmail, mailTransporter);
+                                                sendMail(user.email, originalPassword, user.officerNumber, senderEmail, mailTransporter);
                                                 return callback();
                                             })
                                         }

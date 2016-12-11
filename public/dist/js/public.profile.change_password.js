@@ -84,7 +84,7 @@ $(document).ready(function () {
 
     $("#form").submit(function (e) {
         e.preventDefault();
-
+        NProgress.start();
         if (check && match) {
             $.ajax({
                 url: "/profile/api/change-password",
@@ -95,7 +95,7 @@ $(document).ready(function () {
                 },
                 success: function (response) {
 
-                    console.log(response);
+                    NProgress.done();
 
                     if (response.status == true) {
                         swal(

@@ -10,9 +10,9 @@ var authCtrl = require('../controllers/authentication');
 // LOGIN =====================================================
 // ===========================================================
 router.use(session({
-    secret: 'thesismgr-admin', // session secret
+    secret: require('../config/auth').passportAdminLoginSecret, // session secret
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: false
 }));
 router.use(passport.initialize());
 router.use(passport.session()); // persistent login sessions

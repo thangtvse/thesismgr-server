@@ -3,6 +3,9 @@
  */
 
 var roles = require('../config/roles');
+var jwt = require('jsonwebtoken');
+var authConfig = require('../config/auth');
+var createResponse = require('../helpers/response').createRes;
 
 exports.hasAccess = function (accessLevel) {
     return function (req, res, next) {
@@ -25,34 +28,16 @@ exports.hasAccess = function (accessLevel) {
     }
 };
 
-exports.adminAuth = function (req, res, next) {
+exports.jwtAuth = function (req, res, next) {
 
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated() && req.user.role == 'admin')
-        return next();
+    var token = req.query.token || req.body.token;
 
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
-};
+    jwt.verify(token, authConfig.jwtSecret, function (error, decoded) {
+        if (error) {
+            return res.status(400).send(createResponse(false, null, error.message));
+        }
 
-exports.moderatorAuth = function (req, res, next) {
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated() && (req.user.role == 'moderator' || req.user.role == 'admin'))
-        return next();
-
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
-};
-
-exports.moderatorLevelAuth = function (req, res, next) {
-
-};
-
-
-exports.lecturerAuth = function (req, res, next) {
-
-};
-
-exports.studentAuth = function (req, res, next) {
-
+        req.decoded = decoded;
+        next();
+    })
 };

@@ -77,7 +77,7 @@ var setDataToTable = function () {
             var fieldsHtml = "";
 
             lecturer.lecturer.fields.forEach(function (field) {
-                fieldsHtml.append("<span class='label label-primary'>" + field.name + "</span>");
+                fieldsHtml = fieldsHtml.concat("<span class='label label-primary'>" + field.name + "</span>");
             });
 
             var rank = "";

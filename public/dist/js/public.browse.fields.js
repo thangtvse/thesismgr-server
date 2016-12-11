@@ -36,6 +36,9 @@ $(document).ready(function () {
 });
 
 var success = function (response) {
+
+    NProgress.done();
+
     if (response.status == true) {
 
         console.log(response);
@@ -59,6 +62,8 @@ var getData = function () {
         page: page,
         field_id: unitID
     };
+
+    NProgress.start();
 
     $.ajax({
         url: "/api/get_lecturers_in_field",
