@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="row">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3 style="margin-left: 10px">Khóa luận</h3>
+                    </div>
+                </div>
+                <div class="clearfix" style="margin: 20px"></div>
+
+                <div class="row">
+                    <!-- show any messages that come back with authentication -->
+                    <div class="row alert-container">
+                        <!-- show any messages that come back with authentication -->
+
+                        <% if (message && message.length > 0) { %>
+                        <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <strong>Error!</strong>
+                            <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                        </div>
+                        <% } %>
+
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <a href="/theses/new">
+                            <button type="button" class="btn btn-default">
+                                <i class="fa fa-plus"></i> Đăng kí khóa luận
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table class="table table-hover table-striped" id="officer_table">
+                            <thead>
+                            <tr>
+                                <th class="name">Tên đề tài</th>
+                                <th class="id">Người hướng dẫn</th>
+                                <th class="topic">Mã giảng viên</th>
+                                <th> Lĩnh vực liên quan</th>
+                                <th> Trạng thái</th>
+                                <th class="details">Lựa chọn</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+<script type="text/javascript" src="/dist/js/public.lecturer-theses.min.js"></script>
+
+</body>
+</html>

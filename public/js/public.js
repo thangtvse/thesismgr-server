@@ -23,7 +23,7 @@ function post(path, params, method) {
 }
 
 function errorHandler(xhr) {
-    NProgress.stop();
+    NProgress.done();
     console.log(xhr);
 
     var jsonResponse = xhr.responseJSON;

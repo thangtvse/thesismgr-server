@@ -131,7 +131,7 @@ module.exports = {
      * @param opts
      * @param next
      */
-    countPopulatedThesisList: function (page, opts, next) {
+    countPopulatedThesisList: function (opts, next) {
         var thesisOpts = objectUtil.compactObject({
             faculty: opts.faculty,
             id: opts.id,
@@ -214,7 +214,7 @@ module.exports = {
      * @param page
      * @param next
      */
-    countAllRequestForAdmin: function (page, next) {
+    countAllRequestForAdmin: function (next) {
         var statuses = thesisStatus.filter(function (status) {
             if (status.responder.indexOf("admin") == -1) {
                 return false;
@@ -258,7 +258,7 @@ module.exports = {
      * @param facultyID
      * @param next
      */
-    countAllRequestForModerator: function (page, facultyID, next) {
+    countAllRequestForModerator: function (facultyID, next) {
         var statuses = thesisStatus.filter(function (status) {
             if (status.responder.indexOf("moderator") == -1) {
                 return false;
@@ -308,7 +308,7 @@ module.exports = {
      * @param user
      * @param next
      */
-    countAllRequestForLecturer: function (page, user, next) {
+    countAllRequestForLecturer: function (user, next) {
         if (!user.lecturer || user.lecturer.length == 0) {
             return next(new Error("This user is not a lecturer."));
         }
@@ -358,10 +358,126 @@ module.exports = {
         })
     },
 
+    /**
+     * Get number of all student these of a lecturer
+     * @param user
+     * @param next
+     * @returns {*}
+     */
+    countAllStudentTheseForLecturer: function (user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.count({
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
+    /**
+     * Get all student these for a lecturer
+     * @param page
+     * @param user
+     * @param next
+     * @returns {*}
+     */
     getAllStudentTheseForLecturer: function (page, user, next) {
         if (!user.lecturer || user.lecturer.length == 0) {
             return next(new Error("This user is not a lecturer."));
         }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
+    /**
+     * Get number of denied these by a lecturer
+     * @param user
+     * @param next
+     * @returns {*}
+     */
+    countAllDeniedStudentTheseForLecturer: function (user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.count({
+                lecturer: user.lecturer[0].id,
+                status: 2
+            }, next);
+        })
+    },
+
+    /**
+     * GEt all denied these by a lecturer
+     * @param page
+     * @param user
+     * @param next
+     * @returns {*}
+     */
+    getAllDeniedStudentTheseForLecturer: function (page, user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: 2,
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
+    /**
+     * Get number of these that being guided by a lecturer
+     * @param user
+     * @param next
+     */
+    countAllGuidingTheseForLecturer: function (user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        var statuses = thesisStatus.filter(function (status) {
+            if ([1, 2, 7, 8, 19].indexOf(status.id) != -1) {
+                return false;
+            } else {
+                return true
+            }
+        });
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.count({
+                status: statuses,
+                lecturer: user.lecturer[0].id
+            }).exec(next);
+        })
+    },
+
+    /**
+     * Get all these taht being guided by a lecturer
+     * @param page
+     * @param user
+     * @param next
+     */
+    getAllGuidingTheseForLecturer: function (page, user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        var statuses = thesisStatus.filter(function (status) {
+            if ([1, 2, 7, 8, 19].indexOf(status.id) != -1) {
+                return false;
+            } else {
+                return true
+            }
+        });
 
         getModel('thesis').then(function (Thesis) {
             return Thesis.getPopulatedThesisList(page, {
@@ -372,31 +488,80 @@ module.exports = {
     },
 
     /**
-     * Get number of requests for a student
+     * Get all completed student these of a lecturer
      * @param page
      * @param user
      * @param next
      * @returns {*}
      */
-    countAllRequestForStudent: function (page, user, next) {
-        if (!user.student || user.student.length == 0) {
-            return next(new Error("This user is not a student."));
+    getAllCompletedStudentTheseForLecturer: function (page, user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
         }
 
-        var statuses = thesisStatus.filter(function (status) {
-            if (status.responder.indexOf("student") == -1) {
-                return false;
-            } else {
-                return true
-            }
-        });
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: 19,
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
+    /**
+     * Get number of all completed student these of a lecturer
+     * @param user
+     * @param next
+     * @returns {*}
+     */
+    countAllCompletedStudentTheseForLecturer: function (user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
 
         getModel('thesis').then(function (Thesis) {
-            return Thesis.count(page, {
-                status: statuses,
-                or: {
-                    lecturer: user.student[0].id
-                }
+            return Thesis.count({
+                status: 19,
+                lecturer: user.lecturer[0].id
+            }).exec(next);
+        })
+    },
+
+
+    /**
+     * Get all completed student these of a lecturer
+     * @param page
+     * @param user
+     * @param next
+     * @returns {*}
+     */
+    getAllStoppedStudentTheseForLecturer: function (page, user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getPopulatedThesisList(page, {
+                status: 8,
+                lecturer: user.lecturer[0].id
+            }, next);
+        })
+    },
+
+    /**
+     * Get number of all completed student these of a lecturer
+     * @param user
+     * @param next
+     * @returns {*}
+     */
+    countAllStoppedStudentTheseForLecturer: function (user, next) {
+        if (!user.lecturer || user.lecturer.length == 0) {
+            return next(new Error("This user is not a lecturer."));
+        }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.count({
+                status: 8,
+                lecturer: user.lecturer[0].id
             }).exec(next);
         })
     },
@@ -408,7 +573,7 @@ module.exports = {
      * @param next
      * @returns {*}
      */
-    getAllRequestForStudent: function (page, user, next) {
+    getAllRequestForStudent: function (user, next) {
 
 
         if (!user.student || user.student.length == 0) {
@@ -424,11 +589,21 @@ module.exports = {
         });
 
         getModel('thesis').then(function (Thesis) {
-            return Thesis.getPopulatedThesisList(page, {
+            return Thesis.getAllPopulatedThesisList({
                 status: statuses,
-                or: {
-                    lecturer: user.student[0].id
-                }
+                student: user.student[0].id
+            }, next);
+        })
+    },
+
+    getAllThesisForStudent: function (user, next) {
+        if (!user.student || user.student.length == 0) {
+            return next(new Error("This user is not a student."));
+        }
+
+        getModel('thesis').then(function (Thesis) {
+            return Thesis.getAllPopulatedThesisList({
+                student: user.student[0].id
             }, next);
         })
     },
@@ -478,11 +653,83 @@ module.exports = {
                     })
             })
         })
+    },
+
+    /**
+     * Get all accepted these in a faculty
+     * @param facultyID
+     * @param next
+     */
+    getAllAcceptedTheseInAFaculty: function (facultyID, next) {
+
+        getModel('user').then(function (User) {
+            getModel('thesis').then(function (Thesis) {
+                Thesis.find({
+                    status: 4,
+                    faculty: facultyID
+                })
+                    .populate('lecturer')
+                    .populate('student')
+                    .exec(function (error, theses) {
+                        if (error) {
+                            return next(error);
+                        }
+
+                        var resTheses = [];
+
+                        async.forEach(theses, function (thesis, forCallback) {
+                            var resThesis = thesis.toObject();
+
+                            async.paralell([
+                                function (callback) {
+                                    User.findOne({
+                                            id: thesis.lecturer.user
+                                        }
+                                    ).exec(function (error, user) {
+                                        if (error) {
+                                            return callback(error);
+                                        }
+
+                                        resThesis.lecturer.user = user.toString();
+                                    })
+                                },
+                                function (callback) {
+                                    User.findOne({
+                                        id: thesis.student.user
+                                    })
+                                        .populate('unit')
+                                        .exec(function (error, user) {
+                                            if (error) {
+                                                return callback(error);
+                                            }
+
+                                            resThesis.student.user = user.toString();
+
+                                        })
+                                }
+                            ], function (errors) {
+                                if (errors && errors.length) {
+                                    return forCallback(errors[0]);
+                                }
+
+                                resTheses.push(resThesis);
+                            })
+
+                        }, function (errors) {
+                            if (errors && errors.length) {
+                                return next(errors[0]);
+                            }
+                        })
+
+                    })
+            })
+        });
+
     }
 };
 
 
-var getPopulatedThesisListExecFunction = function(next) {
+var getPopulatedThesisListExecFunction = function (next) {
     return function (error, theses) {
         var resTheses = [];
 

@@ -71,5 +71,7 @@ router.use('/home', [
     }
 ]);
 router.use('/profile', require('./public.profile'));
+router.use('/theses', require('./public.theses'));
+
 
 module.exports = router;

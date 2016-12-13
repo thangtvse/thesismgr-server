@@ -80,6 +80,10 @@ var getData = function () {
 var setDataToTable = function () {
     $('.table.table-body').children().remove();
 
+    if (!theses[page]) {
+        return;
+    }
+
     theses[page].forEach(function (thesis) {
 
         $('#table-theses').append('<tr>' +

@@ -15,6 +15,11 @@ exports.getUnitView = function (req, res) {
                 return res.redirect('/units');
             }
 
+            if (!unit) {
+                req.flash('errorMessage', 'Unit not found.');
+                return res.redirect('/units');
+            }
+
             getModel('user').then(function (User) {
                 User.count({
                     role: ["lecturer", ["moderator"]],

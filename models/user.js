@@ -160,6 +160,10 @@ module.exports = {
         activated: {
             type : "boolean",
             defaultsTo : false
+        },
+
+        dateOfBirth: {
+            type: "date"
         }
     },
 
