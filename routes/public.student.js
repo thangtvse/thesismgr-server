@@ -13,4 +13,9 @@ router.get("/create",[
        res.render("./public/student/student.createthesis.ejs");
    }
 ]);
+router.get("/status",[
+    function (req,res) {
+       res.render("./public/student/student.status.ejs");
+    }
+]);
 module.exports = router;

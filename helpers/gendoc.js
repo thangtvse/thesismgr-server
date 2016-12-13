@@ -17,7 +17,6 @@ exports.genStudentAndTutorList = function (theses,timezone,next) {
          var doc=new Docxtemplater().loadZip(zip);
          // normalize data
          var students= [];
-         students.push( new Date);
          _.forEach(theses,function (thesis,index) {
              var tmp = {};
              tmp.tt=index+1;
@@ -30,7 +29,8 @@ exports.genStudentAndTutorList = function (theses,timezone,next) {
              students.push(tmp);
          });
 
-         doc.setData();
+         var data= {"student":students};
+         doc.setData(data);
          doc.render();
          var buf = doc.getZip()
              .generate({type:"nodebuffer"});
