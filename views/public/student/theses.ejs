@@ -63,6 +63,28 @@
                             </tr>
                             </thead>
                             <tbody>
+                            <% theses.forEach(function (thesis) { %>
+                            <tr>
+                                <td><%= thesis.title %></td>
+                                <td><%= thesis.lecturer.user.fullName %></td>
+                                <td><%= thesis.lecturer.user.officerNumber %></td>
+                                <td>
+                                    <% thesis.fields.forEach(function (field, index) { %>
+                                    <% if (index != (thesis.fields.length - 1)) { %>
+                                    <%= field.name + ", " %>
+                                    <% } else { %>
+                                    <%= field.name %>
+                                    <% }
+                                    }) %>
+                                </td>
+                                <td><%= thesis.status %></td>
+                                <td>
+                                    <button class="btn btn-default">Xem chi tiết</button>
+                                    <button class="btn btn-default">Xem chi tiết</button>
+                                    <button class="btn btn-default">Xem chi tiết</button>
+                                </td>
+                            </tr>¬
+                            <% }) %>
                             </tbody>
                         </table>
                     </div>
@@ -82,7 +104,6 @@
 </div>
 
 <%- include('../../partials/public.scripts.ejs') %>
-<script type="text/javascript" src="/dist/js/public.lecturer-theses.min.js"></script>
 
 </body>
 </html>

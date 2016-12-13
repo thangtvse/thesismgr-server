@@ -23,5 +23,9 @@ router.get('/new', [
     thesesCtrl.getNewThesisView
 ]);
 
+router.post('/api/new', [
+    hasAccess('student'),
+    thesesCtrl.newThesisAPI
+]);
 
 module.exports = router;

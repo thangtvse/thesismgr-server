@@ -51,6 +51,11 @@ router.get('/api/search-topic', [
     BrowseAPICtrl.searchTopicByNameAPI
 ]);
 
+router.get('/api/search-lecturer-fast', [
+    hasAccess('public'),
+    BrowseAPICtrl.searchLecturerByNameNoPaginationAPI
+]);
+
 router.get('/change-password-first-time', [
     jwtAuth,
     authCtrl.getFirstTimeChangePasswordView

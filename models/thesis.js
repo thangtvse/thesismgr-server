@@ -31,6 +31,11 @@ module.exports = {
             via: 'theses'
         },
 
+        faculty: {
+            model: 'unit',
+            required: true
+        },
+
         description: {
             type: 'text',
             required: true
@@ -169,6 +174,7 @@ module.exports = {
                 .populate('student')
                 .populate('lecturer')
                 .populate('session')
+                .populate('fields')
                 .populate('council')
                 .sort({
                     createdAt: 'desc'
@@ -202,6 +208,7 @@ module.exports = {
                 .populate('lecturer')
                 .populate('session')
                 .populate('council')
+                .populate('fields')
                 .sort({
                     createdAt: 'desc'
                 })
@@ -625,7 +632,7 @@ module.exports = {
                 Lecturer.findOne({
                     id: user.lecturer[0].id
                 })
-                    .populate('councils')
+                    .populate('council')
                     .exec(function (error, lecturer) {
                         if (error) {
                             return next(error);

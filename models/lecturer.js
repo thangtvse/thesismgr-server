@@ -349,5 +349,23 @@ module.exports = {
                 })
             })
         })
+    },
+
+    /**
+     * Search lecturer by name without pagination
+     * @param text
+     * @param next
+     */
+    searchLecturerByName: function (text, next) {
+        getModel('user').then(function (User) {
+            User.find({
+                role: ["moderator", "lecturer"],
+                slugFullName: {
+                    'contains': text
+                }
+            }).exec(function (error, lecturers) {
+                return next(error, lecturers)
+            })
+        })
     }
 };

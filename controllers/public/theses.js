@@ -29,10 +29,20 @@ exports.getView = function (req, res) {
             })
         });
     } else {
-        return res.render('./public/student/theses.ejs', {
-            req: req,
-            message: req.flash('errorMessage')
-        });
+        getModel('thesis').then(function (Thesis) {
+            Thesis.getAllThesisForStudent(req.user, function (error, theses) {
+                if (error) {
+                    req.flash('errorMessage', error.message);
+                    return res.redirect('/theses');
+                }
+
+                return res.render('./public/student/theses.ejs', {
+                    req: req,
+                    message: req.flash('errorMessage'),
+                    theses: theses
+                });
+            })
+        })
     }
 };
 
@@ -142,4 +152,60 @@ exports.getNewThesisView = function (req, res) {
             })
         })
     })
+};
+
+exports.newThesisAPI = function (req, res) {
+
+    if (req.body.fields == '') {
+        delete req.body.fields;
+    }
+
+    req.checkBody('title', 'Invalid status.').notEmpty();
+    req.checkBody('fields', 'Invalid fields.').optional().isFieldArrayStringAvailable();
+    req.checkBody('tutor_id', 'Invalid status.').notEmpty();
+    req.checkBody('description', 'Invalid description.').notEmpty();
+
+    req.asyncValidationErrors()
+        .then(function () {
+
+            getModel('user').then(function (User) {
+                User.findOne({
+                    officerNumber: req.body.tutor_id,
+                    role: ['moderator', 'lecturer']
+                })
+                    .populate('lecturer')
+                    .exec(function (error, user) {
+
+                        if (error) {
+                            return res.status(400).send(createResponse(false, null, error.message));
+                        }
+
+                        if (!user) {
+                            return res.status(400).send(createResponse(false, null, "Lecturer not found"))
+                        }
+
+                        getModel('thesis').then(function (Thesis) {
+                            Thesis.create({
+                                title: req.body.title,
+                                fields: JSON.parse(req.body.fields),
+                                student: req.user.student[0].id,
+                                lecturer: user.lecturer[0].id,
+                                faculty: req.user.faculty,
+                                description: req.body.description,
+                                status: 1
+                            }).exec(function (error) {
+                                if (error) {
+                                    return res.status(400).send(createResponse(false, null, error.message));
+                                }
+
+                                return res.send(createResponse(true, null, null));
+                            })
+                        })
+                    })
+            })
+
+        })
+        .catch(function (errors) {
+            return res.status(400).send(createResponse(false, null, errors[0].msg));
+        });
 };
