@@ -29,5 +29,26 @@ module.exports = {
             model: 'unit',
             required: true
         }
+    },
+
+    getAllAvailableSessions: function (next) {
+
+        var currentDate = new Date();
+
+        getModel('session').then(function (Session) {
+            Session.find({
+                from: {
+                    '<=': currentDate
+                },
+
+                to: {
+                    '>=': currentDate
+                }
+            })
+                .populate('faculty')
+                .exec(function (error, sessions) {
+                    return next(error, sessions);
+                })
+        })
     }
 };

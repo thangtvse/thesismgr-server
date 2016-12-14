@@ -326,58 +326,55 @@ module.exports = {
 
         getModel('user').then(function (User) {
             getModel('student').then(function (Student) {
-                User.findOne({
+                User.update({
                     officerNumber: officerNumber,
-                })
-                    .populate('student')
-                    .exec(function (error, user) {
+                    role: ['student']
+                }, userUpdateOpts)
+                    .exec(function (error, updated) {
                         if (error) {
                             return next(error);
                         }
 
-                        for (var key in userUpdateOpts) {
-                            user[key] = userUpdateOpts[key];
+                        if (!updated) {
+                            return next(new Error('Student not found.'));
                         }
 
-                        async.parallel([
-                            function (callback) {
-                                user.save(function (error) {
-                                    callback(error);
-                                })
-                            },
-                            function (callback) {
-                                if (user.student == null || user.student.length == 0) {
-                                    return callback(new Error("There are some internal errors."));
-                                }
+                        User.findOne({
+                            officerNumber: officerNumber,
+                            role: ['student']
+                        }).populate('student').exec(function (error, user) {
+                            if (error) {
+                                return next(error);
+                            }
 
-                                Student.findOne({
-                                    id: user.student[0].id
-                                })
-                                    .populate('program')
-                                    .populate('course')
-                                    .exec(function (error, student) {
+                            if (!user) {
+                                return next(new Error('User not found.'));
+                            }
 
+                            Student.update({
+                                id: user.student[0].id
+                            }, studentUpdateOpts)
+                                .exec(function (error) {
+
+                                    if (error) {
+                                        return next(error);
+                                    }
+
+                                    Student.getPopulatedStudentByOfficerNumber(officerNumber, function (error, student) {
                                         if (error) {
-                                            return callback(error.message);
+                                            return next(error);
                                         }
 
-                                        for (var key in studentUpdateOpts) {
-                                            student[key] = studentUpdateOpts[key];
+                                        if (!student) {
+                                            return next(new Error("Student not found"));
                                         }
 
-                                        student.save(function (error) {
-                                            return callback(error);
-                                        });
-                                    });
-                            }
-                        ], function (errors) {
-                            if (errors && errors.length > 0) {
-                                return next(errors[0]);
-                            }
+                                        return next(null, student);
+                                    })
 
-                            Student.getPopulatedStudentByOfficerNumber(officerNumber, next);
-                        });
-                    });
+                                });
+                        })
+                    })
             });
         })
     },

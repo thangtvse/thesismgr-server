@@ -54,6 +54,18 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <label for="research" class="control-label col-md-3 col-sm-3 col-xs-12">Kì đăng kí</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select id="session-id" class="selectpicker" data-live-search="true"
+                                            data-selected-text-format="count" required>
+
+                                        <% sessions.forEach(function (session) { %>
+                                        <option value="<%= session.id %>"><%= session.name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
 
                             <div class="form-group">
                                 <label for="research" class="control-label col-md-3 col-sm-3 col-xs-12">Lĩnh vực liên
@@ -69,13 +81,25 @@
                                 </div>
                             </div>
 
-                            <div class="form-group" id="tutor-form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="lecturer">Giảng viên hưỡng
-                                    dẫn</label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <select id="tutor-id" class="selectpicker" data-live-search="true"
-                                            data-selected-text-format="count" required>
-                                    </select>
+                            <div class="form-group">
+                                <label for="research" class="control-label col-md-3 col-sm-3 col-xs-12">Giảng viên hướng dẫn</label>
+                                <div class="dropdown col-md-6 col-sm-6 col-xs-12">
+                                    <button class="btn btn-default dropdown-toggle" type="button" id="lecturer-search-drop-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Not selected
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" style="margin-left: 8px; max-width: 400px" id="lecturer-dropdown">
+                                        <li id="search-box">
+                                            <div class="form-group input-group category-search" style="margin: 10px">
+                                                <input type="text" class="form-control" id="lecturer-search-input" autocomplete="off">
+                                                <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button"><i class="fa fa-search"></i>
+                                                </button>
+                                            </span>
+                                            </div>
+                                        </li>
+
+                                    </ul>
                                 </div>
                             </div>
                             <!-- text area-->

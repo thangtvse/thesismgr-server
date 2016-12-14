@@ -33,4 +33,9 @@ router.get('/:id', [
     thesesCtrl.getThesisDetailsView
 ]);
 
+router.get('/api/move-thesis-to-next-status', [
+    hasAccess('public'),
+    thesesCtrl.moveThesisToNextStatusAPI
+]);
+
 module.exports = router;

@@ -51,7 +51,7 @@ var success = function (response) {
             theses[page].push(thesis);
         });
 
-        setDataToTable((page - 1) * 10, response.data.length);
+        setDataToTable();
 
     } else {
         showError(response.message)
@@ -78,7 +78,7 @@ var getData = function () {
 };
 
 var setDataToTable = function () {
-    $('.table.table-body').children().remove();
+    $('#table-theses-body').children().remove();
 
     if (!theses[page]) {
         return;
@@ -86,13 +86,30 @@ var setDataToTable = function () {
 
     theses[page].forEach(function (thesis) {
 
-        $('#table-theses').append('<tr>' +
-            '<td>' + thesis.name + '</td>' +
-            '<td>' + formatDate(thesis.from) + '</td>' +
-            '<td>' + formatDate(thesis.to) + '</td>' +
+        var fieldsHtml = "";
+
+        thesis.fields.forEach(function (field, index) {
+            fieldsHtml = fieldsHtml.concat(field.name);
+            if (index != (thesis.fields.length - 1)) {
+                fieldsHtml = fieldsHtml.concat(', ');
+            }
+        });
+
+        var dateOfProtectionHtml = "Not set";
+        if (thesis.dateOfProtection) {
+            dateOfProtectionHtml = formatDate(thesis.dateOfProtection)
+        }
+
+        $('#table-theses-body').append('<tr>' +
+            '<td>' + thesis.title + '</td>' +
+            '<td>' + thesis.student.user.fullName + '</td>' +
+            '<td>' + thesis.lecturer.user.fullName + '</td>' +
             '<td>' + thesis.faculty.name + '</td>' +
-            '<td>' + '</td>' +
-            '<td><a href="#" onclick="notify(event, \'' + thesis.id + '\')">Send Notifications</a></td>' +
+            '<td>' + fieldsHtml + '</td>' +
+            '<td>' + dateOfProtectionHtml + '</td>' +
+            '<td>' + thesis.session.name + '</td>' +
+            '<td>' + thesis.status.content + '</td>' +
+            '<td><a href="/admin/theses/' + thesis.id + '"><button class="btn btn-default">View details</button></a></td>' +
             '</tr>'
         )
     });

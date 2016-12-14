@@ -1,5 +1,6 @@
 var xhr;
 var timer;
+var lecturerOfficerNumber;
 
 $(document).ready(function () {
 
@@ -18,55 +19,52 @@ $(document).ready(function () {
 
     initToolbarBootstrapBindings();
 
-    $('#tutor-id').on('loaded.bs.select', function (e) {
-        // do something...
-        $("#tutor-form-group > div > div > div > div > input").keyup(function (e) {
 
-            e.preventDefault();
-            e.stopPropagation();
+    $("#lecturer-search-input").keyup(function (e) {
 
-            var searchText = $(this).val();
-            $("#tutor-id").children().remove();
-            $("#tutor-id").append("<option></option>");
-            $('.selectpicker').selectpicker('refresh');
+        e.preventDefault();
+        e.stopPropagation();
 
-            if (timer) {
-                clearTimeout(timer)
+        lecturerOfficerNumber = null;
+        var name = $(this).val();
+
+        $("#lecturer-dropdown").children().not('#search-box').remove();
+
+        if (timer) {
+            clearTimeout(timer)
+        }
+
+        timer = setTimeout(function () {
+            if (xhr) {
+                xhr.abort();
             }
 
-            timer = setTimeout(function () {
-                if (xhr) {
-                    xhr.abort();
-                }
+            if (name && name != "") {
+                xhr = $.ajax({
+                    url: "/api/search-lecturer-fast",
+                    method: "GET",
+                    data: {
+                        full_name: name
+                    },
+                    success: function (response) {
 
-                if (searchText && searchText != "") {
-                    xhr = $.ajax({
-                        url: "/api/search-lecturer-fast",
-                        method: "GET",
-                        data: {
-                            full_name: searchText
-                        },
-                        success: function (response) {
+                        if (response.status == true) {
 
-                            if (response.status == true) {
+                            console.log(response);
 
-                                response.data.forEach(function (user) {
-                                    $("#tutor-id").append('<option value="' + user.officerNumber + '">' + user.fullName + ' - ' + user.officerNumber + '</option>')
-                                })
+                            response.data.forEach(function (user) {
+                                $("#lecturer-dropdown").append('<li style=\"display: list-item\"><a onclick=\"setLecturer(\'' + user.officerNumber + '\',\'' + user.fullName + '\')\" style=\"display: block\">' + user.fullName + ' - ' + user.officerNumber + '</a></li>')
+                            })
 
-                                $('.selectpicker').selectpicker('refresh');
+                        } else {
+                            showError(response.message);
+                        }
+                    },
+                    error: errorHandler
+                })
+            }
 
-                            } else {
-                                showError(response.message);
-                            }
-                        },
-                        error: errorHandler
-                    })
-                }
-
-            }, 500);
-
-        })
+        }, 500);
     });
 
     $('#new-thesis-form').submit(function (e) {
@@ -81,6 +79,12 @@ $(document).ready(function () {
             return;
         }
 
+        if (!lecturerOfficerNumber) {
+            showError("You must select a tutor");
+            window.scrollTo(0, 0);
+            return;
+        }
+
         NProgress.start();
 
         $.ajax({
@@ -88,8 +92,9 @@ $(document).ready(function () {
             url: '/theses/api/new',
             data: {
                 title: $('#title').val(),
+                session_id: $('#session-id').val(),
                 fields: JSON.stringify($("#field-ids").val()),
-                tutor_id: $('#tutor-id').val(),
+                tutor_id: lecturerOfficerNumber,
                 description: JSON.stringify($('#editor').html())
             },
             success: function (response) {
@@ -108,6 +113,11 @@ $(document).ready(function () {
     })
 
 });
+
+function setLecturer(officerNumber, name) {
+    $('#lecturer-search-drop-menu-button').text(name);
+    lecturerOfficerNumber = officerNumber
+}
 
 function initToolbarBootstrapBindings() {
     if ("onwebkitspeechchange" in document.createElement("input")) {
