@@ -10,7 +10,7 @@ var studentsCtrl = require('../controllers/admin/users.students.js');
 var hasAccess = require('../middlewares/auth').hasAccess;
 var multer = require('multer');
 var upload = multer({dest: 'temp/'});
-
+var publicBrowseAPICtrl = require('../controllers/public/browse.api');
 
 // MODERATORS =========================================
 router.get('/moderators', [
@@ -44,6 +44,11 @@ router.get('/api/lecturers', [
 router.get('/api/lecturers/search-by-officer-number', [
     hasAccess('moderator'),
     lecturersCtrl.searchLecturerByOfficerNumberAPI
+]);
+
+router.get('/api/lecturers/search-fast', [
+    hasAccess('moderator'),
+    publicBrowseAPICtrl.searchLecturerByNameNoPaginationAPI
 ]);
 
 router.post('/lecturers/create', [
