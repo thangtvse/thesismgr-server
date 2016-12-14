@@ -42,7 +42,8 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">Xuất đề nghị danh sách học viên và người hướng dẫn</div>
                             <div class="panel-body">
-                                <p>Xuất file word chứa danh sách các đề tài đã đăng kí, sinh viên và giảng viên hướng dẫn của khoa</p>
+                                <p>Xuất file word chứa danh sách các đề tài đã đăng kí, sinh viên và giảng viên hướng
+                                    dẫn của khoa</p>
                             </div>
                             <div class="panel-footer">
                                 <a href="/admin/tools/export-student-and-tutor-list">
@@ -50,6 +51,20 @@
                                 </a>
                             </div>
 
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Gửi mail thông báo nộp hồ sơ bảo vệ</div>
+                            <div class="panel-body">
+                                <p>Gửi mail cho các sinh viên có đề tài đã được trường duyệt và đang chờ nộp hồ sơ bảo
+                                    vệ</p>
+                            </div>
+                            <div class="panel-footer">
+                                <button class="btn btn-default" onclick="sendEmailForStudentNeedSubmitFiles()">Gửi
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -89,6 +104,6 @@
 <!-- /#wrapper -->
 
 <%- include ../../partials/admin.scripts.ejs %>
-<script type="text/javascript" src="/dist/js/admin.theses.sessions.min.js"></script>
+<script type="text/javascript" src="/dist/js/admin.tools.min.js"></script>
 </body>
 </html>

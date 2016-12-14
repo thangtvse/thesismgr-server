@@ -59,3 +59,22 @@ exports.sendMailForModerator = function (email, password, officerNumber, senderE
         console.log(util.inspect(info, false, 2, true));
     });
 };
+
+exports.sendMailForStudentsNeedSubmitFiles = function (email, thesisTitle, senderEmail, mailTransporter) {
+    var mailOptions = {
+        from: '"ThesisMgr System 👥" <' + senderEmail + '>', // sender address
+        to: email, // list of receivers
+        subject: 'Invitation Mail', // Subject line
+        html: '<p>Hệ thống thông báo:\n Sinh viên khẩn trương nộp đủ hồ sơ bảo vệ cho khóa luận: <b>' + thesisTitle + '</b> </p>' // html body
+    };
+
+    console.log("sending mail to " + email);
+    // send mail with defined transport object
+    mailTransporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            return console.log(util.inspect(error, false, 2, true));
+        }
+
+        console.log(util.inspect(info, false, 2, true));
+    });
+};

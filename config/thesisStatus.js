@@ -14,24 +14,24 @@ module.exports = [
     },
     {
         id: 3,
-        responder: ["moderator", 'moderator'],
+        responder: ["moderator", 'moderator', 'student'],
         content: "Chờ khoa duyệt",
-        next: [4, 7],
-        buttonTitles: ['Duyệt', 'Yêu cầu dừng']
+        next: [4, 7, 6],
+        buttonTitles: ['Duyệt', 'Yêu cầu dừng', 'Đề nghị sửa']
     },
     {
         id: 4,
-        responder: ["admin", 'moderator'],
+        responder: ["admin", 'moderator', 'student'],
         content: "Chờ nhà trường duyệt",
-        next: [5, 7],
-        buttonTitles: ['Duyệt', 'Yêu cầu dừng']
+        next: [5, 7, 6],
+        buttonTitles: ['Duyệt', 'Yêu cầu dừng', 'Đề nghị sửa']
     },
     {
         id: 5,
-        responder: ["moderator", "student", 'moderator'],
+        responder: ["moderator", "student", 'moderator', 'student'],
         content: "Chờ hồ sơ bảo vệ",
-        next: [9, 6, 7],
-        buttonTitles: ['Đã nộp', 'Yêu cầu thay đổi', 'Yêu cầu dừng']
+        next: [9, 6, 7, 6],
+        buttonTitles: ['Đã nộp', 'Yêu cầu thay đổi', 'Yêu cầu dừng', 'Đề nghị sửa']
     },
     {
         id: 6,

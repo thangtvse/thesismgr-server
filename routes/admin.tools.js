@@ -13,4 +13,9 @@ router.get('/export-student-and-tutor-list', [
     toolsCtrl.exportStudentAndTutorListAPI
 ]);
 
+router.get('/send-email-for-students-need-submit-files', [
+    hasRole('moderator'),
+    toolsCtrl.sendMailForStudentsNeedSubmitFilesAPI
+])
+
 module.exports = router;

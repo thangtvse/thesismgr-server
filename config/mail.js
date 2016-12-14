@@ -13,7 +13,5 @@ module.exports = {
             user: 'uendno@gmail.com',
             pass: 'headofdead'
         }
-    },
-
-    
+    }
 };
