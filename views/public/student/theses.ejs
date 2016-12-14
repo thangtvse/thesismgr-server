@@ -77,13 +77,15 @@
                                     <% }
                                     }) %>
                                 </td>
-                                <td><%= thesis.status %></td>
+                                <td><%= thesis.status.content %></td>
                                 <td>
-                                    <button class="btn btn-default">Xem chi tiết</button>
-                                    <button class="btn btn-default">Xem chi tiết</button>
-                                    <button class="btn btn-default">Xem chi tiết</button>
+                                    <a href="/theses/<%= thesis.id %>">
+                                        <button class="btn btn-default">Xem chi tiết</button>
+                                    </a>
+
                                 </td>
-                            </tr>¬
+                            </tr>
+                            ¬
                             <% }) %>
                             </tbody>
                         </table>

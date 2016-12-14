@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3 style="margin-left: 10px"><%= thesis.title %></h3>
+                </div>
+            </div>
+            <div class="clearfix" style="margin: 20px"></div>
+
+            <div class="row">
+                <!-- show any messages that come back with authentication -->
+                <div class="row alert-container">
+                    <!-- show any messages that come back with authentication -->
+
+                    <% if (message && message.length > 0) { %>
+                    <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Error!</strong>
+                        <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                    </div>
+                    <% } %>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Mô tả
+                                <small>Cập nhật lần cuối: <%= thesis.updatedAt %></small>
+                            </h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <%- thesis.description %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Thông tin</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="project_detail">
+                                <p class="title">Sinh viên</p>
+                                <p><a href="#"><%= thesis.student.user.fullName %></a></p>
+
+                                <p class="title">Giảng viên hướng dẫn</p>
+                                <p><a href="#"><%= thesis.lecturer.user.fullName %></a></p>
+
+                                <p class="title">Ngày tạo</p>
+                                <p><a href="#"><%= thesis.createdAt %></a></p>
+
+                                <p class="title">Lĩnh vực liên quan</p>
+                                <p>
+                                    <% thesis.fields.forEach(function (field, index) { %>
+                                    <% if (index != (thesis.fields.length - 1)) { %>
+                                    <%= field.name + ", " %>
+                                    <% } else { %>
+                                    <%= field.name %>
+                                    <% }
+                                    }) %>
+                                </p>
+
+                                <p class="title">Trạng thái</p>
+                                <p><%= thesis.status.content %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+<script type="text/javascript" src="/dist/js/public.browse.lecturers.min.js"></script>
+</body>
+</html>
+
+

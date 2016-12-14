@@ -28,4 +28,9 @@ router.post('/api/new', [
     thesesCtrl.newThesisAPI
 ]);
 
+router.get('/:id', [
+    hasAccess('public'),
+    thesesCtrl.getThesisDetailsView
+]);
+
 module.exports = router;

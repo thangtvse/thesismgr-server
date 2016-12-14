@@ -48,6 +48,9 @@ $(document).ready(function () {
 });
 
 var success = function (response) {
+
+    NProgress.done();
+
     if (response.status == true) {
 
         console.log(response);
@@ -58,7 +61,7 @@ var success = function (response) {
             theses[page].push(thesis);
         });
 
-        setDataToTable((page - 1) * 10, response.data.length);
+        setDataToTable();
 
     } else {
         showError(response.message)
@@ -100,6 +103,7 @@ var getData = function () {
         status: status
     };
 
+    NProgress.start();
 
     $.ajax({
         url: "/theses/api/all",
@@ -111,21 +115,32 @@ var getData = function () {
 };
 
 var setDataToTable = function () {
-    $('.table.table-body').children().remove();
+    $('#these-table-body').children().remove();
 
     if (!theses[page]) {
         return;
     }
 
+
     theses[page].forEach(function (thesis) {
 
-        $('#table-theses').append('<tr>' +
+        var fieldsHTML = "";
+
+        thesis.fields.forEach(function (field, index) {
+            fieldsHTML = fieldsHTML.concat(field.name);
+            if (index != (thesis.fields.length - 1)) {
+                fieldsHTML = fieldsHTML.concat(', ');
+            }
+        });
+
+
+        $('#these-table-body').append('<tr>' +
+            '<td>' + thesis.title +
             '<td>' + thesis.student.user.fullName + '</td>' +
             '<td>' + thesis.student.user.officerNumber + '</td>' +
-            '<td>' + thesis.title +
-            '<td>' + thesis.faculty.name + '</td>' +
-            '<td>' + thesis.status + '</td>' +
-            '<td><a href="#" onclick="notify(event, \'' + thesis.id + '\')">Send Notifications</a></td>' +
+            '<td>' + fieldsHTML + '</td>' +
+            '<td>' + thesis.status.content + '</td>' +
+            '<td><a href="/theses/' + thesis.id + '"><button class="btn btn-default">Xem chi tiết</button></a></td>' +
             '</tr>'
         )
     });
