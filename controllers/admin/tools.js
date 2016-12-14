@@ -8,9 +8,19 @@ var nodemailer = require('nodemailer');
 var _ = require('underscore');
 
 exports.getView = function (req, res) {
-    res.render('./admin/tools/tools.ejs', {
-        req: req,
-        message: req.flash('errorMessage')
+
+    getModel('session').then(function (Session) {
+        Session.getAllAvailableSessions(function (error, sessions) {
+            if (error) {
+                return res.redirect('/500');
+            }
+
+            res.render('./admin/tools/tools.ejs', {
+                req: req,
+                message: req.flash('errorMessage'),
+                sessions: sessions
+            })
+        })
     })
 };
 
@@ -69,6 +79,40 @@ exports.sendMailForStudentsNeedSubmitFilesAPI = function (req, res) {
     })
 };
 
-exports.exportsCanDefendThesisListAPI = function (req, res) {
+exports.exportProtectableStudentListAPI = function (req, res) {
 
+    req.checkQuery('session_id', 'Invalid session ID').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+    getModel('thesis').then(function (Thesis) {
+        Thesis.getAllPopulatedThesisList({
+            faculty: req.user.faculty.id,
+            session: req.params.session_id,
+            status: 9
+        }, function (error, theses) {
+            if (error) {
+                return res.status(400).send(createResponse(false, null, error.message));
+            }
+
+            docGenHelper.genStudentAndTutorList(theses, function (error, buffer) {
+                if (error) {
+                    return res.status(400).send(createResponse(false, null, error.message));
+                }
+
+                res.writeHead(200, {
+                    'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'Content-Length': buffer.byteLength
+                });
+                res.write(buffer);
+                res.end();
+
+            })
+
+        })
+    })
 };

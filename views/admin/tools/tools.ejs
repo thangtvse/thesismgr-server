@@ -73,9 +73,17 @@
                             <div class="panel-heading">Xuất danh sách học viên được bảo vệ</div>
                             <div class="panel-body">
                                 <p>Xuất file word chứa danh sách các học viên được bảo vệ của khoa</p>
+                                <labe>Kì bảo vệ</labe>
+                                <select id="session-id" class="form-control" >
+                                    <% sessions.forEach(function (session) { %>
+                                    <option value="<%= session.id %>"><%= session.name %></option>
+                                    <% }) %>
+                                </select>
                             </div>
+
+
                             <div class="panel-footer">
-                                <button class="btn btn-default">Xuất</button>
+                                <button class="btn btn-default" onclick="exportProtectableStudentList()">Xuất</button>
                             </div>
 
                         </div>
