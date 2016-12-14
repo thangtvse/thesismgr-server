@@ -127,6 +127,8 @@ exports.getNumberOfPagesAPI = function (req, res) {
                     return Thesis.countAllCompletedStudentTheseForLecturer(req.user, process);
                 case 'stopped':
                     return Thesis.countAllStoppedStudentTheseForLecturer(req.user, process);
+                case 'i-am-secretary':
+                    return Thesis.countAllReque
                 default:
                     return Thesis.countAllStudentTheseForLecturer(req.user, process);
             }
@@ -291,3 +293,20 @@ exports.moveThesisToNextStatusAPI = function (req, res) {
         })
     })
 };
+
+exports.thesesOfSecretary = function (req, res) {
+    getModel('thesis').then(function (Thesis) {
+        Thesis.getAllRequestForASecretary(req.user, function (error, theses) {
+            if (error) {
+                req.flash('errorMessage', error.message);
+                return res.redirect('/theses/secretary');
+            }
+
+            return res.render('./public/lecturer/theses-secretary.ejs', {
+                req: req,
+                message: req.flash('errorMessage'),
+                theses: theses
+            })
+        })
+    })
+}

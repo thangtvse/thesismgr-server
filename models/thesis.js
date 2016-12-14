@@ -181,7 +181,8 @@ module.exports = {
             status: opts.status,
             lecturer: opts.lecturer,
             student: opts.student,
-            session: opts.session
+            session: opts.session,
+            council: opts.council
         });
 
         getModel('thesis').then(function (Thesis) {
@@ -215,7 +216,8 @@ module.exports = {
             status: opts.status,
             lecturer: opts.lecturer,
             student: opts.student,
-            session: opts.session
+            session: opts.session,
+            council: opts.council
         });
 
         getModel('thesis').then(function (Thesis) {
@@ -649,35 +651,43 @@ module.exports = {
                 Lecturer.findOne({
                     id: user.lecturer[0].id
                 })
-                    .populate('council')
+                    .populate('councils')
                     .exec(function (error, lecturer) {
                         if (error) {
                             return next(error);
                         }
 
-                        var resThese = [];
+                        var resTheses = [];
                         getModel('council').then(function (Council) {
                             async.forEach(lecturer.councils, function (council, callback) {
 
                                 if (council.secretary != lecturer.id) {
-                                    callback();
+                                    return callback();
                                 }
 
                                 Thesis.getAllPopulatedThesisList({
                                     council: council.id
-                                }).exec(function (error, theses) {
+                                }, function (error, theses) {
                                     if (error) {
                                         return callback(error);
                                     }
 
-                                    resTheses.push.apply(resThese, theses);
-                                })
+                                    resTheses.push.apply(resTheses, theses);
+                                    return callback();
+                                });
+                            }, function (errors) {
+                                if (errors && errors.length >0) {
+                                    return next(errors[0]);
+                                }
+
+                                return next(null, resTheses);
                             })
                         })
                     })
             })
         })
     },
+
 
     /**
      * Get all accepted these in a faculty

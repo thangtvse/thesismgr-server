@@ -15,8 +15,9 @@ jQuery.fn.extend({
                         '<button class="btn btn-default" data-index="' + index + '" onclick="moveThesisToNextStep(\'' + thesisID + '\', \'' + status.id + '\', \'' + index + '\', \'' + redirectURL + '\', \'' + role + '\')">' + status.buttonTitles[index] + '</button>' +
                         '')
                 }
-
-
+            } else if (responder == 'secretary') {
+                o.append('' +
+                    '<button class="btn btn-default" data-index="' + index + '">' + status.buttonTitles[index] + '</button>')
             }
         })
 

@@ -8,6 +8,11 @@ router.get('/', [
     thesesCtrl.getView
 ]);
 
+router.get('/secretary', [
+    hasAccess('lecturer'),
+    thesesCtrl.thesesOfSecretary
+]);
+
 router.get('/api/all', [
     hasAccess('public'),
     thesesCtrl.getAllTheseAPI

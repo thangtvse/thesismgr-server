@@ -79,7 +79,7 @@ module.exports = [
         responder: ["secretary", 'moderator'],
         content: "Chờ biên bản bảo vệ",
         next: [13, 7],
-        buttonTitles: ['Xong', 'Yêu cầu dừng']
+        buttonTitles: ['Xuất biên bản bảo vệ', 'Yêu cầu dừng']
     },
     {
         id: 13,

@@ -100,6 +100,51 @@
                 </div>
             </div>
         </div>
+
+        <div id="make-result-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Create Session</h4>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <p class="help-block">Nhập kết quả và ý kiến đánh giá</p>
+                        <form id="assign-council-form" action="/admin/theses/assign-council" method="post">
+                            <div class="form-group">
+                                <label>Điểm</label>
+                                <input name="result" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Ý kiến phản biện</label>
+                                <textarea name="reviews" class="form-control" rows="5"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Ý kiến đánh giá</label>
+                                <textarea name="reviews" class="form-control" rows="5"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Ý kiến thành viên hội đồng</label>
+                                <textarea name="reviews" class="form-control" rows="5"></textarea>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <!-- /page content -->
 
         <!-- footer content -->
@@ -127,6 +172,15 @@
     console.log(status);
 
     $('#thesis-processes').buildThesisProcesses(thesisID, JSON.parse(status), role);
+
+    if (JSON.parse(status).id == 12 && role == 'lecturer') {
+        $('button[data-index=0]').click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            $('#make-result-modal').modal('toggle');
+        })
+    }
 </script>
 </body>
 </html>
