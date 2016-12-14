@@ -12,12 +12,13 @@
 ################################################################# */
 
 /* Import fonts */
-/*@import url(http://fonts.googleapis.com/css?family=Raleway:900,700,400);*/
+@import url('https://fonts.googleapis.com/css?family=Lobster');
+
 
 * { 
 	margin: 0;
 	padding: 0px;
-    /*font-family: 'Raleway', sans-serif;*/
+    font-family: 'Arial', sans-serif;
 } 
 body { 
 	background: #fff; 
@@ -26,7 +27,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    /*font-family: 'Raleway', sans-serif;*/
+    font-family: 'Lobster', cursive;
 	font-weight: 700;
 }
 
@@ -34,7 +35,7 @@ h1, h2, h3, h4, h5, h6 {
 p { 
 	padding: 0; 
 	margin-bottom: 12px; 
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Arial', sans-serif;
 	font-weight: 300;
 	font-size: 18px; 
 	line-height: 28px;

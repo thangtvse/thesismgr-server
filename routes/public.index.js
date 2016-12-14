@@ -77,6 +77,7 @@ router.post('/change-password-first-time', [
 router.use('/units', require('./public.browse.units'));
 router.use('/fields', require('./public.browse.fields'));
 router.use('/lecturers', require('./public.browse.lecturers'));
+
 router.use('/home', [
     hasAccess('public'),
     function (req, res) {
