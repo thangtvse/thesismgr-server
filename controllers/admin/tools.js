@@ -163,6 +163,19 @@ exports.exportThesisAndCouncilListAPI = function (req, res) {
                     return res.status(400).send(createResponse(false, null, errors[0].message));
                 }
 
+                docGenHelper.genThesisAndCouncilList(theses,councils,function (error,buffer) {
+                    if (error) {
+                        return res.status(400).send(createResponse(false, null, error.message));
+                    }
+
+                    res.writeHead(200, {
+                        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'Content-Length': buffer.byteLength
+                    });
+                    res.write(buffer);
+                    res.end();
+
+                });
 
             });
         })

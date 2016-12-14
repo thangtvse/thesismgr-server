@@ -9,6 +9,7 @@ var getModel = require('express-waterline').getModels;
 var root = require('../setting').root;
 const genStudentAndTutorListPath = root + "/templates/genStudentAndTutor.docx";
 const genCanDefendThesisListPath= root + "/templates/genCanDefendThesis.docx";
+const genThesisAndCouncilList= root + "/templates/genThesisAndCouncil.docx";
 const genStopThesisListPath = root +"/templates/genStopThesis.docx";
 const tmp = root + "/tmp";
 
@@ -59,8 +60,6 @@ exports.genCanDefendThesisList = function (theses,next) {
                 var doc = new Docxtemplater().loadZip(zip);
                 // normalize data
                 var studentList = [];
-                var unitList=[];
-                var counts=[];
                 _.forEach(theses,function (thesis,index) {
                     var tmp={};
                     tmp.tt=index+1;
@@ -116,6 +115,39 @@ exports.genStopThesisList = function (theses, next) {
             return createDoc(data,genStopThesisListPath,next);
         })
     });
+};
+
+exports.genThesisAndCouncilList= function (theses,councils,next) {
+    var thesisList = [];
+    _.forEach(theses,function (thesis,index) {
+        var tmp={};
+        tmp.tt=index+1;
+        tmp.name = thesis.student.user.fullName;
+        tmp.id = thesis.student.user.officerNumber;
+        tmp.thesis = thesis.title;
+        tmp.tutor = thesis.lecturer.user.fullName;
+        tmp.mhd= thesis.council.name;
+        thesisList.push(tmp);
+    });
+    console.log("fshaffialdaioddoai"+thesisList.length);
+    var councilList =[];
+    _.forEach(councils,function(council,index){
+        var tmp={};
+        tmp.tt=index+1;
+        tmp.mhd=council.name;
+        tmp.chairman= council.chairman.user.fullName;
+        tmp.secretary=council.secretary.user.fullName;
+        tmp.reviewer=council.reviewer.user.fullName;
+        councilList.push(tmp);
+    });
+    console.log("sfuhauadaddi"+councilList.length);
+    var data={
+        'thesis':thesisList,
+        'hd':councilList
+    };
+
+
+    return createDoc(data,genThesisAndCouncilList,next);
 };
 
 function createDoc (data,templatePath,next) {
