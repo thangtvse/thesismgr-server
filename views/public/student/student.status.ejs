@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<% var student={
+    "name":"Nguyễn Văn B"
+};%>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <%- include ./student.nav.ejs%>
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="panel panel-primary" style="margin-top:100px">
+                <div class="panel-heading"><h4>Trạng thái đề tài</h4></div>
+                <div class="panel-body" >
+                    <p><strong>Đề tài:</strong> Cơ sở dữ liệu tuần hoàn</p>
+                    <p><strong>Tên người thực hiện:</strong>Nguyễn Văn A</p>
+                    <p><strong>Mã sinh viên:</strong> 14020614</p>
+                    <p><strong>Giảng viên hướng dẫn:</strong> Đào Trọng Tấn</p>
+                    <p><strong>Lĩnh vực:</strong>Hệ thống thông tin liên lạc</p>
+                    <p> <strong>Trạng thái:</strong> <div style="display: inline; color: green">Được chấp nhận</div> </p>
+                </div>
+                <div class="panel-footer"></div>
+            </div>
+        </div>
+        <!-- /page content -->
+        <%- include('../../partials/public.footer.ejs') %>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="/vendor/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="/vendor/nprogress/nprogress.js"></script>
+<!-- jQuery custom content scroller -->
+<script src="/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script src="/vendor/bootstrap-select/bootstrap-select.min.js"></script>
+<!-- Custom Theme Scripts -->
+<script src="/vendor/student/js/custom.min.js"></script>
+</body>
+</html>

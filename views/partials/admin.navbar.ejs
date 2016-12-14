@@ -299,6 +299,13 @@
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
+
+                <% if (req.user.role == 'moderator'){ %>
+                <li>
+                    <a href="/admin/tools"><i class="fa fa-bar-chart-o fa-fw"></i> Tools</a>
+                    <!-- /.nav-second-level -->
+                </li>
+                <% } %>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->
