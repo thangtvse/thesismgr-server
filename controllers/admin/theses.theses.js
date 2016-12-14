@@ -123,7 +123,7 @@ exports.exportStopRequestDocAPI = function (req, res) {
                 return res.status(400).send(createResponse(false, null, "This thesis is not able for doing this task."));
             }
 
-            docGenHelper.genStudentAndTutorList(thesis, function (error, buffer) {
+            docGenHelper.genStopThesisList(thesis, function (error, buffer) {
                 if (error) {
                     return res.status(400).send(createResponse(false, null, error.message));
                 }
