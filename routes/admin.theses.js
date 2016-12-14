@@ -3,7 +3,7 @@ var router = express.Router();
 var hasAccess = require('../middlewares/auth').hasAccess;
 var SessionsCtrl = require('../controllers/admin/theses.sessions');
 var ThesesCtrl = require('../controllers/admin/theses.theses');
-
+var DetailsCtrl = require('../controllers/admin/theses.details');
 // Sessions
 router.get('/sessions', [
     hasAccess('moderator'),
@@ -29,6 +29,21 @@ router.post('/api/sessions/notify', [
 router.get('/theses', [
     hasAccess('moderator'),
     ThesesCtrl.getView
+]);
+
+router.get('/api/theses', [
+    hasAccess('moderator'),
+    ThesesCtrl.getAllThesesAPI
+]);
+
+router.get('/:id', [
+    hasAccess('moderator'),
+    DetailsCtrl.getThesisDetailsView
+]);
+
+router.get('/api/move-thesis-to-next-status', [
+    hasAccess('moderator'),
+    DetailsCtrl.moveThesisToNextStatusAPI
 ]);
 
 module.exports = router;

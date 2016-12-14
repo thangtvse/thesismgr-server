@@ -10,6 +10,7 @@ module.exports = {
     connection: 'default',
     autoPK: true,
     autoCreatedAt: true,
+    autoUpdatedAt: true,
     attributes: {
         student: {
             model: 'student',
@@ -54,7 +55,8 @@ module.exports = {
         },
 
         session: {
-            model: 'session'
+            model: 'session',
+            required: true
         },
 
         council: {
@@ -88,6 +90,11 @@ module.exports = {
      * @param next
      */
     moveToNextStatus: function (changer, thesisID, selectionIndex, next) {
+
+        if (!changer || !changer.role) {
+            return next(new Error("You have no permission."))
+        }
+
         getModel('thesis').then(function (Thesis) {
             Thesis.findOne({
                 id: thesisID
@@ -100,31 +107,39 @@ module.exports = {
                     return next(new Error("Thesis not found."))
                 }
 
-                var status = thesisStatus[thesis.status];
+                var status = _.find(thesisStatus, function (item) {
+                    return item.id == thesis.status
+                });
+
+                if (selectionIndex >= status.next.length) {
+                    return next(new Error("Index out of range."));
+                }
 
                 switch (status.responder[selectionIndex]) {
                     case "student":
-                        if (changer.students && changer.students[0] && changer.students[0].id == thesis.student) {
+                        if (changer.role == 'student' && changer.student && changer.student[0] && changer.student[0].id == thesis.student) {
                             thesis.status = status.next[selectionIndex];
                         }
                         break;
                     case "lecturer":
-                        if (changer.lecturers && changer.lecturers[0] && changer.lecturers[0].id == thesis.lecturer) {
+                        if (changer.role == 'lecturer' && changer.lecturer && changer.lecturer[0] && changer.lecturer[0].id == thesis.lecturer) {
                             thesis.status = status.next[selectionIndex];
                         }
                         break;
                     case "moderator":
-                        if (changer.faculty == thesis.faculty) {
+                        if (changer.role == 'moderator' && changer.faculty.id == thesis.faculty) {
                             thesis.status = status.next[selectionIndex];
                         }
                         break;
                     case "admin":
-                        thesis.status = status.next[selectionIndex];
+                        if (changer.role == 'admin') {
+                            thesis.status = status.next[selectionIndex];
+                        }
                         break;
                 }
 
                 thesis.save(function (error) {
-                    next(error);
+                    return next(error, thesisStatus[thesis.status]);
                 })
             })
         })
@@ -175,6 +190,7 @@ module.exports = {
                 .populate('lecturer')
                 .populate('session')
                 .populate('fields')
+                .populate('faculty')
                 .populate('council')
                 .sort({
                     createdAt: 'desc'
@@ -209,6 +225,7 @@ module.exports = {
                 .populate('session')
                 .populate('council')
                 .populate('fields')
+                .populate('faculty')
                 .sort({
                     createdAt: 'desc'
                 })
@@ -749,6 +766,7 @@ module.exports = {
                 .populate('session')
                 .populate('council')
                 .populate('fields')
+                .populate('faculty')
                 .exec(function (error, thesis) {
 
                     if (error) {
@@ -879,7 +897,6 @@ var getPopulatedThesisListExecFunction = function (next) {
             if (errors && errors.length > 0) {
                 return next(errors[0]);
             }
-
 
 
             return next(null, resTheses);

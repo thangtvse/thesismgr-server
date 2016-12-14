@@ -72,10 +72,10 @@ module.exports = {
     isFieldIDAvailable: function (fieldID) {
         return new Promise(function (resolve, reject) {
             getModel('field').then(function (Field) {
-                Field.findOne({_id: fieldID})
+                Field.findOne({id: fieldID})
                     .then(function (field) {
                         if (field) {
-                            resovle;
+                            resolve();
                         } else {
                             reject(field)
                         }
@@ -116,18 +116,18 @@ module.exports = {
 
             try {
                 fieldIDs = JSON.parse(string);
-            } catch(error) {
+            } catch (error) {
                 return reject(error);
             }
 
             async.forEach(fieldIDs, function (id, callback) {
                 getModel('field').then(function (Field) {
-                    Field.findOne({_id: id})
+                    Field.findOne({id: id})
                         .then(function (field) {
                             if (field) {
                                 return callback();
                             } else {
-                                return callback(new Error ("Field not found."));
+                                return callback(new Error("Field not found."));
                             }
                         })
                         .catch(function (error) {
@@ -144,7 +144,34 @@ module.exports = {
         })
     },
 
-    gte: function(param, num) {
+    isSessionIDAvailable: function (sessionID) {
+        return new Promise(function (resolve, reject) {
+            getModel('session').then(function (Session) {
+                Session.findOne({id: sessionID})
+                    .then(function (session) {
+                        if (session) {
+
+                            var currentDate = new Date();
+                            if (currentDate >= session.from && currentDate <= session.to) {
+                                resolve();
+                            } else {
+                                reject(new Error('Invalid session.'));
+                            }
+
+                        } else {
+                            reject(session)
+                        }
+                    })
+                    .catch(function (error) {
+                        if (error) {
+                            reject(error);
+                        }
+                    })
+            })
+        })
+    },
+
+    gte: function (param, num) {
         return param >= num;
     }
 };

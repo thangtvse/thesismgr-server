@@ -23,7 +23,7 @@ router.post('/moderators/assign', [
     moderatorsCtrl.assignModerator
 ]);
 
-router.post('/moderators/revoke', [
+router.get('/moderators/revoke', [
     hasAccess('admin'),
     moderatorsCtrl.revokeModerator
 ]);

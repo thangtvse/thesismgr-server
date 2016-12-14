@@ -137,24 +137,59 @@ exports.getNumberOfPagesAPI = function (req, res) {
 };
 
 exports.getNewThesisView = function (req, res) {
-    getModel('field').then(function (Field) {
-        Field.getAllFields(function (error, fields) {
 
-            if (error) {
-                req.flash('errorMessage', error.message);
-                return res.redirect('/theses/new');
-            }
+    if (req.user.student[0].thesisRegistrable == false) {
+        req.flash('errorMessage', 'You are not able to register a new thesis.');
+        return res.redirect('/theses')
+    }
 
-            return res.render('./public/student/theses.new.ejs', {
-                req: req,
-                message: req.flash('errorMessage'),
-                fields: fields
+    var fields;
+    var sessions;
+
+    async.parallel([
+        function (callback) {
+            getModel('field').then(function (Field) {
+                Field.getAllFields(function (error, results) {
+
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    fields = results;
+                    return callback();
+                })
             })
+        },
+        function (callback) {
+            getModel('session').then(function (Session) {
+                Session.getAllAvailableSessions(function (error, results) {
+                    sessions = results;
+                    return callback();
+                })
+            })
+        }
+    ], function (errors) {
+        if (errors && errors.length > 0) {
+            req.flash('errorMessage', errors[0].message);
+            return res.redirect('/theses/new');
+        }
+
+        return res.render('./public/student/theses.new.ejs', {
+            req: req,
+            fields: fields,
+            sessions: sessions,
+            message: req.flash('errorMessage')
         })
-    })
+    });
+
 };
 
 exports.newThesisAPI = function (req, res) {
+
+    if (req.user.student[0].thesisRegistrable == false) {
+        return res.status(400).send(createResponse(false, null, 'You are not able to register a new thesis.'))
+    }
+
 
     if (req.body.fields == '') {
         delete req.body.fields;
@@ -164,6 +199,7 @@ exports.newThesisAPI = function (req, res) {
     req.checkBody('fields', 'Invalid fields.').optional().isFieldArrayStringAvailable();
     req.checkBody('tutor_id', 'Invalid status.').notEmpty();
     req.checkBody('description', 'Invalid description.').notEmpty();
+    req.checkBody('session_id', 'Invalid session ID.').notEmpty().isSessionIDAvailable();
 
     req.asyncValidationErrors()
         .then(function () {
@@ -187,6 +223,7 @@ exports.newThesisAPI = function (req, res) {
                         getModel('thesis').then(function (Thesis) {
                             Thesis.create({
                                 title: req.body.title,
+                                session: req.body.session_id,
                                 fields: JSON.parse(req.body.fields),
                                 student: req.user.student[0].id,
                                 lecturer: user.lecturer[0].id,
@@ -230,6 +267,27 @@ exports.getThesisDetailsView = function (req, res) {
                 message: req.flash('errorMessage'),
                 thesis: thesis
             })
+        })
+    })
+};
+
+exports.moveThesisToNextStatusAPI = function (req, res) {
+    req.checkQuery('index', 'Invalid selection index.').notEmpty().isInt();
+    req.checkQuery('thesis_id', 'Invalid thesis id.').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+    getModel('thesis').then(function (Thesis) {
+        Thesis.moveToNextStatus(req.user, req.query.thesis_id, req.query.index, function (error, status) {
+            if (error) {
+                return res.status(400).send(createResponse(false, null, error.message));
+            }
+
+            return res.send(createResponse(true, status, null));
         })
     })
 };

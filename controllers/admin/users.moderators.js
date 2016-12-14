@@ -1,5 +1,8 @@
 var getModel = require('express-waterline').getModels;
-
+var mailTransportConfig = require('../../config/mail').transportConfig;
+var nodemailer = require('nodemailer');
+var mailHelper = require('../../helpers/mail');
+var mailConfig = require('../../config/mail');
 /**
  * Get a view for a list of moderators
  * @param req
@@ -50,54 +53,45 @@ exports.getView = function (req, res) {
  */
 exports.assignModerator = function (req, res) {
     req.checkBody('officer_number', "Invalid officer number,").notEmpty();
+    req.checkBody('password', "Invalid password,").notEmpty();
+    req.checkBody('full_name', "Invalid full name,").notEmpty();
+    req.checkBody('email', "Invalid email,").notEmpty().isEmail();
+    req.checkBody('faculty_id', "Invalid faculty ID,").notEmpty().isFacultyIDAvailable();
 
-    var errors = req.validationErrors();
 
-    if (errors && errors.length > 0) {
-        console.log(errors);
-        req.flash('errorMessage', errors[0].msg);
-        return res.redirect('/admin/users/moderators');
-    }
-    getModel('user').then(function (User) {
+    req.asyncValidationErrors()
+        .then(function () {
+            getModel('user').then(function (User) {
 
-        User.findOne({
-            officerNumber: req.body.officer_number
-        }).exec(function (error, user) {
+                User.create({
+                    officerNumber: req.body.officer_number,
+                    fullName: req.body.full_name,
+                    password: req.body.password,
+                    faculty: req.body.faculty_id,
+                    unit: req.body.faculty_id,
+                    email: req.body.email,
+                    role: 'moderator'
+                }).exec(function (error) {
 
-            if (error) {
-                console.log(error);
-                req.flash('errorMessage', error.message);
-                return res.redirect('/admin/users/moderators');
-            }
+                    if (error) {
+                        console.log(error);
+                        req.flash('errorMessage', error.message);
+                        return res.redirect('/admin/users/moderators');
+                    }
 
-            if (user == null) {
-                console.log("User not found.");
-                req.flash('errorMessage', "User not found.");
-                return res.redirect('/admin/users/moderators');
-            }
+                    var mailTransporter = nodemailer.createTransport(mailTransportConfig);
+                    mailHelper.sendMailForModerator(req.body.email, req.body.password, req.body.officer_number, mailConfig.transportConfig.auth.user, mailTransporter);
 
-            if (user.role == "moderator" || user.role == "admin") {
-                req.flash('errorMessage', "Can't not assign this user.");
-                return res.redirect('/admin/users/moderators');
-            }
+                    return res.redirect('/admin/users/moderators');
 
-            if (user.role != 'lecturer') {
-                req.flash('errorMessage', "Can't not assign this user");
-                return res.redirect('/admin/users/moderators');
-            }
-
-            user.role = 'moderator';
-            user.save(function (error) {
-                if (error) {
-                    console.log(error);
-                    req.flash('errorMessage', error.message);
-                }
-
-                return res.redirect('/admin/users/moderators');
+                })
             })
-
         })
-    })
+        .catch(function (errors) {
+            console.log(errors);
+            req.flash('errorMessage', errors[0].msg);
+            return res.redirect('/admin/users/moderators');
+        });
 };
 
 /**
@@ -106,7 +100,7 @@ exports.assignModerator = function (req, res) {
  * @param res
  */
 exports.revokeModerator = function (req, res) {
-    req.checkBody('officer_number', "Invalid officer number,").notEmpty();
+    req.checkQuery('officer_number', "Invalid officer number,").notEmpty();
 
     var errors = req.validationErrors();
 
@@ -116,25 +110,17 @@ exports.revokeModerator = function (req, res) {
         return res.redirect('/admin/users/moderators');
     }
 
-    getModel('user', function (User) {
-        User.findOne({
-            officerNumber: req.body.officer_number
-        }).exec(function (error, user) {
+    getModel('user').then(function (User) {
+        User.destroy({
+            officerNumber: req.query.officer_number
+        }, function (error) {
 
-            if (user.role != 'moderator') {
-                req.flash('errorMessage', "Can't not assign this user");
+            if (error) {
+                req.flash('errorMessage', error.message);
                 return res.redirect('/admin/users/moderators');
             }
 
-            user.role = 'lecturer';
-            user.save(function (error) {
-                if (error) {
-                    console.log(error);
-                    req.flash('errorMessage', error.message);
-                }
-
-                return res.redirect('/admin/users/moderators');
-            })
+            return res.redirect('/admin/users/moderators');
         })
     })
 };

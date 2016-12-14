@@ -10,12 +10,16 @@
 
         <%- include('../../partials/public.navbar.ejs') %>
         <!-- /top navigation -->
+        <span id="thesis-id" hidden><%= thesis.id %></span>
+        <span id="role" hidden><%= req.user.role %></span>
+
 
         <!-- page content -->
         <div class="right_col" role="main">
             <div class="page-title">
                 <div class="title_left">
                     <h3 style="margin-left: 10px"><%= thesis.title %></h3>
+                    <small style="margin-left: 10px" id="updated-at">Cập nhật lần cuối: <%= thesis.updatedAt %></small>
                 </div>
             </div>
             <div class="clearfix" style="margin: 20px"></div>
@@ -42,9 +46,7 @@
                 <div class="col-lg-8">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>Mô tả
-                                <small>Cập nhật lần cuối: <%= thesis.updatedAt %></small>
-                            </h2>
+                            <h2>Mô tả</h2>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -64,24 +66,34 @@
                                 <p><a href="#"><%= thesis.student.user.fullName %></a></p>
 
                                 <p class="title">Giảng viên hướng dẫn</p>
-                                <p><a href="#"><%= thesis.lecturer.user.fullName %></a></p>
+                                <p>
+                                    <a href="/lecturers/<%= thesis.lecturer.user.officerNumber %>"><%= thesis.lecturer.user.fullName %></a>
+                                </p>
 
                                 <p class="title">Ngày tạo</p>
-                                <p><a href="#"><%= thesis.createdAt %></a></p>
+                                <p id="creation-date"><%= thesis.createdAt %></p>
 
                                 <p class="title">Lĩnh vực liên quan</p>
-                                <p>
-                                    <% thesis.fields.forEach(function (field, index) { %>
-                                    <% if (index != (thesis.fields.length - 1)) { %>
-                                    <%= field.name + ", " %>
-                                    <% } else { %>
-                                    <%= field.name %>
-                                    <% }
-                                    }) %>
+
+                                <% thesis.fields.forEach(function (field, index) { %>
+                                <% if (index != (thesis.fields.length - 1)) { %>
+                                <a href="/fields/<%= field.urlName %>"> <%= field.name + ", " %></a>
+                                <% } else { %>
+                                <a href="/fields/<%= field.urlName %>"> <%= field.name %></a>
+                                <% }
+                                }) %>
                                 </p>
 
                                 <p class="title">Trạng thái</p>
                                 <p><%= thesis.status.content %></p>
+
+                                <% if ((req.user.lecturer && req.user.lecturer[0] && req.user.lecturer[0].id == thesis.lecturer.id)
+                                        || (req.user.student && req.user.student[0] && req.user.student[0].id == thesis.student.id)) { %>
+                                <p class="title">Tùy chọn</p>
+                                <p>
+                                <div id="thesis-processes"></div>
+                                </p>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -97,7 +109,25 @@
 </div>
 
 <%- include('../../partials/public.scripts.ejs') %>
-<script type="text/javascript" src="/dist/js/public.browse.lecturers.min.js"></script>
+<script type="text/javascript">
+
+    var date = moment($('#creation-date').text());
+    $('#creation-date').html(moment(date).format('MMMM Do YYYY, h:mm:ss a'));
+
+    var date = moment($('#updated-at').text());
+    $('#updated-at').html("Sửa đổi lần cuối: " + moment(date).format('MMMM Do YYYY, h:mm:ss a'));
+
+    var thesisID = $('#thesis-id').text();
+    var status = '<%- JSON.stringify(thesis.status) %>';
+    var role = $('#role').text();
+
+    console.log(thesisID);
+    console.log(role);
+
+    console.log(status);
+
+    $('#thesis-processes').buildThesisProcesses(thesisID, JSON.parse(status), role);
+</script>
 </body>
 </html>
 

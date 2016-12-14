@@ -87,7 +87,7 @@ exports.getAllThesesAPI = function (req, res) {
     var opts = {};
 
     if (req.user.role == 'moderator') {
-        opts.faculty = req.user.faculty;
+        opts.faculty = req.user.faculty.id;
     }
 
     getModel('thesis').then(function (Thesis) {
@@ -96,7 +96,7 @@ exports.getAllThesesAPI = function (req, res) {
                 return res.status(400).send(createResponse(false, null, error.message));
             }
 
-            return res.sendFile(createResponse(true, theses, null));
+            return res.send(createResponse(true, theses, null));
         })
     })
 };
