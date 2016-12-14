@@ -121,53 +121,54 @@ exports.exportThesisAndCouncilListAPI = function (req, res) {
 
     req.checkQuery('session_id', 'Invalud session ID').isSessionIDAvailable();
 
-    var errors = req.validationErrors();
+    req.asyncValidationErrors()
+        .then(function () {
 
-    if (errors) {
-        return res.status(400).send(createResponse(false, null, errors[0].msg));
-    }
+            var councils;
+            var theses;
 
-    var councils;
-    var theses;
+            async.parallel([
+                function (callback) {
+                    getModel('council').then(function (Council) {
+                        Council.getAllPopulatedCouncilList({
+                            session: req.query.session_id
+                        }, function (error, results) {
+                            if (error) {
+                                return callback(error);
+                            }
 
-    async.parallel([
-        function (callback) {
-            getModel('council').then(function (Council) {
-                Council.getAllPopulatedCouncilList({
-                    session: req.query.session_id
-                }, function (error, results) {
-                    if (error) {
-                        return callback(error);
-                    }
+                            councils = results;
+                            return callback();
+                        })
+                    })
+                },
 
-                    councils = results;
-                    return callback();
-                })
-            })
-        },
+                function (callback) {
+                    getModel('thesis').then(function (Thesis) {
+                        Thesis.getAllPopulatedThesisList({
+                            faculty: req.user.faculty.id,
+                            status: 11
+                        }, function (error, results) {
+                            if (error) {
+                                return callback(error);
+                            }
 
-        function (callback) {
-            getModel('thesis').then(function (Thesis) {
-                Thesis.getAllPopulatedThesisList({
-                    faculty: req.user.faculty.id,
-                    status: 11
-                }, function (error, results) {
-                    if (error) {
-                        return callback(error);
-                    }
+                            theses = results;
+                            return callback();
+                        })
+                    })
+                }
+            ], function (errors) {
+                if (errors && errors.length > 0) {
+                    return res.status(400).send(createResponse(false, null, errors[0].message));
+                }
 
-                    theses = results;
-                    return callback();
-                })
-            })
-        }
-    ], function (errors) {
-        if (errors && errors.length >0) {
+
+            });
+        })
+        .catch(function (errors) {
             return res.status(400).send(createResponse(false, null, errors[0].message));
-        }
+        });
 
 
-
-
-    });
 };
