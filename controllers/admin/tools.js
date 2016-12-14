@@ -99,7 +99,7 @@ exports.exportProtectableStudentListAPI = function (req, res) {
                 return res.status(400).send(createResponse(false, null, error.message));
             }
 
-            docGenHelper.genStudentAndTutorList(theses, function (error, buffer) {
+            docGenHelper.genCanDefendThesisList(theses, function (error, buffer) {
                 if (error) {
                     return res.status(400).send(createResponse(false, null, error.message));
                 }
