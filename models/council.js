@@ -38,6 +38,11 @@ module.exports = {
             via: 'council'
         },
 
+        session: {
+            model: 'session',
+            required: true
+        },
+
         faculty: {
             model: 'unit',
             required: true

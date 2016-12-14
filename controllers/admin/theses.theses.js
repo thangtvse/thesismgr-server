@@ -2,6 +2,7 @@ var getModel = require('express-waterline').getModels;
 var createResponse = require('../../helpers/response').createRes;
 var async = require('async');
 var paginationConfig = require('../../config/pagination');
+var docGenHelper = require('../../helpers/gendoc');
 
 exports.getView = function (req, res) {
     var findOpts = {};
@@ -97,6 +98,45 @@ exports.getAllThesesAPI = function (req, res) {
             }
 
             return res.send(createResponse(true, theses, null));
+        })
+    })
+};
+
+exports.exportStopRequestDocAPI = function (req, res) {
+
+    req.checkQuery('thesis_id', 'Invalid thesis ID').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+
+    getModel('thesis').then(function (Thesis) {
+        Thesis.getThesisDetails(req.query.thesis_id, function (error, thesis) {
+            if (error) {
+                return res.status(400).send(createResponse(false, null, error.message));
+            }
+
+            if (thesis.status.id != 7) {
+                return res.status(400).send(createResponse(false, null, "This thesis is not able for doing this task."));
+            }
+
+            docGenHelper.genStudentAndTutorList(thesis, function (error, buffer) {
+                if (error) {
+                    return res.status(400).send(createResponse(false, null, error.message));
+                }
+
+                res.writeHead(200, {
+                    'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'Content-Length': buffer.byteLength
+                });
+                res.write(buffer);
+                res.end();
+
+            })
+
         })
     })
 };
