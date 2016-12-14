@@ -30,6 +30,14 @@ router.post('/login', passport.authenticate('login', {
     failureFlash: true
 }));
 
+router.get('/logout',function (req,res) {
+    hasAccess('public');
+    req.logout();
+    req.session.destroy();
+    res.render('./public/login',{
+        'message':{}
+    });
+});
 
 router.get('/api/get_lecturers_in_unit', [
     hasAccess('public'),

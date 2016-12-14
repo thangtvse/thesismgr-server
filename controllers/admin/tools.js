@@ -10,6 +10,7 @@ exports.getView = function (req, res) {
     })
 };
 
+
 exports.exportStudentAndTutorListAPI = function (req, res) {
     getModel('thesis').then(function (Thesis) {
         Thesis.getAllPopulatedThesisList({
@@ -36,4 +37,7 @@ exports.exportStudentAndTutorListAPI = function (req, res) {
 
         })
     })
+};
+exports.exportsCanDefendThesisListAPI =function (req,res) {
+
 };
