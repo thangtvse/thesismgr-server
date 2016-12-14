@@ -44,7 +44,7 @@ exports.genStudentAndTutorList = function (theses, next) {
     });
 
 };
-exports.genCanDefendThesisList = function (students,next) {
+exports.genCanDefendThesisList = function (theses,next) {
     getModel('unit').then(function (Unit) {
         Unit.find().exec(function (error,units) {
             if(error) {
@@ -61,37 +61,21 @@ exports.genCanDefendThesisList = function (students,next) {
                 var studentList = [];
                 var unitList=[];
                 var counts=[];
-                _.forEach(students,function (student,index) {
+                _.forEach(theses,function (thesis,index) {
                     var tmp={};
                     tmp.tt=index+1;
-                    tmp.name = student.user.fullName;
-                    tmp.id = student.user.officerNumber;
+                    tmp.name = thesis.student.user.fullName;
+                    tmp.id = thesis.student.user.officerNumber;
                     tmp.unit = _.find(units, function (item) {
-                        return item.id == student.user.unit;
+                        return item.id == thesis.student.user.unit;
                     }).name;
                     tmp.other= "";
                     studentList.push(tmp);
                 });
 
-                studentList.forEach(function (e) {
-                    if(counts[e.unit]){
-                        counts[e.unit].count++;
-                    }else{
-                        counts[e.unit]= {'val':e.unit, 'count':0};
-                    }
-                });
-
-                _forEach(counts,function (e,index) {
-                    var tmp = {};
-                    tmp.tt=index+1;
-                    tmp.unit=e.val;
-                    tmp.number=e.count;
-                    unitList.push(tmp);
-                });
                 var data={
-                    "students":studentList,
+                    "student":studentList,
                     "sum":studentList.length,
-                    "units":unitList
                 };
                 doc.setData(data);
                 doc.render();
