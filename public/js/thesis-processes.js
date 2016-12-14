@@ -4,6 +4,9 @@ jQuery.fn.extend({
         var o = $(this[0]);
 
         status.responder.forEach(function (responder, index) {
+
+            console.log(responder + " " + role)
+
             if (responder == role) {
 
                 console.log(status.buttonTitles[index]);
@@ -21,7 +24,7 @@ function moveThesisToNextStep(thesisID, selectionIndex, redirectURL, role) {
 
     var url;
     if (role == 'lecturer' || role == 'student') {
-        url = '/api/move-thesis-to-next-status';
+        url = '/theses/api/move-thesis-to-next-status';
     } else {
         url = '/admin/theses/api/move-thesis-to-next-status';
     }

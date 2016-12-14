@@ -28,6 +28,27 @@ exports.hasAccess = function (accessLevel) {
     }
 };
 
+exports.hasRole = function (role) {
+    return function (req, res, next) {
+
+        var redirectUrl;
+
+        if (role == 'student' || role == 'lecturer' || role == 'public') {
+            redirectUrl = '/login';
+        } else {
+            redirectUrl = '/admin/login';
+        }
+
+
+        if (req.isAuthenticated() && role == req.user.role) {
+            return next();
+        } else {
+            return res.redirect(redirectUrl);
+        }
+
+    }
+};
+
 exports.jwtAuth = function (req, res, next) {
 
     var token = req.query.token || req.body.token;
