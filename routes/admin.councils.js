@@ -13,6 +13,11 @@ router.get('/api/all', [
     councilsCtrl.getCouncilsAPI
 ]);
 
+router.get('/api/all-no-pagination', [
+    hasAccess('moderator'),
+    councilsCtrl.getAllCouncilsAPI
+]);
+
 router.post('/api/create', [
     hasAccess('moderator'),
     councilsCtrl.createCouncilAPI

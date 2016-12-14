@@ -23,4 +23,9 @@ router.get('/export-protectable-student-list', [
     toolsCtrl.exportProtectableStudentListAPI
 ]);
 
+router.get('/export-thesis-council-list', [
+    hasRole('moderator'),
+    toolsCtrl.exportThesisAndCouncilListAPI
+]);
+
 module.exports = router;

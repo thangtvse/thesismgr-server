@@ -3,9 +3,10 @@ var createResponse = require('../../helpers/response').createRes;
 var docGenHelper = require('../../helpers/gendoc');
 var fileSystem = require('fs');
 var mailHelper = require('../../helpers/mail');
-var mailConfig = require('../../config/mail');
+var mailConfig = require('../../config/mail').transportConfig;
 var nodemailer = require('nodemailer');
 var _ = require('underscore');
+var async = require('async');
 
 exports.getView = function (req, res) {
 
@@ -23,7 +24,6 @@ exports.getView = function (req, res) {
         })
     })
 };
-
 
 exports.exportStudentAndTutorListAPI = function (req, res) {
     getModel('thesis').then(function (Thesis) {
@@ -68,7 +68,7 @@ exports.sendMailForStudentsNeedSubmitFilesAPI = function (req, res) {
             _.forEach(theses, function (thesis) {
                 mailHelper.sendMailForStudentsNeedSubmitFiles(thesis.lecturer.user.email,
                     thesis.title,
-                    mailConfig.transportConfig.auth.user,
+                    mailConfig.auth.user,
                     mailTransporter
                 )
             });
@@ -115,4 +115,59 @@ exports.exportProtectableStudentListAPI = function (req, res) {
 
         })
     })
+};
+
+exports.exportThesisAndCouncilListAPI = function (req, res) {
+
+    req.checkQuery('session_id', 'Invalud session ID').isSessionIDAvailable();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+    var councils;
+    var theses;
+
+    async.parallel([
+        function (callback) {
+            getModel('council').then(function (Council) {
+                Council.getAllPopulatedCouncilList({
+                    session: req.query.session_id
+                }, function (error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    councils = results;
+                    return callback();
+                })
+            })
+        },
+
+        function (callback) {
+            getModel('thesis').then(function (Thesis) {
+                Thesis.getAllPopulatedThesisList({
+                    faculty: req.user.faculty.id,
+                    status: 11
+                }, function (error, results) {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    theses = results;
+                    return callback();
+                })
+            })
+        }
+    ], function (errors) {
+        if (errors && errors.length >0) {
+            return res.status(400).send(createResponse(false, null, errors[0].message));
+        }
+
+
+
+
+    });
 };

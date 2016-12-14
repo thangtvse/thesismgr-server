@@ -58,7 +58,7 @@ module.exports = [
         responder: ["moderator", 'moderator'],
         content: "Chờ phân công hội đồng phản biện",
         next: [10, 7],
-        buttonTitles: ['Xong', 'Yêu cầu dừng']
+        buttonTitles: ['Phân công hội đồng', 'Yêu cầu dừng']
     },
     {
         id: 10,

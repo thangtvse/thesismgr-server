@@ -7,9 +7,16 @@ jQuery.fn.extend({
 
             if (responder == role) {
 
-                o.append('' +
-                    '<button class="btn btn-default" onclick="moveThesisToNextStep(\'' + thesisID + '\', \'' + status.id + '\', \'' + index + '\', \'' + redirectURL + '\', \'' + role + '\')">' + status.buttonTitles[index] + '</button>' +
-                    '')
+                if (status.id == 9 && index == 0) {
+                    o.append('' +
+                        '<button class="btn btn-default" data-index="' + index + '">' + status.buttonTitles[index] + '</button>')
+                } else {
+                    o.append('' +
+                        '<button class="btn btn-default" data-index="' + index + '" onclick="moveThesisToNextStep(\'' + thesisID + '\', \'' + status.id + '\', \'' + index + '\', \'' + redirectURL + '\', \'' + role + '\')">' + status.buttonTitles[index] + '</button>' +
+                        '')
+                }
+
+
             }
         })
 
@@ -17,10 +24,6 @@ jQuery.fn.extend({
 });
 
 function moveThesisToNextStep(thesisID, statusID, selectionIndex, redirectURL, role) {
-
-    if (statusID == 9) {
-
-    }
 
     var url;
     if (role == 'lecturer' || role == 'student') {
@@ -57,4 +60,5 @@ function moveThesisToNextStep(thesisID, statusID, selectionIndex, redirectURL, r
 
         error: errorHandler
     })
+
 }

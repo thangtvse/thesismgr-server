@@ -85,13 +85,40 @@ exports.getCouncilsAPI = function (req, res) {
         return res.status(400).send(createResponse(false, null, errors[0].msg));
     }
 
+    var opts = {};
 
+    if (req.user.role == 'moderator') {
+        opts.faculty = req.user.faculty.id;
+    }
+
+    getModel('council').then(function (Council) {
+        Council.getPopulatedCouncilList(req.query.page, opts, function (error, councils) {
+            if (error) {
+                return res.status(400).send(createResponse(false, null, error.message));
+            }
+
+            return res.send(createResponse(true, councils, null));
+        })
+    })
+};
+
+exports.getAllCouncilsAPI = function (req, res) {
+
+    req.checkQuery('session_id', 'Invalid session ID.').notEmpty()
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
 
     var opts = {};
 
     if (req.user.role == 'moderator') {
         opts.faculty = req.user.faculty.id;
     }
+
+    opts.session = req.query.session_id;
 
     getModel('council').then(function (Council) {
         Council.getPopulatedCouncilList(req.query.page, opts, function (error, councils) {
@@ -117,6 +144,7 @@ exports.createCouncilAPI = function (req, res) {
 
     req.checkBody('name', 'Invalid name.').notEmpty();
     req.checkBody('faculty_id', 'Invalid faculty ID').notEmpty().isFacultyIDAvailable();
+    req.checkBody('session_id', 'Invalid session ID').notEmpty().isSessionIDAvailable();
     req.checkBody('chairman', 'Invalid chairman').notEmpty().isLecturerOfficerNumberAvailable();
     req.checkBody('secretary', 'Invalid secretary').notEmpty().isLecturerOfficerNumberAvailable();
     req.checkBody('reviewer', 'Invalid reviewer').notEmpty().isLecturerOfficerNumberAvailable();
@@ -236,6 +264,7 @@ exports.createCouncilAPI = function (req, res) {
                             secretary: secretary,
                             reviewer: reviewer,
                             members: members,
+                            session: req.body.session_id
                         }).exec(function (error, council) {
                             if (error) {
                                 req.flash('errorMessage', error.message);

@@ -147,6 +147,7 @@ var setDataToTable = function () {
             '<td>' + council.reviewer.user.fullName + '</td>' +
             '<td>' + membersHtml + '</td>' +
             '<td>' + council.faculty.name + '</td>' +
+            '<td>' + council.session.name + '</td>' +
             '<td></td>' +
             '</tr>'
         )

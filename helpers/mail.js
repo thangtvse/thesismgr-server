@@ -1,5 +1,6 @@
 var jwt = require('jsonwebtoken');
 var hostConfig = require('../config/host');
+var util = require('util');
 
 /**
  * Send invitation mail

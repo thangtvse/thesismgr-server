@@ -70,7 +70,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Faculty</label>
+                                    <label>Khoa</label>
                                     <select class="form-control" name="faculty_id" id="faculty_id" required>
                                         <% if (req.user.role != 'admin') {
                                             faculties = faculties.filter(function (faculty) {
@@ -85,6 +85,25 @@
                                         <% }) %>
                                     </select>
                                     <p class="help-block">Course of the new student that you want to add.</p>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label>Kì bảo vệ</label>
+                                    <select class="form-control" name="session_id" id="session-id" required>
+                                        <% if (req.user.role != 'admin') {
+                                            sessions = sessions.filter(function (session) {
+                                                return session.faculty.id == req.user.faculty.id;
+                                            });
+                                        }
+
+                                        sessions.forEach(function (session) { %>
+                                        <option
+                                                class="faculty-option-item"
+                                                value="<%= session.id %>"><%= session.name %></option>
+                                        <% }) %>
+                                    </select>
+
                                 </div>
 
                                 <div class="form-group">
@@ -144,6 +163,7 @@
                     <th>Đại diện phản biện</th>
                     <th>Members</th>
                     <th>Faculty</th>
+                    <th>Kì bảo vệ</th>
                     <th>Action</th>
                 </tr>
                 </thead>

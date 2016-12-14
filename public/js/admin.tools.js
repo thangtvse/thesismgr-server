@@ -23,5 +23,9 @@ function sendEmailForStudentNeedSubmitFiles() {
 
 
 function exportProtectableStudentList() {
-    window.location.href = '/admin/tools/export-protectable-student-list?session_id=' + $("#session-id").val()
+    window.location.href = '/admin/tools/export-protectable-student-list?session_id=' + $("#protectable-students-ession-id").val()
+}
+
+function exportTheseCouncilsList() {
+    window.location.href = '/admin/tools/export-thesis-council-list?session_id=' + $("#theses-councils-students-session-id").val()
 }

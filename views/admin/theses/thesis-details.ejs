@@ -91,6 +91,12 @@
                                 <p><%= thesis.status.content %></p>
                                 <div class="clearfix"></div>
 
+                                <% if (thesis.council) { %>
+                                <h5 class="title">Hội đồng bảo vệ</h5>
+                                <p id="creation-date"><%= thesis.council.name %></p>
+                                <div class="clearfix"></div>
+                                <% } %>
+
                                 <% if ((req.user.role == 'moderator' && req.user.faculty.id == thesis.faculty.id)
                                         || (req.user.role == 'admin')) { %>
                                 <h5 class="title">Tùy chọn</h5>
@@ -106,6 +112,51 @@
                     </div>
                 </div>
             </div>
+
+
+            <div id="assign-council-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Create Session</h4>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <p class="help-block">Phân công hội đồng phản biện cho khóa luận</p>
+                            <form id="assign-council-form" action="/admin/theses/assign-council" method="post">
+                                <div class="form-group">
+
+                                    <input name="thesis_id" value="<%= thesis.id %>" hidden>
+                                    <label>Hội đồng</label>
+                                    <select class="form-control" name="council_id" id="council-id" required>
+                                        <% if (req.user.role != 'admin') {
+                                            councils = councils.filter(function (council) {
+                                                return council.faculty == req.user.faculty.id;
+                                            });
+                                        }
+
+                                        councils.forEach(function (council) { %>
+                                        <option
+                                                class="faculty-option-item"
+                                                value="<%= council.id %>"><%= council.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">Course of the new student that you want to add.</p>
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </div>
 </div>
@@ -128,7 +179,16 @@
     $('#thesis-processes').buildThesisProcesses(thesisID, JSON.parse(status), role);
 
     if (JSON.parse(status).id == 7 && role == 'moderator') {
-        $('#thesis-processes').append('<a href="/admin/theses/api/export-stop-request-doc?thesis_id=' + thesisID  +'"><button class="btn btn-default">Xuất biên bản dừng khóa luận</button></a>')
+        $('#thesis-processes').append('<a href="/admin/theses/api/export-stop-request-doc?thesis_id=' + thesisID + '"><button class="btn btn-default">Xuất biên bản dừng khóa luận</button></a>')
+    }
+
+    if (JSON.parse(status).id == 9 && role == 'moderator') {
+        $('button[data-index=0]').click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            $('#assign-council-modal').modal('toggle');
+        })
     }
 </script>
 </body>

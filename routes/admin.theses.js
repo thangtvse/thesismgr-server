@@ -51,4 +51,9 @@ router.get('/api/export-stop-request-doc', [
     ThesesCtrl.exportStopRequestDocAPI
 ]);
 
+router.post('/assign-council', [
+    hasAccess('moderator'),
+    DetailsCtrl.assignCouncil
+]);
+
 module.exports = router;

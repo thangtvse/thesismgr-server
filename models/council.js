@@ -69,7 +69,7 @@ module.exports = {
                     var resCouncil = council.toObject();
                     resCouncil.members = [];
 
-                    async.paralell([
+                    async.parallel([
                         function (callback) {
 
                             async.forEach(council.members, function (member, callback) {
@@ -90,6 +90,8 @@ module.exports = {
                                 if (errors && errors.length > 0) {
                                     return callback(errors[0]);
                                 }
+
+                                return callback();
                             })
                         },
 
@@ -143,112 +145,135 @@ module.exports = {
                 .populate('secretary')
                 .populate('reviewer')
                 .populate('faculty')
+                .populate('session')
                 .sort({
                     createdAt: 'desc'
                 })
-                .exec(function (error, councils) {
-                    if (error) {
-                        return next(error);
-                    }
+                .paginate({
+                    limit: 10,
+                    page: page
+                })
+                .exec(getPopulatedCouncilsExecFunction(next))
+        })
+    },
 
+    getAllPopulatedCouncilList: function (opts, next) {
+        getModel('council').then(function (Council) {
+            Council.find(opts)
+                .populate('members')
+                .populate('chairman')
+                .populate('secretary')
+                .populate('reviewer')
+                .populate('faculty')
+                .populate('session')
+                .sort({
+                    createdAt: 'desc'
+                })
+                .exec(getPopulatedCouncilsExecFunction(next))
+        })
+    }
+};
 
-                    var resCouncils = [];
+var getPopulatedCouncilsExecFunction = function (next) {
+    return function (error, councils) {
+        if (error) {
+            return next(error);
+        }
 
-                    async.forEachSeries(councils, function (council, callback) {
+        var resCouncils = [];
 
-                        var resCouncil = council.toObject();
-                        resCouncil.members = [];
+        async.forEachSeries(councils, function (council, callback) {
 
-                        async.parallel([
-                            function (callback) {
+            var resCouncil = council.toObject();
+            resCouncil.members = [];
 
-                                async.forEach(council.members, function (member, callback) {
-                                    getModel('lecturer').then(function (Lecturer) {
-                                        Lecturer.findOne({
-                                            id: member.id
-                                        }).populate('user')
-                                            .exec(function (error, result) {
-                                                if (error) {
-                                                    return callback(error);
-                                                }
-                                                resCouncil.members.push(result);
-                                                return callback();
-                                            })
-                                    })
+            async.parallel([
+                function (callback) {
 
-                                }, function (errors) {
-                                    if (errors && errors.length > 0) {
-                                        return callback(errors[0]);
+                    async.forEach(council.members, function (member, callback) {
+                        getModel('lecturer').then(function (Lecturer) {
+                            Lecturer.findOne({
+                                id: member.id
+                            }).populate('user')
+                                .exec(function (error, result) {
+                                    if (error) {
+                                        return callback(error);
                                     }
-
+                                    resCouncil.members.push(result);
                                     return callback();
                                 })
-                            },
-
-                            function (callback) {
-                                getModel('lecturer').then(function (Lecturer) {
-                                    Lecturer.findOne({
-                                        id: council.chairman.id
-                                    }).populate('user')
-                                        .exec(function (error, result) {
-                                            if (error) {
-                                                return callback(error);
-                                            }
-                                            resCouncil.chairman = result
-                                            return callback();
-                                        })
-                                })
-                            },
-
-                            function (callback) {
-                                getModel('lecturer').then(function (Lecturer) {
-                                    Lecturer.findOne({
-                                        id: council.reviewer.id
-                                    }).populate('user')
-                                        .exec(function (error, result) {
-                                            if (error) {
-                                                return callback(error);
-                                            }
-                                            resCouncil.reviewer = result;
-                                            return callback();
-                                        })
-                                })
-                            },
-
-                            function (callback) {
-                                getModel('lecturer').then(function (Lecturer) {
-                                    Lecturer.findOne({
-                                        id: council.secretary.id
-                                    }).populate('user')
-                                        .exec(function (error, result) {
-                                            if (error) {
-                                                return callback(error);
-                                            }
-                                            resCouncil.secretary = result;
-                                            return callback();
-                                        })
-                                })
-                            }
-
-                        ], function (errors) {
-                            if (errors && errors.length > 0) {
-                                return callback(errors[0]);
-                            }
-
-                            resCouncils.push(resCouncil);
-                            return callback();
-                        });
-
+                        })
 
                     }, function (errors) {
                         if (errors && errors.length > 0) {
-                            return next(errors[0]);
+                            return callback(errors[0]);
                         }
 
-                        return next(null, resCouncils);
-                    });
+                        return callback();
+                    })
+                },
 
-                })
-        })
+                function (callback) {
+                    getModel('lecturer').then(function (Lecturer) {
+                        Lecturer.findOne({
+                            id: council.chairman.id
+                        }).populate('user')
+                            .exec(function (error, result) {
+                                if (error) {
+                                    return callback(error);
+                                }
+                                resCouncil.chairman = result
+                                return callback();
+                            })
+                    })
+                },
+
+                function (callback) {
+                    getModel('lecturer').then(function (Lecturer) {
+                        Lecturer.findOne({
+                            id: council.reviewer.id
+                        }).populate('user')
+                            .exec(function (error, result) {
+                                if (error) {
+                                    return callback(error);
+                                }
+                                resCouncil.reviewer = result;
+                                return callback();
+                            })
+                    })
+                },
+
+                function (callback) {
+                    getModel('lecturer').then(function (Lecturer) {
+                        Lecturer.findOne({
+                            id: council.secretary.id
+                        }).populate('user')
+                            .exec(function (error, result) {
+                                if (error) {
+                                    return callback(error);
+                                }
+                                resCouncil.secretary = result;
+                                return callback();
+                            })
+                    })
+                }
+
+            ], function (errors) {
+                if (errors && errors.length > 0) {
+                    return callback(errors[0]);
+                }
+
+                resCouncils.push(resCouncil);
+                return callback();
+            });
+
+
+        }, function (errors) {
+            if (errors && errors.length > 0) {
+                return next(errors[0]);
+            }
+
+            return next(null, resCouncils);
+        });
     }
 };

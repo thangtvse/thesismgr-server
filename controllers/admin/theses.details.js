@@ -16,16 +16,30 @@ exports.getThesisDetailsView = function (req, res) {
                 return res.redirect('/404');
             }
 
-            return res.render('./admin/theses/thesis-details.ejs', {
-                req: req,
-                message: req.flash('errorMessage'),
-                thesis: thesis
-            })
+            getModel('council').then(function (Council) {
+                Council.find({
+                    faculty: req.user.faculty.id,
+                    session: thesis.session.id
+                }).exec(function (error, councils) {
+                    if (error) {
+                        return res.redirect('/404');
+                    }
+
+                    return res.render('./admin/theses/thesis-details.ejs', {
+                        req: req,
+                        message: req.flash('errorMessage'),
+                        thesis: thesis,
+                        councils: councils
+                    })
+                })
+            });
+
+
         })
     })
 };
 
-exports.moveThesisToNextStatusAPI = function(req, res) {
+exports.moveThesisToNextStatusAPI = function (req, res) {
     req.checkQuery('index', 'Invalid selection index.').notEmpty().isInt();
     req.checkQuery('thesis_id', 'Invalid thesis id.').notEmpty();
 
@@ -42,6 +56,38 @@ exports.moveThesisToNextStatusAPI = function(req, res) {
             }
 
             return res.send(createResponse(true, status, null));
+        })
+    })
+};
+
+exports.assignCouncil = function (req, res) {
+    req.checkBody('council_id', 'Invalid council ID').notEmpty();
+    req.checkBody('thesis_id', 'Invalid thesis id.').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.redirect('/400');
+    }
+
+    getModel('thesis').then(function (Thesis) {
+        Thesis.update({
+            id: req.body.thesis_id
+        }, {
+            council: req.body.council_id
+        }).exec(function (error, updated) {
+            if (error) {
+                req.flash('errorMessage', error.message);
+                return res.redirect('/admin/theses/' + req.body.thesis_id);
+            }
+
+            Thesis.moveToNextStatus(req.user, req.body.thesis_id, 0, function (error, status) {
+                if (error) {
+                    req.flash('errorMessage', error.message);
+                }
+
+                return res.redirect('/admin/theses/' + req.body.thesis_id);
+            })
         })
     })
 };
