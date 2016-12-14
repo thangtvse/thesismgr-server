@@ -64,24 +64,28 @@ exports.getProfileView = function (req, res) {
             });
         })
     } else {
-        getModel('student').then(function (Student) {
-            Student.getPopulatedStudentByOfficerNumber(req.user.officerNumber, function (error, student) {
-                if (error) {
-                    req.flash('errorMessage', error.message);
-                    return res.redirect('/profile');
-                }
-
-                if (!student) {
-                    req.flash('errorMessage', 'Internal error: Student not found');
-                    return res.redirect('/profile');
-                }
-
-                return res.render('./public/student/profile', {
-                    req: req,
-                    profile: student,
-                    message: req.flash('errorMessage')
-                });
-            })
+        // getModel('student').then(function (Student) {
+        //     Student.getPopulatedStudentByOfficerNumber(req.user.officerNumber, function (error, student) {
+        //         if (error) {
+        //             req.flash('errorMessage', error.message);
+        //             return res.redirect('/profile');
+        //         }
+        //
+        //         if (!student) {
+        //             req.flash('errorMessage', 'Internal error: Student not found');
+        //             return res.redirect('/profile');
+        //         }
+        //
+        //         return res.render('./public/student/profile', {
+        //             req: req,
+        //             profile: student,
+        //             message: req.flash('errorMessage')
+        //         });
+        //     })
+        // });
+        return res.render('./public/partials/profile.change_password.ejs',{
+            req:req,
+            message: req.flash('errorMessage')
         });
     }
 };
