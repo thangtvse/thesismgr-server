@@ -5,7 +5,7 @@ var fs = require("fs");
 var Docxtemplater = require('docxtemplater');
 var JSZip = require('jszip');
 var _= require("underscore");
-const genStudentAndTutorListPath= __dirname +"/template/genStudentAndTutor.docx";
+const genStudentAndTutorListPath= __dirname +"/templates/genStudentAndTutor.docx";
 const tmp = __dirname +"/tmp";
 
 exports.genStudentAndTutorList = function (theses,timezone,next) {
