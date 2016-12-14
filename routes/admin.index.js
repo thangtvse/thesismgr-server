@@ -23,7 +23,14 @@ router.post('/login', passport.authenticate('admin-login', {
     failureRedirect: '/admin/login',
     failureFlash: true
 }));
-
+router.get('/logout',function (req,res) {
+    hasAccess('moderator');
+    req.logout();
+    req.session.destroy();
+    res.render('./admin/login',{
+        'message':{}
+    });
+});
 
 router.get('/', [
     hasAccess('moderator'),

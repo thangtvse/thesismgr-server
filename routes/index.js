@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var expressValidator = require('express-validator');
-
 router.use(expressValidator({
     customValidators: require('../helpers/customValidators')
 }));
@@ -20,7 +19,7 @@ router.get('/500', function (req, res) {
 
 
 router.use('/admin', require('./admin.index.js'));
-router.use("/student",require('./public.student.js'));
+// router.use("/student",require('./public.student.js'));
 router.use('/', require('./public.index'));
 
 
