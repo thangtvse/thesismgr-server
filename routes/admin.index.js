@@ -45,5 +45,6 @@ router.use('/users', require('./admin.users'));
 router.use('/categories', require('./admin.categories'));
 router.use('/theses', require('./admin.theses'));
 router.use('/tools', require('./admin.tools'));
+router.use('/councils', require('./admin.councils'));
 
 module.exports = router;

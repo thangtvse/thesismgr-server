@@ -94,7 +94,7 @@
                                 <% if ((req.user.role == 'moderator' && req.user.faculty.id == thesis.faculty.id)
                                         || (req.user.role == 'admin')) { %>
                                 <h5 class="title">Tùy chọn</h5>
-                                <p> 
+                                <p>
                                 <div class="clearfix"></div>
 
                                 <div id="thesis-processes"></div>
@@ -126,6 +126,10 @@
     var role = $('#role').text();
 
     $('#thesis-processes').buildThesisProcesses(thesisID, JSON.parse(status), role);
+
+    if (JSON.parse(status).id == 7 && role == 'moderator') {
+        $('#thesis-processes').append('<a href="/admin/theses/api/export-stop-request-doc?thesis_id=' + thesisID  +'"><button class="btn btn-default">Xuất biên bản dừng khóa luận</button></a>')
+    }
 </script>
 </body>
 </html>

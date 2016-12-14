@@ -46,4 +46,9 @@ router.get('/api/move-thesis-to-next-status', [
     DetailsCtrl.moveThesisToNextStatusAPI
 ]);
 
+router.get('/api/export-stop-request-doc', [
+    hasAccess('moderator'),
+    ThesesCtrl.exportStopRequestDocAPI
+]);
+
 module.exports = router;

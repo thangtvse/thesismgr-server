@@ -264,6 +264,64 @@ module.exports = {
         });
     },
 
+
+    getPopulatedLecturerByOfficerNumber: function (officerNumber, next) {
+        getModel('user').then(function (User) {
+            getModel('lecturer').then(function (Lecturer) {
+
+                User.find({
+                    officerNumber: officerNumber,
+                    role: ['lecturer', 'moderator']
+                })
+                    .sort({
+                        createdAt: 'desc'
+                    })
+                    .populate('lecturer')
+                    .populate('unit')
+                    .populate('faculty')
+                    .exec(function (error, users) {
+                        if (error) {
+                            return next(error);
+                        }
+
+                        var resLecturers = [];
+
+                        async.forEachSeries(users, function (user, callback) {
+
+                            if (user.lecturer == null || user.lecturer.length == 0) {
+                                return callback();
+                            }
+
+                            var resLecturer = user.toObject();
+
+                            Lecturer.findOne({
+                                id: user.lecturer[0].id
+                            })
+                                .populate('fields')
+                                .populate('topics')
+                                .exec(function (error, lecturer) {
+
+                                    if (error) {
+                                        return callback(error);
+                                    }
+
+                                    resLecturer.lecturer = _.omit(lecturer.toObject(), ['password', 'user']);
+
+                                    resLecturers.push(resLecturer);
+                                    return callback();
+                                });
+                        }, function (errors) {
+                            if (errors && errors.length > 0) {
+                                return next(errors[0]);
+                            }
+
+                            return next(null, resLecturers);
+                        });
+                    });
+            });
+        });
+    },
+
     /**
      * Get number of page when searching lecturer by name
      * @param text
@@ -332,9 +390,9 @@ module.exports = {
 
                     getModel('lecturer').then(function (Lecturer) {
                         Lecturer.update({
-                            id: user.lecturer[0].id
-                        },
-                        lecturerOpts).exec(function (error, updated) {
+                                id: user.lecturer[0].id
+                            },
+                            lecturerOpts).exec(function (error, updated) {
                             if (error) {
                                 return next(error);
                             }

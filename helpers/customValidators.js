@@ -29,6 +29,30 @@ module.exports = {
         });
     },
 
+    isLecturerOfficerNumberAvailable: function (officerNumber) {
+        return new Promise(function (resolve, reject) {
+
+            getModel('user').then(function (User) {
+                User.findOne({
+                    officerNumber: officerNumber,
+                    role: 'lecturer'
+                })
+                    .then(function (user) {
+                        if (user) {
+                            resolve();
+                        } else {
+                            reject(user);
+                        }
+                    })
+                    .catch(function (error) {
+                        if (error) {
+                            reject(error);
+                        }
+                    });
+            });
+        });
+    },
+
     isEmailAvailable: function (email) {
         return new Promise(function (resolve, reject) {
             getModel('user').then(function (User) {
