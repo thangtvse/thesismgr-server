@@ -5,6 +5,10 @@ router.use(expressValidator({
     customValidators: require('../helpers/customValidators')
 }));
 
+router.get('/',function (req,res) {
+   res.render('./index');
+});
+
 router.get('/400', function (req, res) {
     res.render('./partials/400')
 });
