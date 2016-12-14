@@ -110,7 +110,6 @@ $(document).ready(function () {
                 NProgress.done();
 
                 if (response.status == true) {
-                    NProgress.done();
 
                     var fieldsHTML = "";
 

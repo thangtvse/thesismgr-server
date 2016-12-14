@@ -102,7 +102,7 @@ module.exports = {
 
                 var status = thesisStatus[thesis.status];
 
-                switch (status.responder) {
+                switch (status.responder[selectionIndex]) {
                     case "student":
                         if (changer.students && changer.students[0] && changer.students[0].id == thesis.student) {
                             thesis.status = status.next[selectionIndex];
@@ -222,13 +222,13 @@ module.exports = {
      * @param next
      */
     countAllRequestForAdmin: function (next) {
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if (status.responder.indexOf("admin") == -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
         getModel('thesis').then(function (Thesis) {
             Thesis.count({
@@ -244,13 +244,13 @@ module.exports = {
      */
     getAllRequestForAdmin: function (page, next) {
 
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if (status.responder.indexOf("admin") == -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
         getModel('thesis').then(function (Thesis) {
             return Thesis.getPopulatedThesisList(page, {
@@ -266,13 +266,13 @@ module.exports = {
      * @param next
      */
     countAllRequestForModerator: function (facultyID, next) {
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if (status.responder.indexOf("moderator") == -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
 
         getModel('thesis').then(function (Thesis) {
@@ -291,13 +291,13 @@ module.exports = {
      */
     getAllRequestForModerator: function (page, facultyID, next) {
 
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if (status.responder.indexOf("moderator") == -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
 
         getModel('thesis').then(function (Thesis) {
@@ -320,13 +320,13 @@ module.exports = {
             return next(new Error("This user is not a lecturer."));
         }
 
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if (status.responder.indexOf("lecturer") == -1 || status.responder.indexOf("secretary") == -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
         getModel('thesis').then(function (Thesis) {
             return Thesis.count({
@@ -349,13 +349,13 @@ module.exports = {
             return next(new Error("This user is not a lecturer."));
         }
 
-        var statuses = thesisStatus.filter(function (status) {
-            if (status.responder.indexOf("lecturer") == -1 || status.responder.indexOf("secretary") == -1) {
-                return false;
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
+            if (status.responder.indexOf("lecturer") != -1 || status.responder.indexOf("secretary") != -1) {
+                return true;
             } else {
-                return true
+                return false
             }
-        });
+        }));
 
         getModel('thesis').then(function (Thesis) {
             return Thesis.getPopulatedThesisList(page, {
@@ -451,13 +451,13 @@ module.exports = {
             return next(new Error("This user is not a lecturer."));
         }
 
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if ([1, 2, 7, 8, 19].indexOf(status.id) != -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
         getModel('thesis').then(function (Thesis) {
             return Thesis.count({
@@ -478,13 +478,13 @@ module.exports = {
             return next(new Error("This user is not a lecturer."));
         }
 
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if ([1, 2, 7, 8, 19].indexOf(status.id) != -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
         getModel('thesis').then(function (Thesis) {
             return Thesis.getPopulatedThesisList(page, {
@@ -587,13 +587,13 @@ module.exports = {
             return next(new Error("This user is not a student."));
         }
 
-        var statuses = thesisStatus.filter(function (status) {
+        var statuses = mapStatuses(thesisStatus.filter(function (status) {
             if (status.responder.indexOf("student") == -1) {
                 return false;
             } else {
                 return true
             }
-        });
+        }));
 
         getModel('thesis').then(function (Thesis) {
             return Thesis.getAllPopulatedThesisList({
@@ -732,6 +732,96 @@ module.exports = {
             })
         });
 
+    },
+
+    /**
+     * Get thesis details by id
+     * @param id
+     * @param next
+     */
+    getThesisDetails: function (id, next) {
+        getModel('thesis').then(function (Thesis) {
+            Thesis.findOne({
+                id: id
+            })
+                .populate('student')
+                .populate('lecturer')
+                .populate('session')
+                .populate('council')
+                .populate('fields')
+                .exec(function (error, thesis) {
+
+                    if (error) {
+                        return next(error);
+                    }
+
+                    if (!thesis) {
+                        return next(new Error("Thesis not found."));
+                    }
+
+                    var resThesis = thesis.toObject();
+
+                    async.parallel([
+                        function (callback) {
+                            getModel('student').then(function (Student) {
+                                Student.findOne({
+                                    id: thesis.student.id
+                                })
+                                    .populate('user')
+                                    .exec(function (error, result) {
+                                        if (error) {
+                                            return callback(error);
+                                        }
+                                        resThesis.student = result;
+                                        return callback();
+                                    })
+                            })
+                        },
+                        function (callback) {
+                            getModel('lecturer').then(function (Lecturer) {
+                                Lecturer.findOne({
+                                    id: thesis.lecturer.id
+                                })
+                                    .populate('user')
+                                    .exec(function (error, result) {
+                                        if (error) {
+                                            return callback(error);
+                                        }
+                                        resThesis.lecturer = result;
+                                        return callback();
+                                    })
+                            })
+                        },
+                        function (callback) {
+
+                            if (thesis.council) {
+                                getModel('council').then(function (Council) {
+                                    Council.getPopulatedCouncil(thesis.council.id, function (error, council) {
+                                        if (error) {
+                                            return callback(error);
+                                        }
+
+                                        resThesis.council = council;
+                                        return callback();
+                                    })
+                                })
+                            } else {
+                                callback();
+                            }
+                        }
+                    ], function (errors) {
+                        if (errors && errors.length > 0) {
+                            return next(errors[0]);
+                        }
+
+                        resThesis.status = _.find(thesisStatus, function (status) {
+                            return status.id == resThesis.status;
+                        });
+
+                        return next(null, resThesis);
+                    })
+                })
+        })
     }
 };
 
@@ -778,6 +868,10 @@ var getPopulatedThesisListExecFunction = function (next) {
                     return callback(errors[0]);
                 }
 
+                resThesis.status = _.find(thesisStatus, function (status) {
+                    return status.id == resThesis.status;
+                });
+
                 resTheses.push(resThesis);
                 return callback();
             })
@@ -786,7 +880,15 @@ var getPopulatedThesisListExecFunction = function (next) {
                 return next(errors[0]);
             }
 
+
+
             return next(null, resTheses);
         });
     }
+};
+
+var mapStatuses = function (statuses) {
+    return _.map(statuses, function (status) {
+        return status.id;
+    })
 };

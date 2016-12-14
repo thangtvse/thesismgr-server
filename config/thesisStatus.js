@@ -1,115 +1,131 @@
 module.exports = [
     {
         id: 1,
-        responder: ["lecturer"],
-        content: "Waiting for being accepted by lecturer",
-        next: [3, 2]
+        responder: ["lecturer", "lecturer"],
+        content: "Chờ giảng viên chấp nhận",
+        next: [3, 2],
+        buttonTitles: ['Chấp nhận', 'Từ chối']
     },
     {
         id: 2,
         responder: [],
-        content: "Denied by lecturer",
+        content: "Bị giảng viên từ chối",
         next: []
     },
     {
         id: 3,
         responder: ["moderator"],
-        content: "Waiting for being approved by moderator",
-        next: [4]
+        content: "Chờ khoa duyệt",
+        next: [4],
+        buttonTitles: ['Duyệt']
     },
     {
         id: 4,
         responder: ["admin"],
-        content: "Waiting for being approved by admin",
-        next: [5]
+        content: "Chờ nhà trường duyệt",
+        next: [5],
+        buttonTitles: ['Duyệt']
     },
     {
         id: 5,
-        responder: ["admin"],
-        content: "Waiting for file to be submitted",
-        next: [9, 6]
+        responder: ["admin", "student"],
+        content: "Chờ hồ sơ bảo vệ",
+        next: [9, 6],
+        buttonTitles: ['Đã nộp', 'Yêu cầu thay đổi']
     },
     {
         id: 6,
         responder: ["moderator"],
-        content: "Requesting for topic & tutor change",
-        next: [1]
+        content: "Đang yêu cầu thay đổi",
+        next: [1],
+        buttonTitles: ['Duyệt']
     },
     {
         id: 7,
         responder: ["admin"],
-        content: "Waiting for being stopped",
-        next: [8]
+        content: "Chờ để bị dừng",
+        next: [8],
+        buttonTitles: ['Dừng']
     },
     {
         id: 8,
         responder: [],
-        content: "Stopped",
+        content: "Đã dừng",
         next: []
     },
     {
         id: 9,
         responder: ["moderator"],
-        content: "Waiting for being assigned a council",
-        next: [10]
+        content: "Chờ phân công hội đồng phản biện",
+        next: [10],
+        buttonTitles: ['Xong']
     },
     {
         id: 10,
         responder: ["admin"],
-        content: "Waiting for the council to be approved",
-        next: [11]
+        content: "Chờ hội đồng phản biện được duyệt",
+        next: [11],
+        buttonTitles: ['Duyệt']
     },
     {
         id: 11,
         responder: ["moderator"],
-        content: "Waiting for being protected",
-        next: [12]
+        content: "Chờ để bảo vệ",
+        next: [12],
+        buttonTitles: ['Cho bảo vệ']
     },
     {
         id: 12,
         responder: ["secretary"],
-        content: "Waiting for report",
-        next: [13]
+        content: "Chờ biên bản bảo vệ",
+        next: [13],
+        buttonTitles: ['Xong']
     },
     {
         id: 13,
         responder: ["moderator"],
-        content: "Waiting for result",
-        next: [14]
+        content: "Chờ khoa thẩm định",
+        next: [14],
+        buttonTitles: ['Duyệt']
     },
     {
         id: 14,
-        responder: ["student"],
-        content: "Waiting for result to be accepted by protected",
+        responder: ["student", "student"],
+        content: "Chờ sinh viên đồng ý",
         next: [16, 15],
+        buttonTitles: ['Chấp nhận', 'Yêu cầu thay đổi']
     },
     {
         id: 15,
         responder: ["moderator"],
-        content: "Requesting for a report change",
-        next: [13]
+        content: "Chờ để được điều chỉnh biên bản bảo vệ",
+        next: [13],
+        buttonTitles: ['Duyệt']
     },
     {
         id: 16,
-        responder: ["moderator"],
-        content: "Waiting for hand-copy version to be submitted",
-        next: [18, 17]
+        responder: ["moderator", "moderator"],
+        content: "Chờ nộp quyển",
+        next: [18, 17],
+        buttonTitles: ['Duyệt', 'Nộp giải trình điều chỉnh']
     },
     {
         id: 17,
         responder: ["moderator"],
-        content: "Waiting for editing explanation",
-        next: [18]
+        content: "Chờ báo cáo điều chỉnh",
+        next: [18],
+        buttonTitles: ['Xong']
     },
     {
         id: 18,
         responder: ["admin"],
-        content: "Waiting for being final approved be admin",
-        next: [19]
+        content: "Chờ nhà trường thẩm định",
+        next: [19],
+        buttonTitles: ['Duyệt']
     },
     {
         id: 19,
-        content: "Completed",
+        content: "Hoàn thành",
         responder: [],
         next: []
     }
