@@ -116,6 +116,10 @@ var getData = function () {
 var setDataToTable = function () {
     $('.table.table-body').children().remove();
 
+    if (!sessions[page]) {
+        return;
+    }
+
     sessions[page].forEach(function (session) {
 
         $('#table-sessions').append('<tr>' +

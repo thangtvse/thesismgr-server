@@ -121,6 +121,11 @@ var setData = function () {
     $("#list").children().remove();
 
     if (type == "lecturer-name") {
+
+        if (!data[page]) {
+            return;
+        }
+        
         data[page].forEach(function (lecturer) {
             if (lecturer.lecturer != null) {
                 var fieldsHtml = "";
@@ -151,6 +156,10 @@ var setData = function () {
             }
         })
     } else if (type == "topic-name") {
+        if (!data[page]) {
+            return;
+        }
+        
         data[page].forEach(function (topic) {
 
             var fieldsHtml = "";

@@ -24,7 +24,8 @@
             <div class="menu_section">
                 <h3>General</h3>
                 <ul class="nav side-menu">
-                    <li class="active"><a><i class="fa fa-sitemap"></i> Xem thông tin <span class="fa fa-chevron-down"></span></a>
+                    <li class="active"><a><i class="fa fa-sitemap"></i> Xem thông tin <span
+                                    class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu" style="display: block;">
                             <li><a href="/units">Đơn vị</a>
                             <li><a href="/fields">Các lĩnh vực nghiên cứu</a>
@@ -32,6 +33,13 @@
                             </li>
                         </ul>
                     </li>
+                    <% if (req.user.role != 'student') { %>
+                    <li class="active"><a href="/theses"><i class="fa fa-sitemap"></i> Khóa luận của sinh viên </a>
+                    </li>
+                    <% } else { %>
+                    <li class="active"><a href="/theses"><i class="fa fa-sitemap"></i> Khóa luận </a>
+                    </li>
+                    <% } %>
                 </ul>
             </div>
             <div class="menu_section">

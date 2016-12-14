@@ -33,6 +33,11 @@ exports.getFieldView = function (req, res) {
                 return res.redirect('/fields');
             }
 
+            if (!field) {
+                req.flash('errorMessage', 'Field not found.');
+                return res.redirect('/fields');
+            }
+
             getModel('user').then(function (User) {
                 User.count({
                     role: ["lecturer", ["moderator"]],

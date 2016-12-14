@@ -149,6 +149,35 @@ exports.searchLecturerByNameAPI = function (req, res) {
     })
 };
 
+
+/**
+ * Search lecturer by name without pagination. Response data only contains information about officer number and name
+ * @param req
+ * @param res
+ * @returns {*}
+ */
+exports.searchLecturerByNameNoPaginationAPI = function (req, res) {
+
+    req.checkQuery('full_name', 'Invalid name.').notEmpty();
+
+    var errors = req.validationErrors();
+
+    if (errors) {
+        return res.status(400).send(createResponse(false, null, errors[0].msg));
+    }
+
+    getModel('lecturer').then(function (Lecturer) {
+        Lecturer.searchLecturerByName(req.query.full_name, function (error, lecturers) {
+            if (error) {
+                return res.status(400).send(createResponse(false, null, errors[0].msg));
+            }
+
+            return res.send(createResponse(true, lecturers, null))
+        })
+    })
+
+}
+
 exports.searchTopicByNameAPI = function (req, res) {
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
     req.checkQuery('topic_name', 'Invalid name.').notEmpty();

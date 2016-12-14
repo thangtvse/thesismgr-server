@@ -72,6 +72,10 @@ var getData = function () {
 var setDataToTable = function () {
     $('#lecturer-list').children().remove();
 
+    if (!lecturers[page]) {
+        return;
+    }
+
     lecturers[page].forEach(function (lecturer) {
         if (lecturer.lecturer != null) {
             var fieldsHtml = "";

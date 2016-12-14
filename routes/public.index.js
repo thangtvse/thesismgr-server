@@ -51,6 +51,11 @@ router.get('/api/search-topic', [
     BrowseAPICtrl.searchTopicByNameAPI
 ]);
 
+router.get('/api/search-lecturer-fast', [
+    hasAccess('public'),
+    BrowseAPICtrl.searchLecturerByNameNoPaginationAPI
+]);
+
 router.get('/change-password-first-time', [
     jwtAuth,
     authCtrl.getFirstTimeChangePasswordView
@@ -71,5 +76,7 @@ router.use('/home', [
     }
 ]);
 router.use('/profile', require('./public.profile'));
+router.use('/theses', require('./public.theses'));
+
 
 module.exports = router;

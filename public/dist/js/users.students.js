@@ -234,6 +234,11 @@ var updateInfo = function () {
 var setDataToTable = function () {
     $('.table.table-body').children().remove();
 
+
+    if (!students[page]) {
+        return;
+    }
+    
     students[page].forEach(function (student) {
         if (student.student != null) {
 

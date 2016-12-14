@@ -6,6 +6,7 @@ var theses = {};
 var hash = window.location.hash;
 var page = 1;
 var numberOfPages = $("#number-of-pages").text();
+var status = 'all';
 
 $(document).ready(function () {
 
@@ -34,10 +35,16 @@ $(document).ready(function () {
             } else {
                 setDataToTable();
             }
-
-
         }
     });
+
+    $('#status').change(function () {
+        status = $('#status').val();
+        page = 1;
+        theses = {};
+        getNumberOfPages();
+        getData();
+    })
 });
 
 var success = function (response) {
@@ -58,18 +65,44 @@ var success = function (response) {
     }
 };
 
+var getNumberOfPages = function () {
+    var data = {
+        status: status
+    };
+
+
+    $.ajax({
+        url: "/theses/api/number-of-pages",
+        method: "GET",
+        data: data,
+        success: function (response) {
+            if (response.status == true) {
+
+                console.log(response);
+
+                numberOfPages = response.data;
+                $("#pagination").pagination('redraw');
+
+                setDataToTable((page - 1) * 10, response.data.length);
+
+            } else {
+                showError(response.message)
+            }
+        },
+        error: errorHandler
+    });
+};
+
 var getData = function () {
 
     var data = {
-        page: page
+        page: page,
+        status: status
     };
 
-    if ($("#current-role").text() == "moderator") {
-        data.faculty_id = $("#current-facultyID").text();
-    }
 
     $.ajax({
-        url: "/admin/theses/api/theses",
+        url: "/theses/api/all",
         method: "GET",
         data: data,
         success: success,
@@ -87,11 +120,11 @@ var setDataToTable = function () {
     theses[page].forEach(function (thesis) {
 
         $('#table-theses').append('<tr>' +
-            '<td>' + thesis.name + '</td>' +
-            '<td>' + formatDate(thesis.from) + '</td>' +
-            '<td>' + formatDate(thesis.to) + '</td>' +
+            '<td>' + thesis.student.user.fullName + '</td>' +
+            '<td>' + thesis.student.user.officerNumber + '</td>' +
+            '<td>' + thesis.title +
             '<td>' + thesis.faculty.name + '</td>' +
-            '<td>' + '</td>' +
+            '<td>' + thesis.status + '</td>' +
             '<td><a href="#" onclick="notify(event, \'' + thesis.id + '\')">Send Notifications</a></td>' +
             '</tr>'
         )

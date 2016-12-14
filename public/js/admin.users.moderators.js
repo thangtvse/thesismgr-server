@@ -39,11 +39,7 @@ $(document).ready(function () {
                             })
 
                         } else {
-                            $.toast({
-                                heading: 'Error',
-                                text: response.message,
-                                icon: 'error',
-                            })
+                            showError(response.message);
                         }
                     },
                     error: errorHandler
