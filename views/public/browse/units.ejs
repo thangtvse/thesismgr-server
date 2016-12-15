@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <div class="row">
+                <% units.forEach(function (unit) {
+                if (unit.type == 'faculty') { %>
+                <div class="col-lg-6 col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><a href="/units/<%= unit.urlName %>"><%= unit.name %></a></div>
+                        <div class="panel-body">
+                            <%- trees[unit.urlName] %>
+                        </div>
+                    </div>
+                </div>
+                <% }
+                }) %>
+            </div>
+
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+
+</body>
+</html>
+
+

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/admin.head.ejs', {title: "ThesisMgr"}) %>
+
+<body>
+
+<div id="wrapper">
+
+    <% include ../../partials/admin.navbar.ejs %>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Moderators</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <% faculties.forEach(function (faculty) { %>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <%= faculty.name %>
+                        </div>
+                        <div class="panel-body">
+                            <% moderators.filter(function (moderator) {
+                                return moderator.faculty.id == faculty.id;
+                            }).forEach(function (moderator) { %>
+                            <div class="panel panel-default category-item">
+                                <div class="panel-body">
+                                    <%= moderator.officerNumber %> - <%= moderator.fullName %> - <span
+                                            class="label label-default"><%= moderator.unit.name %></span></h3>
+                                    <a class="pull-right" href="/admin/users/moderators/revoke?officer_number=<%=moderator.officerNumber%>">Revoke</a>
+                                </div>
+                            </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <% }) %>
+
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Add a moderator
+                        </div>
+                        <div class="panel-body">
+                            <form role="form" action="/admin/users/moderators/assign" method="post">
+                                <div class="form-group">
+                                    <label>Mã nhân viên</label>
+                                    <input class="form-control" id="new-moderator-officer-number" type="text"
+                                           name="officer_number" list="officer-number-search-list"
+                                           autocomplete="off"
+                                           required>
+                                    <p class="help-block">Officer number of the moderator (for login)</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tên Moderator</label>
+                                    <input class="form-control" id="new-moderator-officer-number" type="text"
+                                           name="full_name" list="officer-number-search-list"
+                                           autocomplete="off"
+                                           required>
+                                    <p class="help-block">Officer number of the moderator (for login)</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input class="form-control" id="new-moderator-officer-number" type="text"
+                                           name="email" list="officer-number-search-list"
+                                           autocomplete="off"
+                                           required>
+                                    <p class="help-block">Officer number of the moderator (for login)</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input class="form-control" id="new-moderator-officer-number" type="password"
+                                           name="password" list="officer-number-search-list"
+                                           autocomplete="off"
+                                           required>
+                                    <p class="help-block">Password for this moderator</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Khoa</label>
+                                    <select class="form-control" name="faculty_id" id="faculty_id">
+                                        <% faculties.forEach(function (faculty) { %>
+                                        <option
+                                                class="faculty-option-item"
+                                                value="<%= faculty.id %>"><%= faculty.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">Faculty of this moderator</p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Tạo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ../../partials/admin.scripts.ejs %>
+<script type="text/javascript" src="/dist/js/admin.users.moderators.min.js"></script>
+</body>
+
+</html>
+
+
+
+

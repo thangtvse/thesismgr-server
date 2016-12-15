@@ -1,0 +1,74 @@
+<!Doctype html>
+<html>
+<meta charset="utf-8"/>
+<%- include('../../partials/admin.head.ejs', {title: "Lecturers"}) %>
+
+
+<body>
+<div id="wrapper">
+
+    <% include ../../partials/admin.navbar.ejs %>
+
+    <span id="number-of-pages" hidden><%= numberOfPages %></span>
+    <span id="current-role" hidden><%= req.user.role %></span>
+    <span id="current-facultyID" hidden><%= req.user.faculty.id %></span>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+            <!-- show any messages that come back with authentication -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Danh sách đề tài</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <table class="table table-striped" id="table-theses">
+                <thead>
+                <tr class="table table-header">
+                    <th>Tiêu đề</th>
+                    <th>Sinh viên</th>
+                    <th>Giảng viên</th>
+                    <th>Khoa</th>
+                    <th>Lĩnh vực</th>
+                    <th>Ngày bảo vệ</th>
+                    <th>Kỳ bảo vệ</th>
+                    <th>Trạng thái</th>
+                    <th>Tác vụ</th>
+                </tr>
+                </thead>
+                <tbody id="table-theses-body">
+
+                </tbody>
+            </table>
+
+            <nav aria-label="Page navigation" style="text-align: center;">
+                <ul id="pagination" class="pagination">></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ../../partials/admin.scripts.ejs %>
+<script type="text/javascript" src="/dist/js/admin.theses.theses.min.js"></script>
+</body>
+</html>

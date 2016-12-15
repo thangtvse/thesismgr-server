@@ -1,0 +1,111 @@
+<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/admin">ThesisMgr Admin Dashboard</a>
+    </div>
+    <!-- /.navbar-header -->
+
+    <ul class="nav navbar-top-links navbar-right">
+        <!-- /.dropdown -->
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user">
+                <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                </li>
+                <li class="divider"></li>
+                <li><a href="/admin/logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                </li>
+            </ul>
+            <!-- /.dropdown-user -->
+        </li>
+        <!-- /.dropdown -->
+    </ul>
+    <!-- /.navbar-top-links -->
+
+
+    <div class="navbar-default sidebar" role="navigation" hidden>
+        <div class="sidebar-nav navbar-collapse">
+            <ul class="nav" id="side-menu">
+
+                <li>
+                    <a href="/admin"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Quản lý tài khoản<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <% if (req.user.role == 'admin') { %>
+                        <li>
+                            <a href="/admin/users/moderators">Moderators</a>
+                        </li>
+                        <% } %>
+
+                        <li>
+                            <a href="/admin/users/lecturers">Giảng viên</a>
+                        </li>
+                        <li>
+                            <a href="/admin/users/students">Sinh viên</a>
+                        </li>
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Phân loại<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <% if (req.user.role == 'admin') { %>
+                        <li>
+                            <a href="/admin/categories/units">Đơn vị</a>
+                        </li>
+                        <% } %>
+
+                        <% if (req.user.role == 'admin') { %>
+                        <li>
+                            <a href="/admin/categories/fields">Lĩnh vực</a>
+                        </li>
+                        <% } %>
+
+                        <li>
+                            <a href="/admin/categories/courses">Khóa đào tạo</a>
+                        </li>
+                        <li>
+                            <a href="/admin/categories/programs">Chương trình đào tạo</a>
+                        </li>
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Quản lý đề tài<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="/admin/theses/theses">Danh sách đề tài</a>
+                        </li>
+                        <li>
+                            <a href="/admin/theses/sessions">Quản lý đăng ký</a>
+                        </li>
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>
+
+                <% if (req.user.role == 'moderator'){ %>
+                <li>
+                    <a href="/admin/tools"><i class="fa fa-bar-chart-o fa-fw"></i> Tiện ích</a>
+                    <!-- /.nav-second-level -->
+                </li>
+                <% } %>
+                <li>
+                    <a href="/admin/councils"><i class="fa fa-bar-chart-o fa-fw"></i> Quản lý hội đồng</a>
+                    <!-- /.nav-second-level -->
+                </li>
+            </ul>
+        </div>
+        <!-- /.sidebar-collapse -->
+    </div>
+
+    <!-- /.navbar-static-side -->
+</nav>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+
+        <span id="current-field-ids" hidden><%= JSON.stringify(profile.lecturer.fields) %></span>
+        <span id="current-faculty-id" hidden><%= profile.faculty.id %></span>
+        <span id="current-unit-id" hidden><%= profile.unit.id %></span>
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="row">
+                <div class="col-md-2 col-sm-0"></div>
+                <div class="col-md-8 col-sm-12">
+                    <div class="x_panel">
+                        <div class="x_title">Cập nhật thông tin cá nhân</div>
+                        <div class="x_content">
+
+                            <div class="row alert-container">
+                                <!-- show any messages that come back with authentication -->
+
+                                <% if (message && message.length > 0) { %>
+                                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <strong>Error!</strong>
+                                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                                </div>
+                                <% } %>
+
+                            </div>
+
+
+                            <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                                    <li role="presentation" class=""><a href="#tab_content1" id="info-tab"
+                                                                        role="tab" data-toggle="tab"
+                                                                        aria-expanded="false">Thông tin</a>
+                                    </li>
+                                    <li role="presentation" class=""><a href="#tab_content2" role="tab"
+                                                                        id="topics-tab" data-toggle="tab"
+                                                                        aria-expanded="false">Chủ đề nghiên
+                                            cứu</a>
+                                    </li>
+                                </ul>
+                                <div id="myTabContent" class="tab-content">
+                                    <div role="tabpanel" class="tab-pane fade active in" id="tab_content1"
+                                         aria-labelledby="info-tab">
+                                        <form class="form-horizontal form-label-left"
+                                              action="/profile/api/update-profile" method="POST" id="info-form">
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Họ
+                                                    và tên</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <input type="text" class="form-control" id="full-name"
+                                                           name="full_name"
+                                                           placeholder="Nguyễn Văn A"
+                                                           value="<%= req.user.fullName %>"
+                                                           required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Học
+                                                    hàm/ học vị</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <input class="form-control" name="rank"
+                                                           id="rank"
+                                                           form="profile"
+                                                           value="<%= req.user.lecturer[0].rank %>"
+                                                           required>
+                                                    </input>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                                       for="username">Khoa</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" name="faculty_id"
+                                                            form="profile"
+                                                            id="faculty-id"
+                                                            value="<%= req.user.faculty.id %>"
+                                                            required>
+                                                        <% units.forEach(function (unit) {
+                                                        if (unit.type == 'faculty') { %>
+                                                        <option value="<%= unit.id %>" data-left="<%= unit.left %>"
+                                                                data-right="<%= unit.right %>"><%= unit.name %></option>
+                                                        <% }
+                                                        }) %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                                       for="username">Đơn vị</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="form-control" name="unit_id"
+                                                            form="profile"
+                                                            id="unit-id"
+                                                            value="<%= req.user.unit.id %>"
+                                                            required>
+                                                        <% units.forEach(function (unit) { %>
+                                                        <option value="<%= unit.id %>" class="unit-option-item"
+                                                                data-faculty-id="<%= unit.faculty %>"
+                                                                data-left="<%= unit.left %>"
+                                                                data-right="<%= unit.right %>"><%= unit.name %></option>
+                                                        <% }) %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                                       for="research">Lĩnh vực nghiên cứu</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <select class="selectpicker" data-live-search="true"
+                                                            data-selected-text-format="count" multiple required
+                                                            id="field-ids">
+
+                                                        <% fields.forEach(function (field) { %>
+                                                        <option value="<%= field.id %>"><%= field.name %></option>
+                                                        <% }) %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                                       for="email">Email</label>
+                                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                                    <input type="email" class="form-control" id="email" name="email"
+                                                           placeholder="someone@gmail.com"
+                                                           value="<%= req.user.email %>" required>
+                                                    <label id="emailErr"></label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="text-align: center">
+                                                <input type="submit" class="btn btn-primary" value="Cập nhật">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane fade" id="tab_content2"
+                                         aria-labelledby="opics-tab">
+                                        <button type="button" class="btn btn-default" id="btn-add-topic"
+                                                style="margin-bottom: 20px">
+                                            <i class="fa fa-plus"></i> Thêm chủ đề nghiên cứu
+                                        </button>
+
+                                        <div id="topics">
+                                            <% topics.forEach(function (topic) { %>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h5><%= topic.title %></h5>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <p><%= topic.description %></p>
+                                                </div>
+                                                <div class="panel-footer">
+                                                    <% topic.fields.forEach(function (field, index) { %>
+                                                    <% if (index != (topic.fields.length - 1)) { %>
+                                                    <%= field.name + ", " %>
+                                                    <% } else { %>
+                                                    <%= field.name %>
+                                                    <% }
+                                                    }) %>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ROW END -->
+            <!-- SECTION END -->
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="add-topic-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Thêm chủ đề nghiên cứu</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <p class="help-block">Fill in information for the session that you want to add.</p>
+                    <form id="topic-form">
+                        <div class="form-group">
+                            <label for="session-name">
+                                Tên chủ đề nghiên cứu
+                            </label>
+                            <input type="text" class="form-control" id="topic-title"
+                                   name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="from">Mô tả</label>
+                            <textarea class="form-control" rows="5" id="topic-description" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="research">Lĩnh vực nghiên cứu</label>
+                            <select id="topic-field-ids" class="selectpicker" data-live-search="true"
+                                    data-selected-text-format="count" multiple required>
+
+                                <% fields.forEach(function (field) { %>
+                                <option value="<%= field.id %>"><%= field.name %></option>
+                                <% }) %>
+                            </select>
+
+                        </div>
+
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary">Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- /page content -->
+
+    <!-- footer content -->
+    <%- include('../../partials/public.footer.ejs') %>
+    <!-- /footer content -->
+</div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+<script src="/dist/js/public.lecturer-profile.edit.min.js"></script>
+</body>
+</html>

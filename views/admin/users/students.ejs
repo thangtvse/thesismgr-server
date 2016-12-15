@@ -1,0 +1,298 @@
+<!Doctype html>
+<html>
+<meta charset="utf-8"/>
+<%- include('../../partials/admin.head.ejs', {title: "Students"}) %>
+
+
+<body>
+<div id="wrapper">
+
+    <% include ../../partials/admin.navbar.ejs %>
+
+    <span id="number-of-pages" hidden><%= numberOfPages %></span>
+    <span id="current-role" hidden><%= req.user.role %></span>
+    <span id="current-facultyID" hidden><%= req.user.faculty.id %></span>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+            <!-- show any messages that come back with authentication -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Sinh viên</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <div class="btn-group">
+                <!-- Trigger the modal with a button -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-student-modal">
+                    <i class="fa fa-plus"></i> Thêm sinh viên
+                </button>
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#upload-registrable-students-modal">
+                    <i class="fa fa-upload"></i> Upload Thesis Registrable Students
+                </button>
+            </div>
+
+            <table class="table table-striped" id="table-students">
+                <thead>
+                <tr class="table table-header">
+                    <th>Mã sinh viên</th>
+                    <th>Họ và tên</th>
+                    <th>Email</th>
+                    <th>Khoa</th>
+                    <th>Khóa</th>
+                    <th>Chương trình đào tạo</th>
+                    <th>Trạng thái</th>
+                    <th>Tác vụ</th>
+                </tr>
+                </thead>
+                <tbody class="table table-body">
+
+                </tbody>
+            </table>
+
+            <nav aria-label="Page navigation" style="text-align: center;">
+                <ul id="pagination" class="pagination">></ul>
+            </nav>
+
+            <!-- Modal -->
+            <div id="create-student-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Tạo sinh viên</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#menu1">Create Manually</a></li>
+                                <li><a data-toggle="tab" href="#menu2">Use Excel File</a></li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div id="menu1" class="tab-pane fade in active">
+                                    <p class="help-block">Fill in information for the student that you want to add.</p>
+                                    <form method="post" name="register" action="/admin/users/students/create">
+                                        <div class="form-group">
+                                            <label for="unit_number">
+                                                Mã sinh viên:
+                                            </label>
+                                            <input type="number" class="form-control" id="unit_number"
+                                                   name="officer_number">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="email">Email:</label>
+                                            <input type="email" class="form-control" id="email" name="email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Khoa</label>
+                                            <select class="form-control" name="faculty_id" id="faculty_id">
+                                                <% faculties.forEach(function (faculty) { %>
+                                                <option
+                                                        class="faculty-option-item"
+                                                        value="<%= faculty.id %>"><%= faculty.name %></option>
+                                                <% }) %>
+                                            </select>
+                                            <p class="help-block">Course of the new student that you want to add.</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Khóa</label>
+                                            <select class="form-control" name="course_id">
+                                                <% courses.forEach(function (course) { %>
+                                                <option
+                                                        class="course-option-item"
+                                                        value="<%= course.id %>"
+                                                        data-faculty-id="<%= course.faculty %>"><%= course.name %></option>
+                                                <% }) %>
+                                            </select>
+                                            <p class="help-block">Course of the new student that you want to add.</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Chương trình đào tạo</label>
+                                            <select class="form-control" name="program_id">
+                                                <% programs.forEach(function (program) { %>
+                                                <option class="program-option-item"
+                                                        value="<%= program.id %>"
+                                                        data-faculty-id="<%= program.faculty %>"><%= program.name %></option>
+                                                <% }) %>
+                                            </select>
+                                            <p class="help-block">Program of the new student that you want to add.</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="name">Tên:</label>
+                                            <input type="text" class="form-control" id="name" name="full_name">
+                                        </div>
+                                        <div class="text-right">
+                                            <button type="submit" class="btn btn-primary">Tạo</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="menu2" class="tab-pane fade">
+                                    <p class="help-block">Create a list of student using a excel(.xlsx) file.</p>
+                                    <p class="help-block">The excel file must be formatted like the one this image. Name
+                                        of columns do not need to be exactly the same as this image but their order must
+                                        be fixed in this order.</p>
+                                    <img src="/dist/img/students.excel-example.png" style="max-width:100%;">
+                                    <form role="form" method="post" enctype="multipart/form-data"
+                                          action="/admin/users/students/create-xlsx" style="margin-top: 10px">
+                                        <label>Excel file</label>
+                                        <input type="file" name="xlsx" accept=".xlsx, .xls" class="custom-file-input"
+                                               required>
+                                        <div class="text-right">
+                                            <button type="submit" class="btn btn-primary">Tạo</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="update-student-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Update Student Info</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <p class="help-block">Fill in information for the student that you want to add.</p>
+                            <form method="post" name="register" action="#">
+                                <div class="form-group">
+                                    <label for="unit_number">
+                                        Student Code:
+                                    </label>
+                                    <input type="number" class="form-control" id="update-officer-number"
+                                           name="officer_number"
+                                           disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email:</label>
+                                    <input type="email" class="form-control" id="update-email" name="email">
+                                </div>
+                                <div class="form-group">
+                                    <label>Faculty</label>
+                                    <select class="form-control" name="unit_id" id="update-faculty-id">
+                                        <% faculties.forEach(function (faculty) { %>
+                                        <option
+                                                class="update-faculty-option-item"
+                                                value="<%= faculty.id %>"><%= faculty.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">Course of the new student that you want to add.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Course</label>
+                                    <select class="form-control" name="course_id" id="update-course-id">
+                                        <% courses.forEach(function (course) { %>
+                                        <option
+                                                class="update-course-option-item"
+                                                value="<%= course.id %>"
+                                                data-faculty-id="<%= course.faculty %>"><%= course.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">Course of the new student that you want to add.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Program</label>
+                                    <select class="form-control" name="program_id" id="update-program-id">
+                                        <% programs.forEach(function (program) { %>
+                                        <option class="update-program-option-item"
+                                                value="<%= program.id %>"
+                                                data-faculty-id="<%= program.faculty %>"><%= program.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">Program of the new student that you want to add.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Name:</label>
+                                    <input type="text" class="form-control" id="update-full-name" name="full_name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Course</label>
+                                    <select class="form-control" name="thesis_registrable"
+                                            id="update-thesis-registrble">
+                                        <option value="true">YES</option>
+                                        <option value="false">NO</option>
+                                    </select>
+                                    <p class="help-block">Course of the new student that you want to add.</p>
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary" id="btn-update-submit">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="upload-registrable-students-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Upload Registrable Students</h4>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <p class="help-block">Upload a list of students that are able to register their thesis using
+                                a excel(.xlsx) file.</p>
+                            <p class="help-block">The excel file must be formatted like the one this image. Name
+                                of columns do not need to be exactly the same as this image but their order must
+                                be fixed in this order.</p>
+                            <img src="/dist/img/students.excel-example.png" style="max-width:100%;">
+                            <form role="form" method="post" enctype="multipart/form-data"
+                                  action="/admin/users/students/upload_registrable_students_xlsx"
+                                  style="margin-top: 10px">
+                                <label>Excel file</label>
+                                <input type="file" name="xlsx" accept=".xlsx, .xls" class="custom-file-input"
+                                       required>
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">
+                                        Submit
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ../../partials/admin.scripts.ejs %>
+<script type="text/javascript" src="/dist/js/admin.users.students.min.js"></script>
+</body>
+</html>

@@ -1,30 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/index/img/favicon.ico">
 
-<%- include('./patrials/head.ejs', {title: "ThesisMgr"}) %>
+    <title>Hệ thống quản lý Khóa Luận</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/vendor/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/index/css/custom-animations.css" rel="stylesheet">
+    <link href="/index/css/style.css" rel="stylesheet">
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/index/js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
 
 <body>
 
-<div id="wrapper">
-
-    <% include ./patrials/navbar.ejs %>
-
-    <!-- Navigation -->
-    <div id="page-wrapper">
-
-        <div class="container-fluid">
-            This is index
+<!--HEADER  -->
+<div id="h">
+    <div class="container">
+        <div class="row">
+            <li><a href="/login"><button class="btn btn-lg btn-info btn-register">Login</button></a></li>
+            <div class="col-md-10 col-md-offset-1 mt">
+                <h3>Một hệ thống mạnh mẽ được xây dựng để giúp bạn</h3>
+                <h1 class="mb">Bảo vệ khóa luận </h1>
+            </div>
+            <div class="col-md-12 mt hidden-xs">
+                <img src="/index/img/graph.png" class="img-responsive aligncenter" alt="" data-effect="slide-bottom">
+            </div>
         </div>
-    </div>
+    </div><!--/container -->
+</div><!--/h -->
+
+<!-- ********** FIRST ********** -->
+<div id="w">
+    <div class="row nopadding">
+        <div class="col-md-5 col-md-offset-1 mt">
+            <h4>Quản lý quá trình đăng ký dành cho sinh viên</h4>
+            <p>Đơn giản chỉ cần đăng nhập và tiến hành đăng ký đề tài.</p>
+            <p>Các bước tiến hành đơn giản ,hỗ trợ tìm kiếm thông tin chính xác cho quá trình đang ký khóa luận, đồng thời cung cấp tính năng theo dõi quá trình bảo vệ và chỉnh sửa khóa luận đã đăng ký.</p>
+            <p>.</p>
+            <p class="mt"><a href="/login"><button class="btn btn-info btn-theme">Đăng nhập ngay bây giờ</button></a></p>
+        </div>
+
+        <div class="col-md-6 pull-right">
+            <img src="/index/img/shot01.png" class="img-responsive alignright" alt="" data-effect="slide-right">
+        </div>
+    </div><!--/row -->
+</div><!--/container -->
 
 
-</div>
-<!-- /#wrapper -->
+<!-- ********** BLUE SECTION - PICTON ********** -->
+<div id="picton">
+    <div class="row nopadding">
+        <div class="col-md-6 pull-left">
+            <img src="/index/img/shot02.png" class="img-responsive alignleft" alt="" data-effect="slide-left">
+        </div>
+        <div class="col-md-5 mt">
+            <h4>Quản lý quá trình đăng ký dành cho giảng viên</h4>
+            <p>Dễ dàng quản lý và phân loại đề tài .</p>
+            <p>Chỉ cần đăng nhập và tiến hành các bước đã được hướng dẫn, mọi việc sẽ trở nên đơn giản và được phân phối theo thời gian, giảm thiểu công sức tối đa.</p>
+            <p>.</p>
+            <p class="mt"><a href="/login"><button class="btn btn-white btn-theme">Đăng nhập ngay bây giờ</button></a></p>
+        </div>
 
-<%- include ./patrials/scripts.ejs%>
+    </div><!--row -->
+</div><!--/Picton -->
 
+
+
+
+<!-- ********** CREDITS ********** -->
+<div id="c">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 centered">
+                <p>Copyright 2014 | LandingSumo.com</p>
+            </div>
+        </div>
+    </div><!--/container -->
+</div><!--/C -->
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/vendor/jquery/dist/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="/index/js/retina-1.1.0.js"></script>
+<script src="/index/js/jquery.unveilEffects.js"></script>
 </body>
-
 </html>
-
-

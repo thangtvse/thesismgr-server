@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="login">
+<div>
+    <a class="hiddenanchor" id="signup"></a>
+    <a class="hiddenanchor" id="signin"></a>
+
+    <div class="login_wrapper">
+        <div class="animate form login_form">
+            <section class="login_content">
+
+                <!-- show any messages that come back with authentication -->
+                <% if (message.length > 0) { %>
+                <div class="alert alert-danger"><%= message %></div>
+                <% } %>
+
+                <form action="/login" method="post">
+                    <h1>Login Form</h1>
+                    <div>
+                        <input type="text" class="form-control" placeholder="Officer number/ Student code" name="officer_number" required/>
+                    </div>
+                    <div>
+                        <input type="password" class="form-control" placeholder="Password" name="password" required />
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-default">Log in</button>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <div class="separator">
+                        <div>
+                            <h1><i class="fa fa-paw"></i> ThesisMgr</h1>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+</html>

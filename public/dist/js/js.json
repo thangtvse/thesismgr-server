@@ -1,0 +1,47 @@
+[
+  {
+    "categories.courses.min": {
+      "public/js/categories.courses.min.js": "1480833983040"
+    }
+  },
+  {
+    "categories.fields.min": {
+      "public/js/categories.fields.min.js": "1480833983040"
+    }
+  },
+  {
+    "categories.programs.min": {
+      "public/js/categories.programs.min.js": "1480833983040"
+    }
+  },
+  {
+    "categories.units.min": {
+      "public/js/categories.units.min.js": "1480833983040"
+    }
+  },
+  {
+    "sb-admin-2.min": {
+      "public/js/sb-admin-2.min.js": "1480833983040"
+    }
+  },
+  {
+    "theses.sessions.min": {
+      "public/js/theses.sessions.min.js": "1480833983040"
+    }
+  },
+  {
+    "users.lecturers.min": {
+      "public/js/users.lecturers.min.js": "1480833983040"
+    }
+  },
+  {
+    "users.moderators.min": {
+      "public/js/users.moderators.min.js": "1480833983040"
+    }
+  },
+  {
+    "users.students.min": {
+      "public/js/users.students.min.js": "1480833983040"
+    }
+  }
+]

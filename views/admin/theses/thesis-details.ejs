@@ -1,0 +1,195 @@
+<!Doctype html>
+<html>
+<meta charset="utf-8"/>
+<%- include('../../partials/admin.head.ejs', {title: "Lecturers"}) %>
+
+
+<body>
+<div id="wrapper">
+
+    <% include ../../partials/admin.navbar.ejs %>
+
+    <span id="role" hidden><%= req.user.role %></span>
+    <span id="current-facultyID" hidden><%= req.user.faculty.id %></span>
+    <span id="thesis-id" hidden><%= thesis.id %></span>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+            <!-- show any messages that come back with authentication -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><%= thesis.title %></h3>
+                    <small id="updated-at">Cập nhật lần cuối: <%= thesis.updatedAt %></small>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <div class="row" style="margin-top: 20px">
+                <div class="col-lg-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Mô tả
+                        </div>
+                        <div class="panel-body">
+                            <%- thesis.description %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Thông tin
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="project_detail">
+                                <h5 class="title">Sinh viên</h5>
+                                <p><a href="#"><%= thesis.student.user.fullName %></a></p>
+                                <div class="clearfix"></div>
+
+                                <h5 class="title">Giảng viên hướng dẫn</h5>
+                                <p>
+                                    <a href="/lecturers/<%= thesis.lecturer.user.officerNumber %>"><%= thesis.lecturer.user.fullName %></a>
+                                </p>
+                                <div class="clearfix"></div>
+
+                                <h5 class="title">Ngày tạo</h5>
+                                <p id="creation-date"><%= thesis.createdAt %></p>
+                                <div class="clearfix"></div>
+
+                                <h5 class="title">Lĩnh vực liên quan</h5>
+
+                                <% thesis.fields.forEach(function (field, index) { %>
+                                <% if (index != (thesis.fields.length - 1)) { %>
+                                <a href="/fields/<%= field.urlName %>"> <%= field.name + ", " %></a>
+                                <% } else { %>
+                                <a href="/fields/<%= field.urlName %>"> <%= field.name %></a>
+                                <% }
+                                }) %>
+                                </p>
+                                <div class="clearfix"></div>
+
+                                <h5 class="title">Trạng thái</h5>
+                                <p><%= thesis.status.content %></p>
+                                <div class="clearfix"></div>
+
+                                <% if (thesis.council) { %>
+                                <h5 class="title">Hội đồng bảo vệ</h5>
+                                <p id="creation-date"><%= thesis.council.name %></p>
+                                <div class="clearfix"></div>
+                                <% } %>
+
+                                <% if ((req.user.role == 'moderator' && req.user.faculty.id == thesis.faculty.id)
+                                        || (req.user.role == 'admin')) { %>
+                                <h5 class="title">Tùy chọn</h5>
+                                <p>
+                                <div class="clearfix"></div>
+
+                                <div id="thesis-processes"></div>
+                                </p>
+                                <div class="clearfix"></div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="assign-council-modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Create Session</h4>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <p class="help-block">Phân công hội đồng phản biện cho khóa luận</p>
+                            <form id="assign-council-form" action="/admin/theses/assign-council" method="post">
+                                <div class="form-group">
+
+                                    <input name="thesis_id" value="<%= thesis.id %>" hidden>
+                                    <label>Hội đồng</label>
+                                    <select class="form-control" name="council_id" id="council-id" required>
+                                        <% if (req.user.role != 'admin') {
+                                            councils = councils.filter(function (council) {
+                                                return council.faculty == req.user.faculty.id;
+                                            });
+                                        }
+
+                                        councils.forEach(function (council) { %>
+                                        <option
+                                                class="faculty-option-item"
+                                                value="<%= council.id %>"><%= council.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">Course of the new student that you want to add.</p>
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ../../partials/admin.scripts.ejs %>
+<script type="text/javascript" src="/dist/js/admin.theses.theses.min.js"></script>
+<script type="text/javascript">
+
+    var date = moment($('#creation-date').text());
+    $('#creation-date').html(moment(date).format('MMMM Do YYYY, h:mm:ss a'));
+
+    var date = moment($('#updated-at').text());
+    $('#updated-at').html("Sửa đổi lần cuối: " + moment(date).format('MMMM Do YYYY, h:mm:ss a'));
+
+    var thesisID = $('#thesis-id').text();
+    var status = '<%- JSON.stringify(thesis.status) %>';
+    var role = $('#role').text();
+
+    $('#thesis-processes').buildThesisProcesses(thesisID, JSON.parse(status), role);
+
+    if (JSON.parse(status).id == 7 && role == 'moderator') {
+        $('#thesis-processes').append('<a href="/admin/theses/api/export-stop-request-doc?thesis_id=' + thesisID + '"><button class="btn btn-default">Xuất biên bản dừng khóa luận</button></a>')
+    }
+
+    if (JSON.parse(status).id == 9 && role == 'moderator') {
+        $('button[data-index=0]').click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            $('#assign-council-modal').modal('toggle');
+        })
+    }
+</script>
+</body>
+</html>

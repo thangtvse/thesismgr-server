@@ -3,47 +3,62 @@
  */
 
 var roles = require('../config/roles');
+var jwt = require('jsonwebtoken');
+var authConfig = require('../config/auth');
+var createResponse = require('../helpers/response').createRes;
 
 exports.hasAccess = function (accessLevel) {
     return function (req, res, next) {
 
+        var redirectUrl;
+
+        if (accessLevel == 'student' || accessLevel == 'lecturer' || accessLevel == 'public') {
+            redirectUrl = '/login';
+        } else {
+            redirectUrl = '/admin/login';
+        }
+
+
         if (req.isAuthenticated() && roles[accessLevel].indexOf(req.user.role) > -1) {
             return next();
         } else {
-            return res.redirect('/login');
+            return res.redirect(redirectUrl);
         }
 
     }
 };
 
-exports.adminAuth = function (req, res, next) {
+exports.hasRole = function (role) {
+    return function (req, res, next) {
 
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated() && req.user.role == 'admin')
-        return next();
+        var redirectUrl;
 
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
+        if (role == 'student' || role == 'lecturer' || role == 'public') {
+            redirectUrl = '/login';
+        } else {
+            redirectUrl = '/admin/login';
+        }
+
+
+        if (req.isAuthenticated() && role == req.user.role) {
+            return next();
+        } else {
+            return res.redirect(redirectUrl);
+        }
+
+    }
 };
 
-exports.moderatorAuth = function (req, res, next) {
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated() && (req.user.role == 'moderator' || req.user.role == 'admin'))
-        return next();
+exports.jwtAuth = function (req, res, next) {
 
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
-};
+    var token = req.query.token || req.body.token;
 
-exports.moderatorLevelAuth = function (req, res, next) {
+    jwt.verify(token, authConfig.jwtSecret, function (error, decoded) {
+        if (error) {
+            return res.status(400).send(createResponse(false, null, error.message));
+        }
 
-};
-
-
-exports.lecturerAuth = function (req, res, next) {
-
-};
-
-exports.studentAuth = function (req, res, next) {
-
+        req.decoded = decoded;
+        next();
+    })
 };

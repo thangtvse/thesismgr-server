@@ -1,0 +1,187 @@
+<!Doctype html>
+<html>
+<meta charset="utf-8"/>
+<%- include('../../partials/admin.head.ejs', {title: "Lecturers"}) %>
+
+
+<body>
+<div id="wrapper">
+
+    <% include ../../partials/admin.navbar.ejs %>
+
+    <span id="number-of-pages" hidden><%= numberOfPages %></span>
+    <span id="current-role" hidden><%= req.user.role %></span>
+    <span id="current-facultyID" hidden><%= req.user.faculty.id %></span>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+            <!-- show any messages that come back with authentication -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Hội đồng phản biện</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <!-- Trigger the modal with a button -->
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
+                <i class="fa fa-plus"></i> Tạo hội đồng mới
+            </button>
+
+            <!-- Modal -->
+            <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Tạo hội đồng</h4>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <p class="help-block">Fill in information for the session that you want to add.</p>
+                            <form method="post" name="create" action="/admin/councils/api/create">
+                                <div class="form-group">
+                                    <label for="session-name">
+                                        Tên hội đồng
+                                    </label>
+                                    <input type="text" class="form-control" id="council-name"
+                                           name="name" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Khoa</label>
+                                    <select class="form-control" name="faculty_id" id="faculty_id" required>
+                                        <% if (req.user.role != 'admin') {
+                                            faculties = faculties.filter(function (faculty) {
+                                                return faculty.id == req.user.faculty.id;
+                                            });
+                                        }
+
+                                        faculties.forEach(function (faculty) { %>
+                                        <option
+                                                class="faculty-option-item"
+                                                value="<%= faculty.id %>"><%= faculty.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">Course of the new student that you want to add.</p>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label>Kì bảo vệ</label>
+                                    <select class="form-control" name="session_id" id="session-id" required>
+                                        <% if (req.user.role != 'admin') {
+                                            sessions = sessions.filter(function (session) {
+                                                return session.faculty.id == req.user.faculty.id;
+                                            });
+                                        }
+
+                                        sessions.forEach(function (session) { %>
+                                        <option
+                                                class="faculty-option-item"
+                                                value="<%= session.id %>"><%= session.name %></option>
+                                        <% }) %>
+                                    </select>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mã chủ tịch hội đồng</label>
+                                    <input class="form-control officer-number-input" id="chairman" name="chairman" list="chairman-list"
+                                           required></input>
+                                    <datalist id="chairman-list" class="officer-number-list"></datalist>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mã thư kí hội đồng</label>
+                                    <input class="form-control officer-number-input" id="secretary" name="secretary" list="secretary-list"
+                                           required></input>
+                                    <datalist id="secretary-list" class="officer-number-list"></datalist>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mã đại diện phản biện</label>
+                                    <input class="form-control officer-number-input" id="reviewer" name="reviewer" required
+                                           list="reviewer-list"></input>
+                                    <datalist id="reviewer-list" class="officer-number-list"></datalist>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mã thành viên thứ 4</label>
+                                    <input class="form-control officer-number-input" id="fourth_member" name="fourth_member"
+                                           list="fourth_member-list"></input>
+                                    <datalist id="fourth_member-list" class="officer-number-list"></datalist>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mã thành viên thứ 5</label>
+                                    <input class="form-control officer-number-input" id="fifth_member" name="fifth_member"
+                                           list="fifth_member-list"></input>
+                                    <datalist id="fifth_member-list" class="officer-number-list"></datalist>
+                                </div>
+
+
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <table class="table table-striped" id="table-councils">
+                <thead>
+                <tr class="table table-header">
+                    <th>Tên hội đồng</th>
+                    <th>Chủ tịch</th>
+                    <th>Thư kí</th>
+                    <th>Đại diện phản biện</th>
+                    <th>Members</th>
+                    <th>Faculty</th>
+                    <th>Kì bảo vệ</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="table-councils-body">
+                </tbody>
+            </table>
+
+            <nav aria-label="Page navigation" style="text-align: center;">
+                <ul id="pagination" class="pagination">></ul>
+            </nav>
+        </div>
+    </div>
+
+
+</div>
+<!-- /#wrapper -->
+
+<%- include ../../partials/admin.scripts.ejs %>
+<script type="text/javascript" src="/dist/js/admin.councils.min.js"></script>
+</body>
+</html>

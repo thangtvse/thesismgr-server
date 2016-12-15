@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/admin.head.ejs', {title: "ThesisMgr"}) %>
+
+<body>
+
+<div id="wrapper">
+
+    <% include ../../partials/admin.navbar.ejs %>
+
+    <!-- Navigation -->
+    <div id="page-wrapper">
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Đơn vị</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Cây đơn vị
+                        </div>
+                        <div class="panel-body">
+                            <%- unit_hierarchy %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Thêm đơn vị
+                        </div>
+                        <div class="panel-body">
+
+                            <form role="form" action="/admin/categories/units" method="post">
+                                <div class="form-group">
+                                    <label>Unit name</label>
+                                    <input class="form-control new-unit-name" type="text" name="name" required>
+                                    <p class="help-block">Name of the new unit that you want to add.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Type</label>
+                                    <div class="radio">
+                                        <label style="margin-left: 10px">
+                                            <input type="radio" name="type" id="type-1" value="faculty" checked="">Faculty
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="margin-left: 10px">
+                                            <input type="radio" name="type" id="type-2" value="laboratory" checked="">Laboratory
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="margin-left: 10px">
+                                            <input type="radio" name="type" id="type-3" value="department" checked="">Department
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="margin-left: 10px">
+                                            <input type="radio" name="type" id="type-4" value="class" checked="">Class
+                                        </label>
+                                    </div>
+                                    <p class="help-block">Type of this unit</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Parent unit</label>
+                                    <input class="new-unit-parent-id" type="text" name="parent_id" hidden>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                id="category-search-drop-menu-button" data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="true">
+                                            No parent
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <div class="form-group input-group category-search">
+                                                    <input type="text" class="form-control category-search input">
+                                                    <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button"><i
+                                                            class="fa fa-search"></i>
+                                                </button>
+                                            </span>
+                                                </div>
+                                            </li>
+                                            <li class="unit-search-item"><a href="#" class="unit-search-item link"
+                                                                            data-name="No parent">No parent</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <% units.forEach(function (unit) { %>
+                                            <li class="unit-search-item"><a href="#" data-name="<%= unit.name %>"
+                                                                            data-id="<%= unit.id %>"
+                                                                            class="unit-search-item link"><%= unit.name %></a>
+                                            </li>
+                                            <% }) %>
+                                        </ul>
+                                    </div>
+                                    <p class="help-block">Parent of the new unit that you want to add.</p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Thêm</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<%- include ../../partials/admin.scripts.ejs %>
+
+<script type="text/javascript" src="/dist/js/admin.categories.units.min.js"></script>
+<script language="JavaScript">
+
+</script>
+
+</body>
+
+</html>
+
+
+
+

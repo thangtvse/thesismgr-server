@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="row">
+
+                <div class="clearfix" style="margin: 20px"></div>
+
+                <div class="row alert-container">
+                    <!-- show any messages that come back with authentication -->
+
+                    <% if (message && message.length > 0) { %>
+                    <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>Error!</strong>
+                        <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                    </div>
+                    <% } %>
+
+                </div>
+                <div class="col-md-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h4>Giảng viên: <%= profile.fullName %> </h4>
+                        </div>
+                        <div class="x_content">
+
+                            <div class="col-lg-4 col-md-6">
+
+                                <img src="http://www.lovemarks.com/wp-content/uploads/profile-avatars/default-avatar-plaid-shirt-guy.png"
+                                     class="img-thumbnail" alt="Cinque Terre">
+
+                                <div class="list-group" style="margin-top: 20px">
+                                    <div class="list-group-item">
+                                        Họ và tên
+                                        <span class="pull-right text-muted small"><em><%= profile.fullName %></em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Mã giảng viên
+                                        <span class="pull-right text-muted small"><em><%= profile.officerNumber %></em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Học hàm / Học vị
+                                        <span class="pull-right text-muted small"><em><%= profile.lecturer.rank %></em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Đơn vị
+                                        <span class="pull-right text-muted small"><em><%= profile.unit.name %></em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Khoa
+                                        <span class="pull-right text-muted small"><em><%= profile.faculty.name %> </em></span>
+                                    </div>
+                                    <div class="list-group-item">
+                                        Email
+                                        <span class="pull-right text-muted small"><em> <%= profile.email %></em></span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-lg-8 col-md-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Các lĩnh vực nghiên cứu
+                                    </div>
+                                    <div class="panel-body">
+                                        <% profile.lecturer.fields.forEach(function (field) { %>
+                                        <h5><%= field.name %></h5>
+                                        <% }) %>
+                                    </div>
+
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Các chủ đề nghiên cứu
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="topics">
+                                            <% topics.forEach(function (topic) { %>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h5><%= topic.title %></h5>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <p><%= topic.description %></p>
+                                                </div>
+                                                <div class="panel-footer">
+                                                    <% topic.fields.forEach(function (field, index) { %>
+                                                    <% if (index != (topic.fields.length - 1)) { %>
+                                                    <%= field.name + ", " %>
+                                                    <% } else { %>
+                                                    <%= field.name %>
+                                                    <% }
+                                                    }) %>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+
+</body>
+</html>

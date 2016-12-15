@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+        <span id="number-of-pages" hidden><%= numberOfPages %></span>
+        <span id="unit-id" hidden><%= unit.id %></span>
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="page-title">
+                <div class="title_left">
+                    <h3><%= unit.name %></h3>
+                </div>
+            </div>
+            <div class="clearfix" style="margin: 20px"></div>
+
+            <div class="row alert-container">
+                <!-- show any messages that come back with authentication -->
+
+                <% if (message && message.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error!</strong>
+                    <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                </div>
+                <% } %>
+
+            </div>
+
+            <div class="row" id="lecturer-list">
+            </div>
+
+            <nav aria-label="Page navigation" style="text-align: center;">
+                <ul id="pagination" class="pagination"></ul>
+            </nav>
+
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+<script type="text/javascript" src="/dist/js/public.browse.units.min.js"></script>
+</body>
+</html>
+
+
+
+

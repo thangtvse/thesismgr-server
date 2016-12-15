@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+        <span id="number-of-pages" hidden><%= numberOfPages %></span>
+
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="row">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3 style="margin-left: 10px">Khóa luận của sinh viên</h3>
+                    </div>
+                </div>
+                <div class="clearfix" style="margin: 20px"></div>
+
+                <div class="row">
+                    <!-- show any messages that come back with authentication -->
+                    <div class="row alert-container">
+                        <!-- show any messages that come back with authentication -->
+
+                        <% if (message && message.length > 0) { %>
+                        <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <strong>Error!</strong>
+                            <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                        </div>
+                        <% } %>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <select class="selectpicker pull-right" id="status">
+                            <option value="all">Tất cả</option>
+                            <option value="pending">Chờ chấp nhận</option>
+                            <option value="guiding">Đang hướng dẫn</option>
+                            <option value="completed">Đã hoàn thành</option>
+                            <option value="stopped">Đã bị dừng</option>
+                            <option value="i-am-scecretary">Các khóa luận mà tôi làm thư ký</option>
+                        </select>
+                    </div>
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table class="table table-hover table-striped" id="officer_table">
+                            <thead>
+                            <tr>
+                                <th class="topic">Tên đề tài</th>
+                                <th class="name">Tên sinh viên</th>
+                                <th class="id">MSV</th>
+                                <th> Lĩnh vực liên quan</th>
+                                <th> Trạng thái</th>
+                                <th class="details">Lựa chọn</th>
+                            </tr>
+                            </thead>
+                            <tbody id="these-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+
+                <nav aria-label="Page navigation" style="text-align: center;">
+                    <ul id="pagination" class="pagination"></ul>
+                </nav>
+            </div>
+
+
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+<script type="text/javascript" src="/dist/js/public.lecturer-theses.min.js"></script>
+
+</body>
+</html>

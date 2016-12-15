@@ -3,9 +3,6 @@ var getModels = require('express-waterline').getModels;
 
 module.exports = function (passport) {
 
-
-
-
     // =========================================================================
     // passport session setup ==================================================
     // =========================================================================
@@ -22,33 +19,66 @@ module.exports = function (passport) {
     passport.deserializeUser(function (id, done) {
         console.log('deserializeUser...');
         getModels('user').then(function (User) {
-            User.findOne({id: id}, function (err, user) {
-                console.log(user);
-                done(err, user);
-            });
+            User.findOne({id: id})
+                .populate('unit')
+                .populate('faculty')
+                .populate('student')
+                .populate('lecturer')
+                .exec(function (err, user) {
+                    console.log(user);
+                    done(err, user);
+                });
         });
     });
 
 
     // =========================================================================
-    // ADMIN LOGIN =============================================================
+    // LOGIN =============================================================
     // =========================================================================
 
-    passport.use('admin-login', new LocalStrategy({
-
-            usernameField: 'email',
+    passport.use('login', new LocalStrategy({
+            usernameField: 'officer_number',
             passwordField: 'password',
             passReqToCallback: true // allows us to pass back the entire request to the callback
         },
-        function (req, email, password, done) {
+        function (req, officerNumber, password, done) {
+
             getModels('user').then(function (User) {
-                User.adminLogin(email, password, function (err, result, user) {
+                User.login(officerNumber, password, function (err, result, user) {
                     if (err) {
                         return done(err, false, req.flash('loginMessage', 'Sorry. There are some errors.'));
                     }
 
-                    if (result == false) {
-                        return done(null, false, req.flash('loginMessage', 'Wrong username or password.'));
+                    if (result == false || ['student', 'lecturer', 'moderator'].indexOf(user.role) == -1) {
+                        return done(null, false, req.flash('loginMessage', 'Wrong officer number or password.'));
+                    }
+
+                    return done(null, user);
+                });
+            });
+        }));
+
+
+    // =========================================================================
+    // ADMIN LOGIN=============================================================
+    // =========================================================================
+
+    passport.use('admin-login', new LocalStrategy({
+
+            usernameField: 'officer_number',
+            passwordField: 'password',
+            passReqToCallback: true // allows us to pass back the entire request to the callback
+        },
+        function (req, officerNumber, password, done) {
+
+            getModels('user').then(function (User) {
+                User.login(officerNumber, password, function (err, result, user) {
+                    if (err) {
+                        return done(err, false, req.flash('loginMessage', 'Sorry. There are some errors.'));
+                    }
+
+                    if (result == false || ['admin', 'moderator'].indexOf(user.role) == -1) {
+                        return done(null, false, req.flash('loginMessage', 'Wrong officer number or password.'));
                     }
 
                     return done(null, user);

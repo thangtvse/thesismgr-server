@@ -9,14 +9,13 @@ var util = require('util');
 var async = require("async");
 
 /**
- * Find ancestors and descendants for an office node
- * @param office
+ * Find ancestors and descendants for an unit node
+ * @param unit
  * @param next
  */
-exports.findAncestorsAndDescendantsForOffice = function (office, next) {
-
-    getModel('office').then(function (Office) {
-        return findAncestorsAndDescendants(Office, office, next);
+exports.findAncestorsAndDescendantsForUnit = function (unit, next) {
+    getModel('unit').then(function (Unit) {
+        return findAncestorsAndDescendants(Unit, unit, next);
     });
 };
 
@@ -39,6 +38,7 @@ exports.findAncestorsAndDescendantsForField = function (field, next) {
  * @param next
  */
 var findAncestorsAndDescendants = function (Model, node, next) {
+
     Model.find({
         left: {
             '<': node.left
@@ -46,7 +46,7 @@ var findAncestorsAndDescendants = function (Model, node, next) {
         right: {
             '>': node.right
         }
-    }).exec(function (error, descendants) {
+    }).exec(function (error, ancestors) {
 
         if (error) {
             return next(error, null, null);
@@ -59,7 +59,7 @@ var findAncestorsAndDescendants = function (Model, node, next) {
             right: {
                 '<': node.right
             }
-        }).exec(function (error, ancestors) {
+        }).exec(function (error, descendants) {
             if (error) {
                 return next(error, null, null);
             }
@@ -199,7 +199,6 @@ exports.beforeCreateANode = function (Model, values, next) {
     })
 };
 
-
 exports.afterDestroyANode = function (Model, left, right, next) {
     // find all descendants
 
@@ -309,26 +308,33 @@ exports.afterDestroyANode = function (Model, left, right, next) {
     })
 };
 
+var createNodeWithEditAndDeleteButton = function (node) {
+
+    if (node.type != null) {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item type-" + node.type + "\"><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
+    } else {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item\"><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
+    }
+};
+
 var createNode = function (node) {
+    if (node.type != null) {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item type-" + node.type + "\"><div class=\"panel-body\">" + "<a href='/units/" + node.urlName + "'>" + node.name + "</a></div></div><ul>";
+    } else {
+        return "<li style='list-style-type: none'><div class=\"panel panel-default category-item\"><div class=\"panel-body\">" + "<a href='/units/" + node.urlName + "'>" + node.name + "</a></div></div><ul>";
+    }
+}
 
-    return "<li style='list-style-type: none'><div class=\"panel panel-default\" style='margin-bottom: 4px; position: relative;'><div class=\"panel-body\">" + node.name + editButton(node) + deleteButton(node) + "</div></div><ul>";
-
-};
-
-var createLeaf = function (node) {
-    return createNode(node);
-};
 
 var editButton = function (node) {
-    return "<a style='position: absolute; right: 60px' href=\"#\" data-action=\"edit\" data-id=\"" + node.id + "\" class=\"category-hierarchy edit\">  Edit </a>"
+    return "<a style='position: absolute; right: 60px' href=\"#\" data-action=\"edit\" data-id=\"" + node.id + "\" class=\"category-item edit\">  Edit </a>"
 };
 
 var deleteButton = function (node) {
-    return "<a style='position: absolute; right: 10px;' href=\"#\" data-action=\"delete\" data-id=\"" + node.id + "\" class=\"category-hierarchy delete\">Delete </a>"
+    return "<a style='position: absolute; right: 10px;' href=\"#\" data-action=\"delete\" data-id=\"" + node.id + "\" class=\"category-item delete\">Delete </a>"
 };
 
-exports.createTree = function (nodes) {
-
+var createTree = function (nodes, createModeHtml, createLeafHtml) {
     var htmlNodes = [];
 
     for (var i = 0; i < nodes.length; i++) {
@@ -354,9 +360,9 @@ exports.createTree = function (nodes) {
                     });
 
                     if (numOfChild > 0) {
-                        htmlNodes[i] = htmlNodes[i].concat(createNode(nodes[i]));
+                        htmlNodes[i] = htmlNodes[i].concat(createModeHtml(nodes[i]));
                     } else {
-                        htmlNodes[i] = htmlNodes[i].concat(createLeaf(nodes[i]));
+                        htmlNodes[i] = htmlNodes[i].concat(createLeafHtml(nodes[i]));
                     }
 
                     break;
@@ -384,4 +390,90 @@ exports.createTree = function (nodes) {
     htmlString = htmlString.replace(new RegExp("<ul></ul>", 'g'), "");
 
     return htmlString;
+}
+
+
+var createNavNode = function (type, node) {
+    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.urlName + "\" data-id='" + node.id + "'><i class=\"fa arrow\"></i><div class='nav-" + type + "-item' data-href=\"/" + type + "s/" + node.urlName + "\" style='margin-right: 20px'>" + node.name + "</div><span class=\"fa \"></span></a><ul class='nav'>";
+};
+var createNavLeaf = function (type, node) {
+    return "<li style='padding-left: 15px;'><a  href=\"/" + type + "s/" + node.urlName + "\" data-id='" + node.id + "'>" + node.name + "</a><ul>";
+};
+
+var createNodeWithLectuersButton = function (node) {
+    return "<li style='list-style-type: none'><div class=\"panel panel-default category-item\"><div class=\"panel-body\">" + "<a href='/fields/" + node.urlName + "'>" + node.name + "</a><a class='pull-right' href='/fields/" + node.urlName + "'>Các giảng viên</a></div></div><ul>";
+};
+
+/**
+ * Create a tree with delete and edit buttons in each item for admin dashboard
+ * @param nodes
+ */
+exports.createTreeWithEditAndDeleteButtons = function (nodes) {
+    return createTree(nodes, createNodeWithEditAndDeleteButton, createNodeWithEditAndDeleteButton)
+};
+
+exports.createNavTree = function (type, nodes) {
+
+    var htmlNodes = [];
+    for (var i = 0; i < nodes.length; i++) {
+
+        htmlNodes[i] = "";
+        if (i == 0) {
+            // first node
+
+        } else {
+
+            for (var j = i - 1; j >= 0; j--) {
+
+                if (nodes[i].left > nodes[j].left && nodes[i].left < nodes[j].right) {
+                    // if current node is a child of this node
+
+                    var numOfChild = 0;
+
+                    nodes.forEach(function (node) {
+                        if (node.left > nodes[i].left && node.right < nodes[i].right) {
+                            numOfChild++;
+                        }
+                    });
+
+                    if (numOfChild > 0) {
+                        htmlNodes[i] = htmlNodes[i].concat(createNavNode(type, nodes[i]));
+                    } else {
+                        htmlNodes[i] = htmlNodes[i].concat(createNavLeaf(type, nodes[i]));
+                    }
+
+                    break;
+                } else {
+                    // if current node is not a child of this node, close the <ul> tag of this node
+                    if (htmlNodes[j].indexOf("</ul>") == -1) {
+                        htmlNodes[i] = htmlNodes[i].concat("</ul></li>");
+                    }
+                }
+            }
+        }
+    }
+
+    var htmlString = "";
+    htmlNodes.forEach(function (htmlNode) {
+        htmlString = htmlString.concat(htmlNode);
+    });
+
+
+    htmlString = sanitizeHtml(htmlString, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['input', 'label']),
+        allowedAttributes: false
+    });
+
+    htmlString = htmlString.replace(new RegExp("<ul></ul>", 'g'), "");
+
+    return htmlString;
+};
+
+
+exports.createUnitTreeNoButton = function (nodes) {
+    return createTree(nodes, createNode, createNode);
+};
+
+exports.createFieldTreeWithLecturersButton = function (nodes) {
+    return createTree(nodes, createNodeWithLectuersButton, createNodeWithLectuersButton)
 };
