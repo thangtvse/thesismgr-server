@@ -62,7 +62,7 @@ exports.getView = function (type) {
                 } else {
 
                     // Return only one faculty which this moderator is managing
-                    process({faculty: req.user.faculty.name}, req.user.faculty, req, res);
+                    process({faculty: req.user.faculty.id}, req.user.faculty, req, res);
 
                 }
             });

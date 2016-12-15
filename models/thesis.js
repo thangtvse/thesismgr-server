@@ -66,19 +66,8 @@ module.exports = {
         dateOfProtection: {
             type: 'date'
         },
-
-        comments: {
-            collection: 'comment',
-            via: 'thesis'
-        },
-
         result: {
             type: 'float'
-        },
-
-        editingExplanations: {
-            collection: 'editingExplanation',
-            via: 'thesis'
         }
     },
 
@@ -128,6 +117,30 @@ module.exports = {
                         break;
                     case "moderator":
                         if (changer.role == 'moderator' && changer.faculty.id == thesis.faculty) {
+                            if (thesis.status == 6) {
+                                getModel('change').then(function (Change) {
+                                    Change.findOne({
+                                        thesisID: thesis.id
+                                    }).exec(function (error, change) {
+                                        if (error) {
+                                            return next(error);
+                                        }
+
+                                        if (!change) {
+                                            return next(new Error('Change not found'));
+                                        }
+
+                                        thesis.title = change.title;
+                                        thesis.lecturer = change.lecturer;
+                                        thesis.description = change.description;
+                                        thesis.fields = change.fields;
+
+                                        thesis.save(function (error) {
+                                        })
+                                    })
+                                })
+                            }
+
                             thesis.status = status.next[selectionIndex];
                         }
                         break;

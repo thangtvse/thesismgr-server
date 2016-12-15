@@ -23,6 +23,11 @@ module.exports = {
             via: 'lecturer'
         },
 
+        changes: {
+            collection: 'change',
+            via: 'lecturer'
+        },
+
         rank: {
             type: 'string'
         },

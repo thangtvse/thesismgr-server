@@ -9,6 +9,8 @@
 
         <%- include('../../partials/public.navbar.ejs') %>
         <!-- /top navigation -->
+        <span id="thesis-id"><%= thesis.id %></span>
+
 
         <!-- page content -->
         <div class="right_col" role="main">
@@ -50,7 +52,7 @@
                                     tài</label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <input class="form-control col-md-7 col-xs-12 " type="text" name="" id="title"
-                                           value="<%= thesis.title %>" required>
+                                           required>
                                 </div>
                             </div>
 
@@ -60,7 +62,8 @@
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <select id="session-id" class="selectpicker" data-live-search="true"
                                             data-selected-text-format="count"
-                                            value="<%= thesis.session.id %>"
+                                            value="<%=thesis.session.id%>"
+                                            disabled
                                             required>
 
                                         <% sessions.forEach(function (session) { %>
@@ -76,7 +79,7 @@
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <select id="field-ids" class="selectpicker" data-live-search="true"
                                             data-selected-text-format="count" multiple
-                                            value="<%= thesisFields %>"
+
                                             required>
 
                                         <% fields.forEach(function (field) { %>
@@ -289,7 +292,7 @@
 <script src="/vendor/bootstrap-wysiwyg/external/jquery.hotkeys.js"></script>
 <script src="/vendor/bootstrap-wysiwyg/external/google-code-prettify/prettify.js"></script>
 <script src="/vendor/bootstrap-wysiwyg/bootstrap-wysiwyg.js"></script>
-<script type='text/javascript' src="/dist/js/public.student-theses.new.min.js"></script>
+<script type='text/javascript' src="/dist/js/public.student-theses.edit.min.js"></script>
 
 </body>
 </html>

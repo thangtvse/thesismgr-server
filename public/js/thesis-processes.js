@@ -10,7 +10,13 @@ jQuery.fn.extend({
                 if (status.id == 9 && index == 0) {
                     o.append('' +
                         '<button class="btn btn-default" data-index="' + index + '">' + status.buttonTitles[index] + '</button>')
-                } else {
+                } else if ((status.id == 3 && index == 2)
+                    || (status.id == 4 && index == 2)
+                    || (status.id == 5 && index == 3)) {
+                    o.append('' +
+                        '<button class="btn btn-default" data-type="edit" data-index="' + index + '">' + status.buttonTitles[index] + '</button>')
+                }
+                else {
                     o.append('' +
                         '<button class="btn btn-default" data-index="' + index + '" onclick="moveThesisToNextStep(\'' + thesisID + '\', \'' + status.id + '\', \'' + index + '\', \'' + redirectURL + '\', \'' + role + '\')">' + status.buttonTitles[index] + '</button>' +
                         '')
@@ -20,6 +26,10 @@ jQuery.fn.extend({
                     '<button class="btn btn-default" data-index="' + index + '">' + status.buttonTitles[index] + '</button>')
             }
         })
+
+
+
+
 
     }
 });

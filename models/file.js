@@ -18,7 +18,10 @@ module.exports = {
 
         thesis: {
             model: 'thesis'
-        }
+        },
 
+        change: {
+            model: 'change'
+        }
     }
 };

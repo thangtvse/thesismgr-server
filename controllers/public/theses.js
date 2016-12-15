@@ -372,10 +372,65 @@ exports.thesesOfSecretary = function (req, res) {
     })
 };
 
-exports.requestChangeThesisAPI = function (req, res) {
-    if (req.user.student[0].thesisRegistrable == false) {
-        return res.status(400).send(createResponse(false, null, 'You are not able to register a new thesis.'))
+exports.editThesisView = function (req, res) {
+
+    if (!req.params.id) {
+        return res.redirect('/404');
     }
+
+    getModel('thesis').then(function (Thesis) {
+        Thesis.getThesisDetails(req.params.id, function (error, thesis) {
+            if (error) {
+                return res.redirect('/404');
+            }
+
+            if (!thesis) {
+                return res.redirect('/404');
+            }
+
+            async.parallel([
+                function (callback) {
+                    getModel('field').then(function (Field) {
+                        Field.getAllFields(function (error, results) {
+
+                            if (error) {
+                                return callback(error);
+                            }
+
+                            fields = results;
+                            return callback();
+                        })
+                    })
+                },
+                function (callback) {
+                    getModel('session').then(function (Session) {
+                        Session.getAllAvailableSessions(function (error, results) {
+                            sessions = results;
+                            return callback();
+                        })
+                    })
+                }
+            ], function (errors) {
+                if (errors && errors.length > 0) {
+                    req.flash('errorMessage', errors[0].message);
+                    return res.redirect('/theses/new');
+                }
+
+
+
+                return res.render('./public/student/theses.edit.ejs', {
+                    req: req,
+                    fields: fields,
+                    sessions: sessions,
+                    message: req.flash('errorMessage'),
+                    thesis: thesis
+                })
+            });
+        })
+    });
+};
+
+exports.requestChangeThesisAPI = function (req, res) {
 
 
     if (req.body.fields == '') {
@@ -408,10 +463,9 @@ exports.requestChangeThesisAPI = function (req, res) {
                             return res.status(400).send(createResponse(false, null, "Lecturer not found"))
                         }
 
-                        getModel('thesis').then(function (Thesis) {
-                            Thesis.update({
-                                id: req.thesis_id
-                            }, {
+                        getModel('change').then(function (Thesis) {
+                            Thesis.create({
+                                thesisID: req.body.thesis_id,
                                 title: req.body.title,
                                 session: req.body.session_id,
                                 fields: JSON.parse(req.body.fields),
@@ -425,25 +479,35 @@ exports.requestChangeThesisAPI = function (req, res) {
                                     return res.status(400).send(createResponse(false, null, error.message));
                                 }
 
-                                getModel('student').then(function (Student) {
-                                    Student.update({
-                                        id: req.user.student[0].id
-                                    }, {
-                                        thesisRegistrable: false
-                                    }).exec(function (error, updated) {
-                                        if (error) {
-                                            return res.status(400).send(createResponse(false, null, error.message));
-                                        }
+                                getModel('thesis').then(function (Theses) {
+                                   Theses.update({
+                                       id: req.body.thesis_id
+                                   }, {
+                                       status: 6
+                                   }).exec(function (error) {
+                                       if (error) {
+                                           return res.status(400).send(createResponse(false, null, error.message));
+                                       }
 
-                                        if (!updated) {
-                                            return res.status(400).send(createResponse(false, null, 'Student not found.'));
-                                        }
+                                       getModel('student').then(function (Student) {
+                                           Student.update({
+                                               id: req.user.student[0].id
+                                           }, {
+                                               thesisRegistrable: false
+                                           }).exec(function (error, updated) {
+                                               if (error) {
+                                                   return res.status(400).send(createResponse(false, null, error.message));
+                                               }
 
-                                        return res.send(createResponse(true, null, null));
-                                    })
+                                               if (!updated) {
+                                                   return res.status(400).send(createResponse(false, null, 'Student not found.'));
+                                               }
+
+                                               return res.send(createResponse(true, null, null));
+                                           })
+                                       });
+                                   })
                                 });
-
-
                             })
                         })
                     })

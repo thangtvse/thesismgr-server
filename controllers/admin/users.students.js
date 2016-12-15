@@ -316,7 +316,7 @@ exports.updateStudentAPI = function (req, res) {
                     return res.status(400).send(createResponse(false, null, "User not found."));
                 }
 
-                if (user.faculty != req.user.faculty) {
+                if (user.faculty != req.user.faculty.id) {
                     return res.status(400).send(createResponse(false, null, "You have no permission for editting this user."));
                 }
 

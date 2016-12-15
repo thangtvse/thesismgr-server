@@ -173,7 +173,9 @@
 
     $('#thesis-processes').buildThesisProcesses(thesisID, JSON.parse(status), role);
 
-    if (JSON.parse(status).id == 12 && role == 'lecturer') {
+    var status = JSON.parse(status)
+
+    if (status.id == 12 && role == 'lecturer') {
         $('button[data-index=0]').click(function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -181,6 +183,14 @@
             $('#make-result-modal').modal('toggle');
         })
     }
+
+    $('button[data-type="edit"]').click(function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        window.location.href = '/theses/' + thesisID +'/edit';
+    })
+
 </script>
 </body>
 </html>

@@ -33,6 +33,16 @@ router.post('/api/new', [
     thesesCtrl.newThesisAPI
 ]);
 
+router.post('/api/edit', [
+    hasAccess('student'),
+    thesesCtrl.requestChangeThesisAPI
+]);
+
+router.get('/:id/edit', [
+    hasAccess('public'),
+    thesesCtrl.editThesisView
+]);
+
 router.get('/:id', [
     hasAccess('public'),
     thesesCtrl.getThesisDetailsView

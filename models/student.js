@@ -35,6 +35,11 @@ module.exports = {
             via: 'student'
         },
 
+        changes: {
+            collection: 'change',
+            via: 'student'
+        },
+
         thesisRegistrable: {
             type: 'boolean',
             defaultsTo: false

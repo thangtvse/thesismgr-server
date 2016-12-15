@@ -45,6 +45,11 @@ module.exports = {
             via: 'fields'
         },
 
+        changes: {
+            collection: 'change',
+            via: 'fields'
+        },
+
         topics: {
             collection: 'topic',
             via: 'fields'
