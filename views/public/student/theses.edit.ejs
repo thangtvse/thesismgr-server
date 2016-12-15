@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/public.head.ejs', {title: "ThesisMgr"}) %>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+
+        <%- include('../../partials/public.navbar.ejs') %>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+            <div class="row">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3 style="margin-left: 10px">Đăng kí khóa luận</h3>
+                    </div>
+                </div>
+                <div class="clearfix" style="margin: 20px"></div>
+
+                <div class="row">
+                    <!-- show any messages that come back with authentication -->
+                    <div class="row alert-container">
+                        <!-- show any messages that come back with authentication -->
+
+                        <% if (message && message.length > 0) { %>
+                        <div class="alert alert-danger alert-dismissible fade in" role="alert" id="error-alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <strong>Error!</strong>
+                            <p id="error-alert-message" style="white-space:pre-wrap;"><%= message %></p>
+                        </div>
+                        <% } %>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form id="new-thesis-form" class="form-horizontal form-label-left">
+                            <!--Name-->
+
+                            <!--thesis name-->
+                            <div class="form-group ">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="thesisname">Tên đề
+                                    tài</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input class="form-control col-md-7 col-xs-12 " type="text" name="" id="title"
+                                           value="<%= thesis.title %>" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="research" class="control-label col-md-3 col-sm-3 col-xs-12">Kì đăng
+                                    kí</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select id="session-id" class="selectpicker" data-live-search="true"
+                                            data-selected-text-format="count"
+                                            value="<%= thesis.session.id %>"
+                                            required>
+
+                                        <% sessions.forEach(function (session) { %>
+                                        <option value="<%= session.id %>"><%= session.name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="research" class="control-label col-md-3 col-sm-3 col-xs-12">Lĩnh vực liên
+                                    quan</label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select id="field-ids" class="selectpicker" data-live-search="true"
+                                            data-selected-text-format="count" multiple
+                                            value="<%= thesisFields %>"
+                                            required>
+
+                                        <% fields.forEach(function (field) { %>
+                                        <option value="<%= field.id %>"><%= field.name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="research" class="control-label col-md-3 col-sm-3 col-xs-12">Giảng viên hướng
+                                    dẫn</label>
+                                <div class="dropdown col-md-6 col-sm-6 col-xs-12">
+                                    <button class="btn btn-default dropdown-toggle" type="button"
+                                            id="lecturer-search-drop-menu-button" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                        Not selected
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1"
+                                        style="margin-left: 8px; max-width: 400px" id="lecturer-dropdown">
+                                        <li id="search-box">
+                                            <div class="form-group input-group category-search" style="margin: 10px">
+                                                <input type="text" class="form-control" id="lecturer-search-input"
+                                                       autocomplete="off">
+                                                <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button"><i
+                                                            class="fa fa-search"></i>
+                                                </button>
+                                            </span>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- text area-->
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="x_panel">
+                                    <!-- Text title-->
+                                    <div class="x_title">
+                                        <h2>Nội dung đề tài</h2>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <!-- main text area-->
+                                    <div class="x_content">
+                                        <div id="alerts"></div>
+                                        <div class="btn-toolbar editor" data-role="editor-toolbar"
+                                             data-target="#editor">
+                                            <div class="btn-group">
+                                                <a class="btn dropdown-toggle" data-toggle="dropdown" title=""
+                                                   data-original-title="Font"><i class="fa fa-font"></i><b
+                                                            class="caret"></b></a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a data-edit="fontName Serif"
+                                                           style="font-family:'Serif'">Serif</a></li>
+                                                    <li><a data-edit="fontName Sans" style="font-family:'Sans'">Sans</a>
+                                                    </li>
+                                                    <li><a data-edit="fontName Arial"
+                                                           style="font-family:'Arial'">Arial</a></li>
+                                                    <li><a data-edit="fontName Arial Black"
+                                                           style="font-family:'Arial Black'">Arial Black</a></li>
+                                                    <li><a data-edit="fontName Courier" style="font-family:'Courier'">Courier</a>
+                                                    </li>
+                                                    <li><a data-edit="fontName Courier New"
+                                                           style="font-family:'Courier New'">Courier New</a></li>
+                                                    <li><a data-edit="fontName Comic Sans MS"
+                                                           style="font-family:'Comic Sans MS'">Comic Sans MS</a></li>
+                                                    <li><a data-edit="fontName Helvetica"
+                                                           style="font-family:'Helvetica'">Helvetica</a></li>
+                                                    <li><a data-edit="fontName Impact" style="font-family:'Impact'">Impact</a>
+                                                    </li>
+                                                    <li><a data-edit="fontName Lucida Grande"
+                                                           style="font-family:'Lucida Grande'">Lucida Grande</a></li>
+                                                    <li><a data-edit="fontName Lucida Sans"
+                                                           style="font-family:'Lucida Sans'">Lucida Sans</a></li>
+                                                    <li><a data-edit="fontName Tahoma" style="font-family:'Tahoma'">Tahoma</a>
+                                                    </li>
+                                                    <li><a data-edit="fontName Times"
+                                                           style="font-family:'Times'">Times</a></li>
+                                                    <li><a data-edit="fontName Times New Roman"
+                                                           style="font-family:'Times New Roman'">Times New Roman</a>
+                                                    </li>
+                                                    <li><a data-edit="fontName Verdana" style="font-family:'Verdana'">Verdana</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="btn-group">
+                                                <a class="btn dropdown-toggle" data-toggle="dropdown" title=""
+                                                   data-original-title="Font Size"><i class="fa fa-text-height"></i>&nbsp;<b
+                                                            class="caret"></b></a>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a data-edit="fontSize 5">
+                                                            <p style="font-size:17px">Huge</p>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a data-edit="fontSize 3">
+                                                            <p style="font-size:14px">Normal</p>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a data-edit="fontSize 1">
+                                                            <p style="font-size:11px">Small</p>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="btn-group">
+                                                <a class="btn" data-edit="bold" title=""
+                                                   data-original-title="Bold (Ctrl/Cmd+B)"><i
+                                                            class="fa fa-bold"></i></a>
+                                                <a class="btn" data-edit="italic" title=""
+                                                   data-original-title="Italic (Ctrl/Cmd+I)"><i
+                                                            class="fa fa-italic"></i></a>
+                                                <a class="btn" data-edit="strikethrough" title=""
+                                                   data-original-title="Strikethrough"><i
+                                                            class="fa fa-strikethrough"></i></a>
+                                                <a class="btn" data-edit="underline" title=""
+                                                   data-original-title="Underline (Ctrl/Cmd+U)"><i
+                                                            class="fa fa-underline"></i></a>
+                                            </div>
+
+                                            <div class="btn-group">
+                                                <a class="btn" data-edit="insertunorderedlist" title=""
+                                                   data-original-title="Bullet list"><i class="fa fa-list-ul"></i></a>
+                                                <a class="btn" data-edit="insertorderedlist" title=""
+                                                   data-original-title="Number list"><i class="fa fa-list-ol"></i></a>
+                                                <a class="btn" data-edit="outdent" title=""
+                                                   data-original-title="Reduce indent (Shift+Tab)"><i
+                                                            class="fa fa-dedent"></i></a>
+                                                <a class="btn" data-edit="indent" title=""
+                                                   data-original-title="Indent (Tab)"><i class="fa fa-indent"></i></a>
+                                            </div>
+
+                                            <div class="btn-group">
+                                                <a class="btn" data-edit="justifyleft" title=""
+                                                   data-original-title="Align Left (Ctrl/Cmd+L)"><i
+                                                            class="fa fa-align-left"></i></a>
+                                                <a class="btn" data-edit="justifycenter" title=""
+                                                   data-original-title="Center (Ctrl/Cmd+E)"><i
+                                                            class="fa fa-align-center"></i></a>
+                                                <a class="btn" data-edit="justifyright" title=""
+                                                   data-original-title="Align Right (Ctrl/Cmd+R)"><i
+                                                            class="fa fa-align-right"></i></a>
+                                                <a class="btn" data-edit="justifyfull" title=""
+                                                   data-original-title="Justify (Ctrl/Cmd+J)"><i
+                                                            class="fa fa-align-justify"></i></a>
+                                            </div>
+
+                                            <div class="btn-group">
+                                                <a class="btn dropdown-toggle" data-toggle="dropdown" title=""
+                                                   data-original-title="Hyperlink"><i class="fa fa-link"></i></a>
+                                                <div class="dropdown-menu input-append">
+                                                    <input class="span2" placeholder="URL" type="text"
+                                                           data-edit="createLink">
+                                                    <button class="btn" type="button">Add</button>
+                                                </div>
+                                                <a class="btn" data-edit="unlink" title=""
+                                                   data-original-title="Remove Hyperlink"><i class="fa fa-cut"></i></a>
+                                            </div>
+
+
+                                            <div class="btn-group">
+                                                <a class="btn" data-edit="undo" title=""
+                                                   data-original-title="Undo (Ctrl/Cmd+Z)"><i
+                                                            class="fa fa-undo"></i></a>
+                                                <a class="btn" data-edit="redo" title=""
+                                                   data-original-title="Redo (Ctrl/Cmd+Y)"><i class="fa fa-repeat"></i></a>
+                                            </div>
+                                        </div>
+
+                                        <div id="editor" class="editor-wrapper placeholderText"
+                                             contenteditable="true"></div>
+                                        <br>
+                                        <div class="ln_solid"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-10">
+                                    <input type="submit" value="Xác nhận" class="btn btn-primary ">
+                                    <input type="button" value="Hủy bỏ" class="btn btn-default ">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <%- include('../../partials/public.footer.ejs') %>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<%- include('../../partials/public.scripts.ejs') %>
+
+
+<script src="/vendor/bootstrap-wysiwyg/external/jquery.hotkeys.js"></script>
+<script src="/vendor/bootstrap-wysiwyg/external/google-code-prettify/prettify.js"></script>
+<script src="/vendor/bootstrap-wysiwyg/bootstrap-wysiwyg.js"></script>
+<script type='text/javascript' src="/dist/js/public.student-theses.new.min.js"></script>
+
+</body>
+</html>
