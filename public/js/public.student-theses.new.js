@@ -117,7 +117,7 @@ $(document).ready(function () {
 function setLecturer(officerNumber, name) {
     $('#lecturer-search-drop-menu-button').text(name);
     lecturerOfficerNumber = officerNumber
-}
+};
 
 function initToolbarBootstrapBindings() {
     if ("onwebkitspeechchange" in document.createElement("input")) {
@@ -130,4 +130,4 @@ function initToolbarBootstrapBindings() {
     } else {
         $('.voiceBtn').hide();
     }
-}
+};

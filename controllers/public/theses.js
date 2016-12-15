@@ -278,10 +278,11 @@ exports.newThesisAPI = function (req, res) {
                                         if (!updated) {
                                             return res.status(400).send(createResponse(false, null, 'Student not found.'));
                                         }
+
+                                        return res.send(createResponse(true, null, null));
                                     })
                                 });
 
-                                return res.send(createResponse(true, null, null));
                             })
                         })
                     })
@@ -369,4 +370,87 @@ exports.thesesOfSecretary = function (req, res) {
             })
         })
     })
-}
+};
+
+exports.requestChangeThesisAPI = function (req, res) {
+    if (req.user.student[0].thesisRegistrable == false) {
+        return res.status(400).send(createResponse(false, null, 'You are not able to register a new thesis.'))
+    }
+
+
+    if (req.body.fields == '') {
+        delete req.body.fields;
+    }
+
+    req.checkBody('thesis_id', 'Invalid thesis ID').notEmpty();
+    req.checkBody('title', 'Invalid status.').notEmpty();
+    req.checkBody('fields', 'Invalid fields.').optional().isFieldArrayStringAvailable();
+    req.checkBody('tutor_id', 'Invalid status.').notEmpty();
+    req.checkBody('description', 'Invalid description.').notEmpty();
+    req.checkBody('session_id', 'Invalid session ID.').notEmpty().isSessionIDAvailable();
+
+    req.asyncValidationErrors()
+        .then(function () {
+
+            getModel('user').then(function (User) {
+                User.findOne({
+                    officerNumber: req.body.tutor_id,
+                    role: ['moderator', 'lecturer']
+                })
+                    .populate('lecturer')
+                    .exec(function (error, user) {
+
+                        if (error) {
+                            return res.status(400).send(createResponse(false, null, error.message));
+                        }
+
+                        if (!user) {
+                            return res.status(400).send(createResponse(false, null, "Lecturer not found"))
+                        }
+
+                        getModel('thesis').then(function (Thesis) {
+                            Thesis.update({
+                                id: req.thesis_id
+                            }, {
+                                title: req.body.title,
+                                session: req.body.session_id,
+                                fields: JSON.parse(req.body.fields),
+                                student: req.user.student[0].id,
+                                lecturer: user.lecturer[0].id,
+                                faculty: req.user.faculty,
+                                description: req.body.description,
+                                status: 1
+                            }).exec(function (error) {
+                                if (error) {
+                                    return res.status(400).send(createResponse(false, null, error.message));
+                                }
+
+                                getModel('student').then(function (Student) {
+                                    Student.update({
+                                        id: req.user.student[0].id
+                                    }, {
+                                        thesisRegistrable: false
+                                    }).exec(function (error, updated) {
+                                        if (error) {
+                                            return res.status(400).send(createResponse(false, null, error.message));
+                                        }
+
+                                        if (!updated) {
+                                            return res.status(400).send(createResponse(false, null, 'Student not found.'));
+                                        }
+
+                                        return res.send(createResponse(true, null, null));
+                                    })
+                                });
+
+
+                            })
+                        })
+                    })
+            })
+
+        })
+        .catch(function (errors) {
+            return res.status(400).send(createResponse(false, null, errors[0].msg));
+        });
+};
