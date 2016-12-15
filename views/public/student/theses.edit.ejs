@@ -51,7 +51,7 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="thesisname">Tên đề
                                     tài</label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input class="form-control col-md-7 col-xs-12 " type="text" name="" id="title"
+                                    <input class="form-control col-md-7 col-xs-12 " type="text" name="" id="title" value="<%= thesis.title%>"
                                            required>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@
                                         style="margin-left: 8px; max-width: 400px" id="lecturer-dropdown">
                                         <li id="search-box">
                                             <div class="form-group input-group category-search" style="margin: 10px">
-                                                <input type="text" class="form-control" id="lecturer-search-input"
+                                                <input type="text" class="form-control" id="lecturer-search-input" value="<%=thesis.lecturer.user.offcierNumber%>"
                                                        autocomplete="off">
                                                 <span class="input-group-btn">
                                                 <button class="btn btn-default" type="button"><i
@@ -256,7 +256,9 @@
                                         </div>
 
                                         <div id="editor" class="editor-wrapper placeholderText"
-                                             contenteditable="true"></div>
+                                             contenteditable="true">
+                                            <%- thesis.description %>
+                                        </div>
                                         <br>
                                         <div class="ln_solid"></div>
                                     </div>
