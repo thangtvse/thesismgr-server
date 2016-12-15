@@ -282,7 +282,7 @@ module.exports = {
                         if (specifiedFaculty.left != 1 && unit != specifiedFaculty) {
 
                             Unit.getFacultyOfUnit(unit, function (error, faculty) {
-                                if (faculty != specifiedFaculty) {
+                                if (faculty.id != specifiedFaculty.id) {
                                     return callback(new Error("User: " + email + " is not in your faculty (" + specifiedFaculty.name + ")"));
                                 }
 
