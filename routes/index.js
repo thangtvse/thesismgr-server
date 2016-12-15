@@ -5,6 +5,9 @@ router.use(expressValidator({
     customValidators: require('../helpers/customValidators')
 }));
 
+/**
+ * Trang index
+ */
 router.get('/',function (req,res) {
    res.render('./index');
 });
@@ -22,8 +25,15 @@ router.get('/500', function (req, res) {
 });
 
 
+/**
+ * Sub-router của trang admin
+ */
 router.use('/admin', require('./admin.index.js'));
 // router.use("/student",require('./public.student.js'));
+
+/**
+ * Sub-router của trang dành cho giảng viên và sinh viên
+ */
 router.use('/', require('./public.index'));
 
 

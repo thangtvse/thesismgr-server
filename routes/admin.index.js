@@ -7,7 +7,7 @@ var session = require('express-session');
 var authCtrl = require('../controllers/authentication');
 
 // ===========================================================
-// LOGIN =====================================================
+// LOGIN SESSION=====================================================
 // ===========================================================
 router.use(session({
     secret: require('../config/auth').passportAdminLoginSecret, // session secret
@@ -23,6 +23,10 @@ router.post('/login', passport.authenticate('admin-login', {
     failureRedirect: '/admin/login',
     failureFlash: true
 }));
+
+/**
+ * Đăng xuất
+ */
 router.get('/logout',function (req,res) {
     hasAccess('moderator');
     req.logout();
@@ -32,6 +36,9 @@ router.get('/logout',function (req,res) {
     });
 });
 
+/**
+ * Trang index
+ */
 router.get('/', [
     hasAccess('moderator'),
     function (req, res) {
@@ -41,10 +48,19 @@ router.get('/', [
     }
 ]);
 
+/// Quản lí người dùng
 router.use('/users', require('./admin.users'));
+
+/// Quản lí các đơn vị, lĩnh vực, khóa đào tạo, chương trình đào tạo
 router.use('/categories', require('./admin.categories'));
+
+/// Quản lí các khóa luận
 router.use('/theses', require('./admin.theses'));
+
+/// Các công cụ hỗ trợ
 router.use('/tools', require('./admin.tools'));
+
+/// Quản lí các hội đồng
 router.use('/councils', require('./admin.councils'));
 
 module.exports = router;

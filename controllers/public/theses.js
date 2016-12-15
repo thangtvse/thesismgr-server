@@ -4,6 +4,11 @@ var async = require('async');
 var util = require('util');
 var paginationConfig = require('../../config/pagination');
 
+/**
+ * View xem các khóa luận
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
     if (req.user.role == 'lecturer' || req.user.role == 'moderator') {
         getModel('thesis').then(function (Thesis) {
@@ -46,6 +51,12 @@ exports.getView = function (req, res) {
     }
 };
 
+/**
+ * API lấy về các khóa luận
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.getAllTheseAPI = function (req, res) {
 
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
@@ -96,6 +107,12 @@ exports.getAllTheseAPI = function (req, res) {
     }
 };
 
+/**
+ * API lấy về số trang
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.getNumberOfPagesAPI = function (req, res) {
     req.checkQuery('status', 'Invalid status.').notEmpty();
 
@@ -138,6 +155,11 @@ exports.getNumberOfPagesAPI = function (req, res) {
     }
 };
 
+/**
+ * View tạo khóa luận mới
+ * @param req
+ * @param res
+ */
 exports.getNewThesisView = function (req, res) {
 
     if (req.user.student[0].thesisRegistrable == false) {
@@ -186,6 +208,12 @@ exports.getNewThesisView = function (req, res) {
 
 };
 
+/**
+ * API tạo khóa luận mới
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.newThesisAPI = function (req, res) {
 
     if (req.user.student[0].thesisRegistrable == false) {
@@ -237,6 +265,22 @@ exports.newThesisAPI = function (req, res) {
                                     return res.status(400).send(createResponse(false, null, error.message));
                                 }
 
+                                getModel('student').then(function (Student) {
+                                    Student.update({
+                                        id: req.user.student[0].id
+                                    }, {
+                                        thesisRegistrable: false
+                                    }).exec(function (error, updated) {
+                                        if (error) {
+                                            return res.status(400).send(createResponse(false, null, error.message));
+                                        }
+
+                                        if (!updated) {
+                                            return res.status(400).send(createResponse(false, null, 'Student not found.'));
+                                        }
+                                    })
+                                });
+
                                 return res.send(createResponse(true, null, null));
                             })
                         })
@@ -249,6 +293,11 @@ exports.newThesisAPI = function (req, res) {
         });
 };
 
+/**
+ * Lấy về view hiển thị thông tin khóa luận
+ * @param req
+ * @param res
+ */
 exports.getThesisDetailsView = function (req, res) {
     if (!req.params.id) {
         return res.redirect('/404');
@@ -273,6 +322,12 @@ exports.getThesisDetailsView = function (req, res) {
     })
 };
 
+/**
+ * API Chuyển khóa luận lên trạng thái tiếp
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.moveThesisToNextStatusAPI = function (req, res) {
     req.checkQuery('index', 'Invalid selection index.').notEmpty().isInt();
     req.checkQuery('thesis_id', 'Invalid thesis id.').notEmpty();
@@ -294,6 +349,11 @@ exports.moveThesisToNextStatusAPI = function (req, res) {
     })
 };
 
+/**
+ * Lấy về view hiển thị danh sách các khóa luận cho một thư kí của hội đồng
+ * @param req
+ * @param res
+ */
 exports.thesesOfSecretary = function (req, res) {
     getModel('thesis').then(function (Thesis) {
         Thesis.getAllRequestForASecretary(req.user, function (error, theses) {

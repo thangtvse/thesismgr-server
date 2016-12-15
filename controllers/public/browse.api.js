@@ -61,7 +61,7 @@ exports.getAllLecturersInAUintAPI = function (req, res) {
 
 
 /**
- * Get all lecturers in a field with pagination
+ * API Get all lecturers in a field with pagination
  */
 exports.getAllLecturersInAFieldAPI = function (req, res) {
 
@@ -87,6 +87,12 @@ exports.getAllLecturersInAFieldAPI = function (req, res) {
     })
 };
 
+/**
+ * API Lấy về số trang khi tìm chủ đề nghiên cứu theo tên
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.getNumberOfPagesOnSearchingTopicByNameAPI = function (req, res) {
     req.checkQuery('topic_name', 'Invalid name.').notEmpty();
 
@@ -101,6 +107,12 @@ exports.getNumberOfPagesOnSearchingTopicByNameAPI = function (req, res) {
     })
 };
 
+/**
+ * API Tìm giảng viên theo tên
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.searchLecturerByNameAPI = function (req, res) {
 
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
@@ -151,7 +163,7 @@ exports.searchLecturerByNameAPI = function (req, res) {
 
 
 /**
- * Search lecturer by name without pagination. Response data only contains information about officer number and name
+ * API Search lecturer by name without pagination. Response data only contains information about officer number and name
  * @param req
  * @param res
  * @returns {*}
@@ -178,6 +190,12 @@ exports.searchLecturerByNameNoPaginationAPI = function (req, res) {
 
 }
 
+/**
+ * API Tìm chủ đề theo tên
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.searchTopicByNameAPI = function (req, res) {
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
     req.checkQuery('topic_name', 'Invalid name.').notEmpty();

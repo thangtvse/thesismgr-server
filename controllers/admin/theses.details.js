@@ -1,6 +1,11 @@
 var getModel = require('express-waterline').getModels;
 var createResponse = require('../../helpers/response').createRes;
 
+/**
+ * Lấy view hiển thị thông tin khóa luận
+ * @param req
+ * @param res
+ */
 exports.getThesisDetailsView = function (req, res) {
     if (!req.params.id) {
         return res.redirect('/404');
@@ -39,6 +44,12 @@ exports.getThesisDetailsView = function (req, res) {
     })
 };
 
+/**
+ * API chuyển trạng thái của khóa luận
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.moveThesisToNextStatusAPI = function (req, res) {
     req.checkQuery('index', 'Invalid selection index.').notEmpty().isInt();
     req.checkQuery('thesis_id', 'Invalid thesis id.').notEmpty();
@@ -60,6 +71,11 @@ exports.moveThesisToNextStatusAPI = function (req, res) {
     })
 };
 
+/**
+ * Phân công hội đồng phản biện cho khóa luận
+ * @param req
+ * @param res
+ */
 exports.assignCouncil = function (req, res) {
     req.checkBody('council_id', 'Invalid council ID').notEmpty();
     req.checkBody('thesis_id', 'Invalid thesis id.').notEmpty();

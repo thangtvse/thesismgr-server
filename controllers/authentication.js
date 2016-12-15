@@ -2,14 +2,29 @@ var passport = require('passport');
 var getModel = require('express-waterline').getModels;
 var createResponse = require('../helpers/response').createRes;
 
+/**
+ * Trang đăng nhập
+ * @param req
+ * @param res
+ */
 exports.getLogin = function (req, res) {
     res.render('./public/login', {message: req.flash('loginMessage')});
 };
 
+/**
+ * Trang đăng nhập vào admin dashboard
+ * @param req
+ * @param res
+ */
 exports.getAdminLogin = function (req, res) {
     res.render('./admin/login', {message: req.flash('loginMessage')})
 };
 
+/**
+ * Trang đổi mật khẩu lần đầu
+ * @param req
+ * @param res
+ */
 exports.getFirstTimeChangePasswordView = function (req, res) {
     res.render('./public/partials/profile.first_time_change_password.ejs', {
         req: req,
@@ -17,6 +32,12 @@ exports.getFirstTimeChangePasswordView = function (req, res) {
     })
 };
 
+/**
+ * Đổi mật khẩu lần đầu
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.firstTimeChangePassword = function (req, res) {
 
     req.checkBody("new_password", "Invalid new password.").notEmpty();

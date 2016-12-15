@@ -8,6 +8,11 @@ var nodemailer = require('nodemailer');
 var _ = require('underscore');
 var async = require('async');
 
+/**
+ * Lấy view các công cụ
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
 
     getModel('session').then(function (Session) {
@@ -25,6 +30,11 @@ exports.getView = function (req, res) {
     })
 };
 
+/**
+ * Export danh sách học viên - giảng viên hướng dẫn
+ * @param req
+ * @param res
+ */
 exports.exportStudentAndTutorListAPI = function (req, res) {
     getModel('thesis').then(function (Thesis) {
         Thesis.getAllPopulatedThesisList({
@@ -53,6 +63,11 @@ exports.exportStudentAndTutorListAPI = function (req, res) {
     })
 };
 
+/**
+ * Gửi mail nhắc nộp hồ sơ bảo vệ
+ * @param req
+ * @param res
+ */
 exports.sendMailForStudentsNeedSubmitFilesAPI = function (req, res) {
     getModel('thesis').then(function (Thesis) {
         Thesis.getAllPopulatedThesisList({
@@ -79,6 +94,12 @@ exports.sendMailForStudentsNeedSubmitFilesAPI = function (req, res) {
     })
 };
 
+/**
+ * Xuất danh sách các sinh viên đủ điều kiện bảo vệ
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.exportProtectableStudentListAPI = function (req, res) {
 
     req.checkQuery('session_id', 'Invalid session ID').notEmpty();
@@ -117,6 +138,11 @@ exports.exportProtectableStudentListAPI = function (req, res) {
     })
 };
 
+/**
+ * API xuất ra danh sách các khóa luận cùng hội đồng phản biện
+ * @param req
+ * @param res
+ */
 exports.exportThesisAndCouncilListAPI = function (req, res) {
 
     req.checkQuery('session_id', 'Invalud session ID').isSessionIDAvailable();

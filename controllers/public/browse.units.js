@@ -4,6 +4,11 @@ var _ = require('underscore');
 var treeHelper = require('../../helpers/tree');
 var async = require('async');
 
+/**
+ * Xem một đơn vị
+ * @param req
+ * @param res
+ */
 exports.getUnitView = function (req, res) {
 
     getModel('unit').then(function (Unit) {
@@ -50,6 +55,11 @@ exports.getUnitView = function (req, res) {
     })
 };
 
+/**
+ * Xem tất cả các đơn vị
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
     getModel('unit').then(function (Unit) {
         Unit.getAllUnits(function (error, units) {

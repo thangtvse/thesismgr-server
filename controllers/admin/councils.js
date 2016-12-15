@@ -3,6 +3,11 @@ var paginationConfig = require('../../config/pagination');
 var createResponse = require('../../helpers/response').createRes;
 var async = require('async');
 
+/**
+ * Lấy view
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
 
     var opts = {};
@@ -75,6 +80,12 @@ exports.getView = function (req, res) {
 
 };
 
+/**
+ * API lấy về các hội đồng
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.getCouncilsAPI = function (req, res) {
 
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
@@ -102,6 +113,12 @@ exports.getCouncilsAPI = function (req, res) {
     })
 };
 
+/**
+ * API lấy về các hội đồng
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.getAllCouncilsAPI = function (req, res) {
 
     req.checkQuery('session_id', 'Invalid session ID.').notEmpty()
@@ -131,6 +148,11 @@ exports.getAllCouncilsAPI = function (req, res) {
     })
 };
 
+/**
+ * API tạo hội đồng
+ * @param req
+ * @param res
+ */
 exports.createCouncilAPI = function (req, res) {
 
     if (req.body.fourth_member == "") {

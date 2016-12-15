@@ -7,6 +7,11 @@ var nodemailer = require('nodemailer');
 var mailTransportConfig = require('../../config/mail').transportConfig;
 var util = require('util');
 
+/**
+ * Lấy về view quản lí các kì đăng kí/ bảo vệ
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
 
     var findOpts = {};

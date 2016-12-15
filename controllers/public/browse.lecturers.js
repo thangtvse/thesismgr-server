@@ -1,6 +1,10 @@
 var getModel = require('express-waterline').getModels;
 
-
+/**
+ * View xem một giảng viên
+ * @param req
+ * @param res
+ */
 exports.viewALecturer = function (req, res) {
     getModel('lecturer').then(function (Lecturer) {
         Lecturer.getPopulatedLecturerList(1, {
@@ -42,6 +46,11 @@ exports.viewALecturer = function (req, res) {
     })
 };
 
+/**
+ * View tìm kiếm giảng viên theo tên và theo chủ đề nghiên cứu
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
     return res.render('./public/browse/lecturers', {
         req: req,
