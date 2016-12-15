@@ -3,6 +3,11 @@ var createResponse = require('../../helpers/response').createRes;
 var async = require('async');
 var util = require('util');
 
+/**
+ * Lấy view xem profile
+ * @param req
+ * @param res
+ */
 exports.getProfileView = function (req, res) {
 
     if (req.user.role == 'lecturer' || req.user.role == 'moderator') {
@@ -90,6 +95,11 @@ exports.getProfileView = function (req, res) {
     }
 };
 
+/**
+ * View Sửa thông tin cá nhân
+ * @param req
+ * @param res
+ */
 exports.getEditProfileView = function (req, res) {
 
     var data = {};
@@ -199,6 +209,11 @@ exports.getEditProfileView = function (req, res) {
 
 };
 
+/**
+ * Lấy view đổi mật khẩu
+ * @param req
+ * @param res
+ */
 exports.getChangePasswordView = function (req, res) {
     return res.render('./public/partials/profile.change_password.ejs',
         {
@@ -208,6 +223,12 @@ exports.getChangePasswordView = function (req, res) {
     );
 };
 
+/**
+ * API đổi mật khẩu
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.changePasswordAPI = function (req, res) {
     req.checkBody("old_password", "Invalid old password.").notEmpty();
     req.checkBody("new_password", "Invalid new password.").notEmpty();
@@ -229,6 +250,11 @@ exports.changePasswordAPI = function (req, res) {
     })
 };
 
+/**
+ * API đổi thông tin cá nhân
+ * @param req
+ * @param res
+ */
 exports.editProfileAPI = function (req, res) {
 
     if (req.body.fields == '') {
@@ -278,6 +304,11 @@ exports.editProfileAPI = function (req, res) {
         })
 };
 
+/**
+ * API tạo chủ đề nghiên cứu
+ * @param req
+ * @param res
+ */
 exports.addTopicAPI = function (req, res) {
     if (req.body.fields == '') {
         delete req.body.fields;

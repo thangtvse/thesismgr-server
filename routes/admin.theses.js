@@ -25,32 +25,49 @@ router.post('/api/sessions/notify', [
     SessionsCtrl.notifyAPI
 ]);
 
-// Thesis
+/**
+ * Lấy view quản lí các khóa luận
+ */
 router.get('/theses', [
     hasAccess('moderator'),
     ThesesCtrl.getView
 ]);
 
+/**
+ * API lấy về các khóa luận
+ */
 router.get('/api/theses', [
     hasAccess('moderator'),
     ThesesCtrl.getAllThesesAPI
 ]);
 
+/**
+ * Xem khóa luận theo id
+ */
 router.get('/:id', [
     hasAccess('moderator'),
     DetailsCtrl.getThesisDetailsView
 ]);
 
+/**
+ * API chuyển trạng thái của khóa luận
+ */
 router.get('/api/move-thesis-to-next-status', [
     hasAccess('moderator'),
     DetailsCtrl.moveThesisToNextStatusAPI
 ]);
 
+/**
+ * Export ra văn bản yêu cầu dừng khóa luận
+ */
 router.get('/api/export-stop-request-doc', [
     hasAccess('moderator'),
     ThesesCtrl.exportStopRequestDocAPI
 ]);
 
+/**
+ * Phân công hội đồng cho khóa luận
+ */
 router.post('/assign-council', [
     hasAccess('moderator'),
     DetailsCtrl.assignCouncil

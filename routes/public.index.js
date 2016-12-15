@@ -14,7 +14,7 @@ var jwtAuth = require('../middlewares/auth').jwtAuth;
  * Middleware for getting units and fields tree
  */
 // ===========================================================
-// LOGIN =====================================================
+// LOGIN SESSION=====================================================
 // ===========================================================
 router.use(session({
     secret: require('../config/auth').passportPublicLoginSecret, // session secret
@@ -31,6 +31,9 @@ router.post('/login', passport.authenticate('login', {
     failureFlash: true
 }));
 
+/**
+ * Đăng xuất
+ */
 router.get('/logout',function (req,res) {
     hasAccess('public');
     req.logout();
@@ -40,47 +43,76 @@ router.get('/logout',function (req,res) {
     });
 });
 
+/**
+ * API lấy về giảng viên trong một đơn ị
+ */
 router.get('/api/get_lecturers_in_unit', [
     hasAccess('public'),
     BrowseAPICtrl.getAllLecturersInAUintAPI
 ]);
 
+/**
+ * API lấy về giảng viên theo lĩnh vực nghiên cứu
+ */
 router.get('/api/get_lecturers_in_field', [
     hasAccess('public'),
     BrowseAPICtrl.getAllLecturersInAFieldAPI
 ]);
 
+/**
+ * API Tìm giảng viên theo tên
+ */
 router.get('/api/search-lecturer', [
     hasAccess('public'),
     BrowseAPICtrl.searchLecturerByNameAPI
 ]);
 
+/**
+ * API tìm chủ đề nghiên cứu
+ */
 router.get('/api/search-topic', [
     hasAccess('public'),
     BrowseAPICtrl.searchTopicByNameAPI
 ]);
 
+/**
+ * API tìm danh giảng viên theo tên, không phân trang
+ */
 router.get('/api/search-lecturer-fast', [
     hasAccess('public'),
     BrowseAPICtrl.searchLecturerByNameNoPaginationAPI
 ]);
 
+/**
+ * View đổi mật khẩu lần đầu
+ */
 router.get('/change-password-first-time', [
     jwtAuth,
     authCtrl.getFirstTimeChangePasswordView
 ]);
 
+/**
+ * Đổi mật khẩu lần đầu
+ */
 router.post('/change-password-first-time', [
     jwtAuth,
     authCtrl.firstTimeChangePassword
 ]);
 
-router.post('/assign-council',function (req,res) {
-    hasAccess('public');
-    assign.assginThesis
-});
+
+/**
+ * Sub-router cho các đơn vị
+ */
 router.use('/units', require('./public.browse.units'));
+
+/**
+ * Sub-router cho các lĩnh vực
+ */
 router.use('/fields', require('./public.browse.fields'));
+
+/**
+ * Sub-router cho các giảng viên
+ */
 router.use('/lecturers', require('./public.browse.lecturers'));
 
 router.use('/home', [
@@ -89,7 +121,15 @@ router.use('/home', [
         res.render('./public/index', {req: req});
     }
 ]);
+
+/**
+ * Sub-router cho profile
+ */
 router.use('/profile', require('./public.profile'));
+
+/**
+ * Sub-router cho khóa luận
+ */
 router.use('/theses', require('./public.theses'));
 
 

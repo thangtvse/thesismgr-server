@@ -2,7 +2,11 @@ var getModel = require('express-waterline').getModels;
 var treeHelper = require('../../helpers/tree');
 var paginationConfig = require('../../config/pagination');
 
-
+/**
+ * Lấy về view xem toàn bộ lĩnh vực nghiên cứu
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
     getModel('field').then(function (Field) {
         Field.find().exec(function (error, fields) {
@@ -22,6 +26,11 @@ exports.getView = function (req, res) {
     });
 };
 
+/**
+ * Lấy về view xem một lĩnh vực nghiên cứu
+ * @param req
+ * @param res
+ */
 exports.getFieldView = function (req, res) {
 
     getModel('field').then(function (Field) {

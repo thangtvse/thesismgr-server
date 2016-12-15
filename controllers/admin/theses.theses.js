@@ -4,6 +4,11 @@ var async = require('async');
 var paginationConfig = require('../../config/pagination');
 var docGenHelper = require('../../helpers/gendoc');
 
+/**
+ * Lấy về view quản lí các khóa luận
+ * @param req
+ * @param res
+ */
 exports.getView = function (req, res) {
     var findOpts = {};
     if (req.user.role != 'admin') {
@@ -76,6 +81,12 @@ exports.getView = function (req, res) {
     });
 };
 
+/**
+ * API lấy về các khóa luận
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.getAllThesesAPI = function (req, res) {
     req.checkQuery('page', 'Invalid page number.').notEmpty().isInt();
 
@@ -102,6 +113,12 @@ exports.getAllThesesAPI = function (req, res) {
     })
 };
 
+/**
+ * Export biên bản buộc dừng khóa luận
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 exports.exportStopRequestDocAPI = function (req, res) {
 
     req.checkQuery('thesis_id', 'Invalid thesis ID').notEmpty();
