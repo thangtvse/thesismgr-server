@@ -192,7 +192,7 @@ exports.createStudent = function (req, res) {
         .then(function () {
 
             // create user
-            authHelper.checkUnitForProcess(req, res, req.body.unit_id, function (req, res) {
+            authHelper.checkUnitForProcess(req, res, req.body.faculty_id, function (req, res) {
                 var officerNumber = req.body.officer_number;
                 var email = req.body.email;
                 var facultyID = req.body.faculty_id;

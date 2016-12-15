@@ -1,5 +1,6 @@
 var getModel = require('express-waterline').getModels;
 var treeHelper = require('../helpers/tree');
+var _ = require('underscore');
 
 exports.unless = function (paths, middleware) {
     return function (req, res, next) {
@@ -68,7 +69,11 @@ exports.checkUnitForProcess = function (req, res, processUnitID, process) {
                             return res.render('./partials/500');
                         }
 
-                        if (ancestors.indexOf(unit) == -1) {
+                        var ancestorIDs = _.map(ancestors, function (ancestor) {
+                            return ancestor.id;
+                        });
+
+                        if (req.user.unit.id != unit.id && ancestorIDs.indexOf(req.user.unit.id) == -1) {
                             console.log("Returning 400...");
                             return res.render('./partials/400');
                         } else {
