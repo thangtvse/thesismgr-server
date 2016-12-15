@@ -21,7 +21,7 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Students</h1>
+                    <h1 class="page-header">Sinh viên</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -44,7 +44,7 @@
             <div class="btn-group">
                 <!-- Trigger the modal with a button -->
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-student-modal">
-                    <i class="fa fa-plus"></i> Add Student
+                    <i class="fa fa-plus"></i> Thêm sinh viên
                 </button>
                 <button type="button" class="btn btn-primary" data-toggle="modal"
                         data-target="#upload-registrable-students-modal">
@@ -55,14 +55,14 @@
             <table class="table table-striped" id="table-students">
                 <thead>
                 <tr class="table table-header">
-                    <th>Student Code</th>
-                    <th>Full name</th>
+                    <th>Mã sinh viên</th>
+                    <th>Họ và tên</th>
                     <th>Email</th>
-                    <th>Faculty</th>
-                    <th>Course</th>
-                    <th>Program</th>
-                    <th>Thesis Registrable</th>
-                    <th>Actions</th>
+                    <th>Khoa</th>
+                    <th>Khóa</th>
+                    <th>Chương trình đào tạo</th>
+                    <th>Trạng thái</th>
+                    <th>Tác vụ</th>
                 </tr>
                 </thead>
                 <tbody class="table table-body">
@@ -82,7 +82,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Create Student</h4>
+                            <h4 class="modal-title">Tạo sinh viên</h4>
                         </div>
 
                         <div class="modal-body">
@@ -97,7 +97,7 @@
                                     <form method="post" name="register" action="/admin/users/students/create">
                                         <div class="form-group">
                                             <label for="unit_number">
-                                                Student Code:
+                                                Mã sinh viên:
                                             </label>
                                             <input type="number" class="form-control" id="unit_number"
                                                    name="officer_number">
@@ -107,7 +107,7 @@
                                             <input type="email" class="form-control" id="email" name="email">
                                         </div>
                                         <div class="form-group">
-                                            <label>Faculty</label>
+                                            <label>Khoa</label>
                                             <select class="form-control" name="faculty_id" id="faculty_id">
                                                 <% faculties.forEach(function (faculty) { %>
                                                 <option
@@ -118,7 +118,7 @@
                                             <p class="help-block">Course of the new student that you want to add.</p>
                                         </div>
                                         <div class="form-group">
-                                            <label>Course</label>
+                                            <label>Khóa</label>
                                             <select class="form-control" name="course_id">
                                                 <% courses.forEach(function (course) { %>
                                                 <option
@@ -130,7 +130,7 @@
                                             <p class="help-block">Course of the new student that you want to add.</p>
                                         </div>
                                         <div class="form-group">
-                                            <label>Program</label>
+                                            <label>Chương trình đào tạo</label>
                                             <select class="form-control" name="program_id">
                                                 <% programs.forEach(function (program) { %>
                                                 <option class="program-option-item"
@@ -141,11 +141,11 @@
                                             <p class="help-block">Program of the new student that you want to add.</p>
                                         </div>
                                         <div class="form-group">
-                                            <label for="name">Name:</label>
+                                            <label for="name">Tên:</label>
                                             <input type="text" class="form-control" id="name" name="full_name">
                                         </div>
                                         <div class="text-right">
-                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                            <button type="submit" class="btn btn-primary">Tạo</button>
                                         </div>
                                     </form>
                                 </div>
@@ -161,7 +161,7 @@
                                         <input type="file" name="xlsx" accept=".xlsx, .xls" class="custom-file-input"
                                                required>
                                         <div class="text-right">
-                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                            <button type="submit" class="btn btn-primary">Tạo</button>
                                         </div>
                                     </form>
                                 </div>

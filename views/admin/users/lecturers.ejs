@@ -21,7 +21,7 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Lecturers</h1>
+                    <h1 class="page-header">Giảng viên</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -44,7 +44,7 @@
 
             <!-- Trigger the modal with a button -->
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
-                <i class="fa fa-plus"></i> Add Lecturer
+                <i class="fa fa-plus"></i> Thêm
             </button>
 
             <!-- Modal -->
@@ -55,12 +55,12 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Create Lecturer</h4>
+                            <h4 class="modal-title">Tạo Giảng viên</h4>
                         </div>
 
                         <div class="modal-body">
                             <ul class="nav nav-tabs">
-                                <li class="active"><a data-toggle="tab" href="#menu1">Create Manually</a></li>
+                                <li class="active"><a data-toggle="tab" href="#menu1">Tùy chọn tạo</a></li>
                                 <li><a data-toggle="tab" href="#menu2">Use Excel File</a></li>
                             </ul>
 
@@ -70,7 +70,7 @@
                                     <form method="post" name="register" action="/admin/users/lecturers/create">
                                         <div class="form-group">
                                             <label for="unit_number">
-                                                Officer Number:
+                                                 Mã người dùng:
                                             </label>
                                             <input type="number" class="form-control" id="unit_number"
                                                    name="officer_number">
@@ -80,7 +80,7 @@
                                             <input type="email" class="form-control" id="email" name="email">
                                         </div>
                                         <div class="form-group">
-                                            <label for="unit">Unit: </label>
+                                            <label for="unit">Đơn vị: </label>
                                             <input class="unit-id" type="text" id="unit" name="unit_id" hidden>
                                             <div class="dropdown">
                                                 <button class="btn btn-default dropdown-toggle" type="button"
@@ -111,7 +111,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="name">Name:</label>
+                                            <label for="name">Tên:</label>
                                             <input type="text" class="form-control" id="name" name="full_name">
                                         </div>
                                         <div class="text-right">
