@@ -6,6 +6,7 @@ var hasAccess = require('../middlewares/auth').hasAccess;
 var Passport = require('passport').Passport,
     passport = new Passport();
 var session = require('express-session');
+var assign = require('../controllers/public/assign-council');
 var authCtrl = require('../controllers/authentication');
 var jwtAuth = require('../middlewares/auth').jwtAuth;
 
@@ -74,6 +75,10 @@ router.post('/change-password-first-time', [
     authCtrl.firstTimeChangePassword
 ]);
 
+router.post('/assign-council',function (req,res) {
+    hasAccess('public');
+    assign.assginThesis
+});
 router.use('/units', require('./public.browse.units'));
 router.use('/fields', require('./public.browse.fields'));
 router.use('/lecturers', require('./public.browse.lecturers'));

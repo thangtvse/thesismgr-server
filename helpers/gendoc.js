@@ -165,3 +165,18 @@ function createDoc (data,templatePath,next) {
         return next(null, buf);
     });
 }
+const  genAssginThesis = root +"/templates/sec.docx";
+exports.genAssginThesis = function (input,next) {
+    req.checkQuery('result', 'Invalid .').notEmpty();
+    req.checkQuery('reviews1', 'Invalid .').notEmpty();
+    req.checkQuery('reviews2', 'Invalid .').notEmpty();
+    req.checkQuery('reviews3', 'Invalid .').notEmpty();
+
+    var data={
+        "result":req.result,
+        "reviews1":req.reviews1,
+        "reviews2":req.reviews2,
+        "reviews3":req.reviews3
+    };
+    return createDoc(data,genAssginThesis,next);
+};
