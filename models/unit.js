@@ -87,7 +87,9 @@ module.exports = {
 
         treeHelper.findAncestorsAndDescendantsForUnit(unit, function (error, ancestors, descendants) {
 
-            console.log("ANCESTORS: " + util.inspect(ancestors));
+            if (ancestors == null || ancestors.length == 0) {
+                return next(null, unit);
+            }
 
             if (error) {
                 return next(error);

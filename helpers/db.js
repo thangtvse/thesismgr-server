@@ -45,7 +45,8 @@ var createRootUserIfNeeded = function (email, password, next) {
                         officerNumber: 'admin',
                         role: 'admin',
                         unit: rootUnit,
-                        faculty: rootUnit
+                        faculty: rootUnit,
+                        fullName: 'admin'
                     }).exec(function (err, finn) {
                         return next(err, finn);
                     });
